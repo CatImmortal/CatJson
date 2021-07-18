@@ -9,23 +9,11 @@ namespace CatJson
     /// </summary>
     public class JsonLexer
     {
-        public JsonLexer(string json)
-        {
-            this.json = json;
-        }
-
-        /// <summary>
-        /// 关键字与token类型的映射
-        /// </summary>
-        private static Dictionary<string, TokenType> keyWordTokenTypeMap = new Dictionary<string, TokenType>
-        {
-            {"null",TokenType.Null},
-            {"true",TokenType.True },
-            {"false",TokenType.False }
-        };
-
         private string json;
         private int curIndex;
+
+        private string nextToken;
+        private TokenType nextTokenType;
 
         public static StringBuilder sb = new StringBuilder();
 
@@ -49,42 +37,122 @@ namespace CatJson
         }
 
         /// <summary>
+        /// 设置Json文本
+        /// </summary>
+        public void SetJsonText(string json)
+        {
+            this.json = json;
+            curIndex = 0;
+            nextToken = null;
+        }
+
+        /// <summary>
+        /// 查看下一个token的类型
+        /// </summary>
+        public TokenType LookNextTokenType()
+        {
+            if (nextToken != null)
+            {
+                return nextTokenType;
+            }
+
+            nextToken = GetNextToken(out nextTokenType);
+            return nextTokenType;
+        }
+
+        /// <summary>
+        /// 获取下一个指定类型的token
+        /// </summary>
+        public string GetNextTokenOfType(TokenType type)
+        {
+           string token = GetNextToken(out TokenType reusltType);
+            if (type != reusltType)
+            {
+                throw new Exception($"NextTokenOfType调用失败，需求{type}但提取到的是{token}");
+            }
+            return token;
+        }
+
+        /// <summary>
         /// 获取下一个token
         /// </summary>
-        public void GetNextToken(out TokenType type, out string token)
+        public string GetNextToken(out TokenType type)
         {
+            string token = null;
+
+            if (nextToken != null)
+            {
+                //有缓存下一个token的信息 直接返回
+                type = nextTokenType;
+                token = nextToken;
+
+                //重置缓存信息
+                nextToken = null;
+
+                return token;
+            }
+
             SkipWhiteSpace();
 
             if (IsEnd)
             {
+                //文本结束
                 type = TokenType.Eof;
                 token = "Eof";
-                return;
+                return token;
             }
 
             token = null;
             type = default;
 
-            //扫描关键字
+            //扫描字面量 分隔符
             switch (CurChar)
             {
                 case 'n':
                     token = "null";
                     type = TokenType.Null;
-                    break;
+                    ScanLiteral(token);
+                    return token;
                 case 't':
                     token = "true";
                     type = TokenType.True;
-                    break;
+                    ScanLiteral(token);
+                    return token;
                 case 'f':
                     token = "false";
                     type = TokenType.False;
-                    break;
-            }
-            if (token != null)
-            {
-                ScanKeyword(token);
-                return;
+                    ScanLiteral(token);
+                    return token;
+                case '[':
+                    token = "]";
+                    type = TokenType.LeftBracket;
+                    Next();
+                    return token;
+                case ']':
+                    token = "]";
+                    type = TokenType.RightBracket;
+                    Next();
+                    return token;
+                case '{':
+                    token = "{";
+                    type = TokenType.LeftBrace;
+                    Next();
+                    return token;
+                case '}':
+                    token = "}";
+                    type = TokenType.RightBrace;
+                    Next();
+                    return token;
+                case ':':
+                    token = ":";
+                    type = TokenType.Colon;
+                    Next();
+                    return token;
+                case ',':
+                    token = ",";
+                    type = TokenType.Comma;
+                    Next();
+                    return token; 
             }
 
             //扫描数字
@@ -92,7 +160,15 @@ namespace CatJson
             {
                 token = ScanNumber();
                 type = TokenType.Number;
-                return;
+                return token;
+            }
+
+            //扫描字符串
+            if (CurChar == '"')
+            {
+                token = ScanString();
+                type = TokenType.String;
+                return token;
             }
 
             throw new Exception("json解析失败");
@@ -106,7 +182,27 @@ namespace CatJson
             curIndex += n;
         }
 
-     
+
+        /// <summary>
+        /// 跳过空白字符
+        /// </summary>
+        private void SkipWhiteSpace()
+        {
+
+            while (!IsEnd && IsWhiteSpace(CurChar))
+            {
+                Next();
+            }
+        }
+
+        /// <summary>
+        /// 是否是空白字符
+        /// </summary>
+        private bool IsWhiteSpace(char c)
+        {
+            bool result = c == ' ' || c == '\t' || c == '\n' || c == '\r';
+            return result;
+        }
 
         /// <summary>
         /// 剩余json字符串是否以prefix开头
@@ -125,31 +221,11 @@ namespace CatJson
         }
 
 
-        /// <summary>
-        /// 解析空白字符
-        /// </summary>
-        private void SkipWhiteSpace()
-        {
-
-            while (!IsEnd&& IsWhiteSpace(CurChar))
-            {
-                Next();
-            }
-        }
 
         /// <summary>
-        /// 是否是空白字符
+        /// 扫描字面量 null true false
         /// </summary>
-        private bool IsWhiteSpace(char c)
-        {
-            bool result = c == ' ' || c == '\t' || c == '\n' || c == '\r';
-            return result;
-        }
-
-        /// <summary>
-        /// 扫描关键字 null true false
-        /// </summary>
-        private void ScanKeyword(string keyword)
+        private void ScanLiteral(string keyword)
         {
             if (IsPrefix(keyword))
             {
@@ -162,11 +238,10 @@ namespace CatJson
         }
 
         /// <summary>
-        /// 扫描浮点数
+        /// 扫描数字
         /// </summary>
         private string ScanNumber()
         {
-            sb.Clear();
 
             bool hasDot = false;
 
@@ -184,7 +259,7 @@ namespace CatJson
                     }
                     else
                     {
-                        throw new Exception("浮点数扫描失败，出现了2次小数点");
+                        throw new Exception("数字扫描失败，出现了2次小数点");
                     }
                 }
 
@@ -193,21 +268,47 @@ namespace CatJson
 
             }
 
-            //不是被空白字符打断扫描
-            if (!IsEnd&& !IsWhiteSpace(CurChar))
-            {
-                throw new Exception("浮点数扫描失败,数字后有其他字符");
-            }
-
             if (sb.Length == 1 && sb[0] == '-')
             {
-                throw new Exception("浮点数扫描失败,只有1个-号");
+                throw new Exception("数字扫描失败,只有1个-号");
             }
 
-            return sb.ToString();
+            string result = sb.ToString();
+            sb.Clear();
+
+            return result;
         }
 
+        /// <summary>
+        /// 扫描字符串
+        /// </summary>
+        private string ScanString()
+        {
 
+            // 起始字符是 "
+            Next();
+
+            while (!IsEnd & CurChar != '"')
+            {
+                sb.Append(CurChar);
+                Next();
+            }
+
+            if (IsEnd && CurChar != '"')
+            {
+                throw new Exception("字符串扫描失败，不是以双引号结尾的");
+            }
+            else
+            {
+                // 末尾也是 "
+                Next();
+            }
+
+            string result = sb.ToString();
+            sb.Clear();
+
+            return result;
+        }
     }
 
 }

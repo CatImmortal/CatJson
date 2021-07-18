@@ -1,58 +1,157 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System;
 
 namespace CatJson
 {
     /// <summary>
-    /// Json解析器
+    /// json解析器
     /// </summary>
     public static class JsonParser
     {
+        private static JsonLexer lexer = new JsonLexer();
+        private static List<JsonValue> cachedList = new List<JsonValue>();
 
 
-        /// <summary>
-        /// 从json文本反序列化JsonValue
-        /// </summary>
-        public static JsonData FromJson(string json)
+        public static JsonObject ParseJson(string json)
         {
-            JsonLexer lexer = new JsonLexer(json);
-            JsonData data = new JsonData();
-
-            lexer.GetNextToken(out TokenType type, out string token);
-
-            switch (type)
-            {
-                case TokenType.Eof:
-                    break;
-                case TokenType.Null:
-                    data.DataType = JsonDataType.Null;
-                    break;
-                case TokenType.True:
-                    data.DataType = JsonDataType.True;
-                    break;
-                case TokenType.False:
-                    data.DataType = JsonDataType.False;
-                    break;
-                case TokenType.Number:
-                    data.DataType = JsonDataType.Number;
-                    data.Number = double.Parse(token);
-                    UnityEngine.Debug.Log(data.Number);
-                    break;
-            }
-
-            lexer.GetNextToken(out type, out token);
-            if (type != TokenType.Eof)
-            {
-                throw new Exception("Json解析错误");
-            }
-
-            return data;
+            lexer.SetJsonText(json);
+            return ParseJsonObject();
         }
 
+        /// <summary>
+        /// 解析json对象
+        /// </summary>
+        private static JsonObject ParseJsonObject()
+        {
+            JsonObject obj = new JsonObject();
 
-    
-      
+            //跳过 {
+            lexer.GetNextTokenOfType(TokenType.LeftBrace);
+
+            while (lexer.LookNextTokenType() != TokenType.RightBrace)
+            {
+                //提取key
+                string key = lexer.GetNextTokenOfType(TokenType.String);
+
+                //跳过 :
+                lexer.GetNextTokenOfType(TokenType.Colon);
+
+                //提取value
+                //array和json obj需要完整的[]和{}，所以只能look
+                TokenType nextTokenType = lexer.LookNextTokenType();
+                JsonValue value = ParseJsonValue(nextTokenType);
+
+                obj[key] = value;
+
+                //有逗号就跳过逗号
+                if (lexer.LookNextTokenType() == TokenType.Comma)
+                {
+                    lexer.GetNextTokenOfType(TokenType.Comma);
+                }
+                else
+                {
+                    //没有逗号就说明结束了
+                    break;
+                }
+               
+            }
+
+            //跳过 {
+            lexer.GetNextTokenOfType(TokenType.RightBrace);
+
+            return obj;
+
+        }
+
+        /// <summary>
+        /// 解析json值
+        /// </summary>
+        private static JsonValue ParseJsonValue(TokenType nextTokenType)
+        {
+            JsonValue value = new JsonValue();
+
+            switch (nextTokenType)
+            {
+
+                case TokenType.Null:
+                    lexer.GetNextTokenOfType(nextTokenType);
+                    value.Type = ValueType.Null;
+                    break;
+                case TokenType.True:
+                    lexer.GetNextTokenOfType(nextTokenType);
+                    value.Type = ValueType.Boolean;
+                    value.Boolean = true;
+                    break;
+                case TokenType.False:
+                    lexer.GetNextTokenOfType(nextTokenType);
+                    value.Type = ValueType.Boolean;
+                    value.Boolean = false;
+                    break;
+                case TokenType.Number:
+                    string token = lexer.GetNextTokenOfType(nextTokenType);
+                    value.Type = ValueType.Number;
+                    value.Number = double.Parse(token);
+                    break;
+                case TokenType.String:
+                    token = lexer.GetNextTokenOfType(nextTokenType);
+                    value.Type = ValueType.String;
+                    value.Str = token;
+                    break;
+                case TokenType.LeftBracket:
+                    value.Type = ValueType.Array;
+                    value.Array = ParseJsonArray();
+                    break;
+                case TokenType.LeftBrace:
+                    value.Type = ValueType.Object;
+                    value.Obj = ParseJsonObject();
+                    break;
+                default:
+                    throw new Exception("JsonValue解析失败，tokenType == " + nextTokenType);
+            }
+
+            return value;
+        }
+   
+        /// <summary>
+        /// 解析Json数组
+        /// </summary>
+        /// <returns></returns>
+        private static JsonValue[] ParseJsonArray()
+        {
+
+            //跳过[
+            lexer.GetNextTokenOfType(TokenType.LeftBracket);
+
+            while (lexer.LookNextTokenType() != TokenType.RightBracket)
+            {
+                //提取value
+                //array和json obj需要完整的[]和{}，所以只能look
+                TokenType nextTokenType = lexer.LookNextTokenType();
+                JsonValue value = ParseJsonValue(nextTokenType);
+
+                cachedList.Add(value);
+
+                //有逗号就跳过
+                if (lexer.LookNextTokenType() == TokenType.Comma)
+                {
+                    lexer.GetNextTokenOfType(TokenType.Comma);
+                }
+                else
+                {
+                    //没有逗号就说明结束了
+                    break;
+                }
+            }
+
+            //跳过]
+            lexer.GetNextTokenOfType(TokenType.RightBracket);
+
+            JsonValue[] array = cachedList.ToArray();
+            cachedList.Clear();
+
+            return array;
+        }
     }
-}
 
+}

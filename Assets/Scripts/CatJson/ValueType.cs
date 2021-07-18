@@ -4,13 +4,12 @@ using System.Collections.Generic;
 namespace CatJson
 {
     /// <summary>
-    /// Json数据类型
+    /// Json值类型
     /// </summary>
-    public enum JsonDataType
+    public enum ValueType
     {
         Null,
-        False,
-        True,
+        Boolean,
         Number,
         String,
         Array,

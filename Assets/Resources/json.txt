@@ -1,0 +1,15 @@
+{
+  "array": [
+    1,
+    2,
+    3
+  ],
+  "type": true,
+  "null": null,
+  "number": 123,
+  "object": {
+    "a": "b",
+    "c": "d"
+  },
+  "string": "welcome to json"
+}
