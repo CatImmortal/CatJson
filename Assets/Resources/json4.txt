@@ -1,5 +1,4 @@
 {  
 
      "str" : "abcd\nefg"
-
 }                                      

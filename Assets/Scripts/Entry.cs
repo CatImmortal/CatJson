@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using CatJson;
 using UnityEngine.Profiling;
+using LitJson;
 
 public class Entry : MonoBehaviour
 {
@@ -30,9 +31,16 @@ public class Entry : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.A))
         {
             Profiler.BeginSample("Cat Json");
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 Json2_Root result2 = JsonParser.ParseJson<Json2_Root>(json2Text);
+            }
+            Profiler.EndSample();
+
+            Profiler.BeginSample("Lit Json");
+            for (int i = 0; i < 1000; i++)
+            {
+                Json2_Root result2 = JsonMapper.ToObject<Json2_Root>(json2Text);
             }
             Profiler.EndSample();
         }

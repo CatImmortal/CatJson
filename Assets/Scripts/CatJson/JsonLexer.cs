@@ -70,7 +70,7 @@ namespace CatJson
         /// <summary>
         /// 获取下一个指定类型的token，如果是字符串或数字，那么将值存放在RangeString中
         /// </summary>
-        public string GetNextTokenOfType(TokenType type)
+        public string GetNextTokenByType(TokenType type)
         {
             string token = GetNextToken(out TokenType resultType);
             if (type != resultType)
