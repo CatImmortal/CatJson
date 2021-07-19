@@ -9,6 +9,7 @@ public class Entry : MonoBehaviour
     public TextAsset json1;
     public TextAsset json2;
     public TextAsset json3;
+    public TextAsset json4;
 
     private string json1Text;
     private string json2Text;
@@ -39,7 +40,7 @@ public class Entry : MonoBehaviour
 
     private void Test()
     {
-        JsonObject obj = JsonParser.ParseJson(json3.text);
+        JsonObject obj = JsonParser.ParseJson(json4.text);
         Debug.Log(obj);
 
         //Debug.Log(obj["array"]);

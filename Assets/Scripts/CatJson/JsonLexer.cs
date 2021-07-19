@@ -284,6 +284,51 @@ namespace CatJson
 
             while (!IsEnd & CurChar != '"')
             {
+                //处理转义字符
+                if (CurChar == '\\')
+                {
+                    if (curIndex == json.Length - 1)
+                    {
+                        throw new Exception("处理转义字符失败，\\后没有剩余字符了");
+                    }
+
+                    Next();
+                    switch (CurChar)
+                    {
+                        case '"':
+                            Util.CachedSB.Append('\"');
+                            break;
+                        case '\\':
+                            Util.CachedSB.Append('\\');
+                            break;
+                        case '/':
+                            Util.CachedSB.Append('/');
+                            break;
+                        case 'b':
+                            Util.CachedSB.Append('\b');
+                            break;
+                        case 'f':
+                            Util.CachedSB.Append('\f');
+                            break;
+                        case 'n':
+                            Util.CachedSB.Append('\n');
+                            break;
+                        case 'r':
+                            Util.CachedSB.Append('\r');
+                            break;
+                        case 't':
+                            Util.CachedSB.Append('\t');
+                            break;
+                        default:
+                            throw new Exception("处理转义字符失败，\\后的字符不在可转义范围内");
+                    }
+
+                    Next();
+
+                    continue;
+                }
+
+                //处理普通字符
                 Util.CachedSB.Append(CurChar);
                 Next();
             }
