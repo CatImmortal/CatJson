@@ -5,11 +5,11 @@
     3
   ],
   "type": true,
-  "null": null,
+  "n": null,
   "number": 123,
-  "object": {
+  "obj": {
     "a": "b",
     "c": "d"
   },
-  "string": "welcome to json"
+  "str": "welcome to json"
 }

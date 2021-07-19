@@ -22,7 +22,7 @@ public class Entry : MonoBehaviour
         json1Text = json1.text;
         json2Text = json2.text;
 
-        Test();
+        Test2();
     }
 
     private void Update()
@@ -30,9 +30,9 @@ public class Entry : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.A))
         {
             Profiler.BeginSample("Cat Json");
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 100; i++)
             {
-                JsonObject obj = JsonParser.ParseJson(json2Text);
+                Json2_Root result2 = JsonParser.ParseJson<Json2_Root>(json2Text);
             }
             Profiler.EndSample();
         }
@@ -50,6 +50,18 @@ public class Entry : MonoBehaviour
         //Debug.Log(obj["object"]);
         //Debug.Log(obj["string"]);
 
+    }
+
+    private void Test2()
+    {
+        Json1_Root result1 = JsonParser.ParseJson<Json1_Root>(json1.text);
+        Debug.Log(result1);
+
+        Json2_Root result2 = JsonParser.ParseJson<Json2_Root>(json2.text);
+        Debug.Log(result2);
+
+        Json3_Root result3 = JsonParser.ParseJson<Json3_Root>(json3.text);
+        Debug.Log(result3);
     }
 
 

@@ -49,6 +49,27 @@ namespace CatJson
 
             return "";
         }
+   
+        public object GetValue()
+        {
+            switch (Type)
+            {
+                case ValueType.Null:
+                    return null;
+                case ValueType.Boolean:
+                    return Boolean;
+                case ValueType.Number:
+                    return Number;
+                case ValueType.String:
+                    return Str;
+                case ValueType.Array:
+                    return Array;
+                case ValueType.Object:
+                    return Obj;
+                default:
+                    return null;
+            }
+        }
     }
 
 }

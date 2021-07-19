@@ -53,6 +53,17 @@ namespace CatJson
             str += "} ";
             return str;
         }
+    
+        public bool TryGetValue(string key,out JsonValue value)
+        {
+            value = null;
+            if (values == null)
+            {
+                return false;
+            }
+
+            return values.TryGetValue(key, out value);
+        }
     }
 }
 
