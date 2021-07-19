@@ -2,17 +2,44 @@
 using System.Collections.Generic;
 using UnityEngine;
 using CatJson;
+using UnityEngine.Profiling;
+
 public class Entry : MonoBehaviour
 {
-    public TextAsset json;
+    public TextAsset json1;
+    public TextAsset json2;
+    public TextAsset json3;
+
+    private string json1Text;
+    private string json2Text;
 
     // Start is called before the first frame update
     void Start()
     {
-        JsonLexer lexer = new JsonLexer();
-        lexer.SetJsonText(json.text);
+        Application.targetFrameRate = 30;
 
-        JsonObject obj = JsonParser.ParseJson(json.text);
+        json1Text = json1.text;
+        json2Text = json2.text;
+
+        Test();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            Profiler.BeginSample("Cat Json");
+            for (int i = 0; i < 1000; i++)
+            {
+                JsonObject obj = JsonParser.ParseJson(json2Text);
+            }
+            Profiler.EndSample();
+        }
+    }
+
+    private void Test()
+    {
+        JsonObject obj = JsonParser.ParseJson(json3.text);
         Debug.Log(obj);
 
         //Debug.Log(obj["array"]);
@@ -20,7 +47,9 @@ public class Entry : MonoBehaviour
         //Debug.Log(obj["null"]);
         //Debug.Log(obj["number"]);
         //Debug.Log(obj["object"]);
+        //Debug.Log(obj["string"]);
+
     }
 
-    
+
 }

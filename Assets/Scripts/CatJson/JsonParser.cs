@@ -10,9 +10,10 @@ namespace CatJson
     public static class JsonParser
     {
         private static JsonLexer lexer = new JsonLexer();
-        private static List<JsonValue> cachedList = new List<JsonValue>();
-
-
+      
+        /// <summary>
+        /// 解析json文本
+        /// </summary>
         public static JsonObject ParseJson(string json)
         {
             lexer.SetJsonText(json);
@@ -24,10 +25,10 @@ namespace CatJson
         /// </summary>
         private static JsonObject ParseJsonObject()
         {
-            JsonObject obj = new JsonObject();
-
             //跳过 {
             lexer.GetNextTokenOfType(TokenType.LeftBrace);
+
+            JsonObject obj = new JsonObject();
 
             while (lexer.LookNextTokenType() != TokenType.RightBrace)
             {
@@ -48,6 +49,11 @@ namespace CatJson
                 if (lexer.LookNextTokenType() == TokenType.Comma)
                 {
                     lexer.GetNextTokenOfType(TokenType.Comma);
+
+                    if (lexer.LookNextTokenType() == TokenType.RightBracket)
+                    {
+                        throw new Exception("Json对象不能以逗号结尾");
+                    }
                 }
                 else
                 {
@@ -57,7 +63,7 @@ namespace CatJson
                
             }
 
-            //跳过 {
+            //跳过 }
             lexer.GetNextTokenOfType(TokenType.RightBrace);
 
             return obj;
@@ -119,6 +125,7 @@ namespace CatJson
         /// <returns></returns>
         private static JsonValue[] ParseJsonArray()
         {
+            List<JsonValue> list = new List<JsonValue>();
 
             //跳过[
             lexer.GetNextTokenOfType(TokenType.LeftBracket);
@@ -130,12 +137,17 @@ namespace CatJson
                 TokenType nextTokenType = lexer.LookNextTokenType();
                 JsonValue value = ParseJsonValue(nextTokenType);
 
-                cachedList.Add(value);
+                list.Add(value);
 
                 //有逗号就跳过
                 if (lexer.LookNextTokenType() == TokenType.Comma)
                 {
                     lexer.GetNextTokenOfType(TokenType.Comma);
+
+                    if (lexer.LookNextTokenType() == TokenType.RightBracket)
+                    {
+                        throw new Exception("数组不能以逗号结尾");
+                    }
                 }
                 else
                 {
@@ -147,8 +159,7 @@ namespace CatJson
             //跳过]
             lexer.GetNextTokenOfType(TokenType.RightBracket);
 
-            JsonValue[] array = cachedList.ToArray();
-            cachedList.Clear();
+            JsonValue[] array = list.ToArray();
 
             return array;
         }

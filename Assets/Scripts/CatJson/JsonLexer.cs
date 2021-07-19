@@ -12,11 +12,15 @@ namespace CatJson
         private string json;
         private int curIndex;
 
-        private string nextToken;
+        private bool hasNextTokenCache;
         private TokenType nextTokenType;
+        private string nextToken;
 
         public static StringBuilder sb = new StringBuilder();
 
+        /// <summary>
+        /// 当前剩余的json文本的首字符
+        /// </summary>
         public char CurChar
         {
             get
@@ -43,7 +47,7 @@ namespace CatJson
         {
             this.json = json;
             curIndex = 0;
-            nextToken = null;
+            hasNextTokenCache = false;
         }
 
         /// <summary>
@@ -51,24 +55,27 @@ namespace CatJson
         /// </summary>
         public TokenType LookNextTokenType()
         {
-            if (nextToken != null)
+            if (hasNextTokenCache)
             {
+                //有缓存直接返回缓存
                 return nextTokenType;
             }
 
+            //没有就get一下
             nextToken = GetNextToken(out nextTokenType);
+            hasNextTokenCache = true;
             return nextTokenType;
         }
 
         /// <summary>
-        /// 获取下一个指定类型的token
+        /// 获取下一个指定类型的token，如果是字符串或数字，那么将值存放在RangeString中
         /// </summary>
         public string GetNextTokenOfType(TokenType type)
         {
-           string token = GetNextToken(out TokenType reusltType);
-            if (type != reusltType)
+            string token = GetNextToken(out TokenType resultType);
+            if (type != resultType)
             {
-                throw new Exception($"NextTokenOfType调用失败，需求{type}但提取到的是{token}");
+                throw new Exception($"NextTokenOfType调用失败，需求{type}但获取到的是{resultType}");
             }
             return token;
         }
@@ -78,97 +85,84 @@ namespace CatJson
         /// </summary>
         public string GetNextToken(out TokenType type)
         {
-            string token = null;
+            type = default;
 
-            if (nextToken != null)
+            
+            if (hasNextTokenCache)
             {
                 //有缓存下一个token的信息 直接返回
                 type = nextTokenType;
-                token = nextToken;
 
-                //重置缓存信息
-                nextToken = null;
+                hasNextTokenCache = false;
 
-                return token;
+                return nextToken;
             }
 
+            //跳过空白字符
             SkipWhiteSpace();
 
             if (IsEnd)
             {
                 //文本结束
                 type = TokenType.Eof;
-                token = "Eof";
-                return token;
+                return null;
             }
-
-            token = null;
-            type = default;
 
             //扫描字面量 分隔符
             switch (CurChar)
             {
                 case 'n':
-                    token = "null";
                     type = TokenType.Null;
-                    ScanLiteral(token);
-                    return token;
+                    ScanLiteral("null");
+                    return null;
                 case 't':
-                    token = "true";
                     type = TokenType.True;
-                    ScanLiteral(token);
-                    return token;
+                    ScanLiteral("true");
+                    return null;
                 case 'f':
-                    token = "false";
                     type = TokenType.False;
-                    ScanLiteral(token);
-                    return token;
+                    ScanLiteral("false");
+                    return null;
                 case '[':
-                    token = "]";
                     type = TokenType.LeftBracket;
                     Next();
-                    return token;
+                    return null;
                 case ']':
-                    token = "]";
                     type = TokenType.RightBracket;
                     Next();
-                    return token;
+                    return null;
                 case '{':
-                    token = "{";
                     type = TokenType.LeftBrace;
                     Next();
-                    return token;
+                    return null;
                 case '}':
-                    token = "}";
                     type = TokenType.RightBrace;
                     Next();
-                    return token;
+                    return null;
                 case ':':
-                    token = ":";
                     type = TokenType.Colon;
                     Next();
-                    return token;
+                    return null;
                 case ',':
-                    token = ",";
                     type = TokenType.Comma;
                     Next();
-                    return token; 
+                    return null;
             }
 
             //扫描数字
             if (char.IsDigit(CurChar) || CurChar == '-')
             {
-                token = ScanNumber();
+                string str = ScanNumber();
                 type = TokenType.Number;
-                return token;
+                return str;
             }
 
             //扫描字符串
             if (CurChar == '"')
             {
-                token = ScanString();
+                string str = ScanString();
                 type = TokenType.String;
-                return token;
+                return str;
             }
 
             throw new Exception("json解析失败");
@@ -285,30 +279,31 @@ namespace CatJson
         private string ScanString()
         {
 
-            // 起始字符是 "
+            // 起始字符是 " 要跳过
             Next();
 
             while (!IsEnd & CurChar != '"')
             {
-                sb.Append(CurChar);
+                Util.CachedSB.Append(CurChar);
                 Next();
             }
 
-            if (IsEnd && CurChar != '"')
+            if (IsEnd)
             {
                 throw new Exception("字符串扫描失败，不是以双引号结尾的");
             }
             else
             {
-                // 末尾也是 "
+                // 末尾也是 " 也要跳过
                 Next();
             }
 
-            string result = sb.ToString();
-            sb.Clear();
+            string str = Util.CachedSB.ToString();
+            Util.CachedSB.Clear();
 
-            return result;
+            return str;
         }
+
     }
 
 }

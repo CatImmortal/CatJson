@@ -10,13 +10,14 @@ namespace CatJson
     {
         private Dictionary<string, JsonValue> values;
 
+
         public JsonValue this[string key]
         {
             get
             {
                 if (values == null)
                 {
-                    return null;
+                    return default;
                 }
 
                 return values[key];
@@ -36,14 +37,14 @@ namespace CatJson
         {
             if (values == null)
             {
-                return "empty";
+                return "{} ";
             }
             string str = "{";
             int count = 0;
             foreach (KeyValuePair<string, JsonValue> item in values)
             {
                 count++;
-                str += item.Key + " : " + item.Value;
+                str += "\"" + item.Key + "\"" + " : " + item.Value;
                 if (count < values.Count)
                 {
                     str += ", ";

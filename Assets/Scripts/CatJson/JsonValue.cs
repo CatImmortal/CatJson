@@ -8,9 +8,9 @@ namespace CatJson
     /// </summary>
     public class JsonValue
     {
+        
+
         public ValueType Type;
-
-
 
         public bool Boolean;
         public double Number;
@@ -29,7 +29,7 @@ namespace CatJson
                 case ValueType.Number:
                     return Number.ToString();
                 case ValueType.String:
-                    return Str;
+                    return "\"" + Str + "\"";
                 case ValueType.Array:
                     string str = "[";
                     for (int i = 0; i < Array.Length; i++)
