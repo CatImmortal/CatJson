@@ -15,8 +15,6 @@ namespace CatJson
         /// </summary>
         private static JsonLexer lexer = new JsonLexer();
 
-        private static object[] parameters2 = new object[2];
-
         /// <summary>
         /// 解析JsonObject的通用流程
         /// </summary>
