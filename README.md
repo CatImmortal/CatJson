@@ -1,2 +1,2 @@
 # CatJson
-一个在Unity中实现的Json解析库
+在Unity中实现的C#Json解析库
