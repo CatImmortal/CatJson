@@ -4,6 +4,7 @@ using UnityEngine;
 using CatJson;
 using UnityEngine.Profiling;
 using LitJson;
+using Newtonsoft.Json;
 
 public class Entry : MonoBehaviour
 {
@@ -22,27 +23,13 @@ public class Entry : MonoBehaviour
 
         json1Text = json1.text;
         json2Text = json2.text;
-
-        Test2();
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            Profiler.BeginSample("Cat Json");
-            for (int i = 0; i < 1000; i++)
-            {
-                Json2_Root result2 = JsonParser.ParseJson<Json2_Root>(json2Text);
-            }
-            Profiler.EndSample();
-
-            Profiler.BeginSample("Lit Json");
-            for (int i = 0; i < 1000; i++)
-            {
-                Json2_Root result2 = JsonMapper.ToObject<Json2_Root>(json2Text);
-            }
-            Profiler.EndSample();
+            TestDeserializeJsonObject();
         }
     }
 
@@ -72,5 +59,32 @@ public class Entry : MonoBehaviour
         Debug.Log(result3);
     }
 
+    /// <summary>
+    /// 测试反序列化json数据对象，统一基于反射
+    /// </summary>
+    private void TestDeserializeJsonObject()
+    {
+        Profiler.BeginSample("Cat Json");
+        for (int i = 0; i < 1000; i++)
+        {
+            Json2_Root result2 = JsonParser.ParseJson<Json2_Root>(json2Text);
+        }
+        Profiler.EndSample();
+
+        Profiler.BeginSample("Lit Json");
+        for (int i = 0; i < 1000; i++)
+        {
+            Json2_Root result2 = JsonMapper.ToObject<Json2_Root>(json2Text);
+        }
+        Profiler.EndSample();
+
+
+        Profiler.BeginSample("Newtonsoft Json");
+        for (int i = 0; i < 1000; i++)
+        {
+            Json2_Root result2 = JsonConvert.DeserializeObject<Json2_Root>(json2Text);
+        }
+        Profiler.EndSample();
+    }
 
 }
