@@ -237,6 +237,7 @@ MonoBehaviour:
   json2: {fileID: 4900000, guid: d9065a152b138994c88957a5b7ce9ef7, type: 3}
   json3: {fileID: 4900000, guid: f5ce08f20dac44649b75b6f1ba9d8a36, type: 3}
   json4: {fileID: 4900000, guid: d6729398872826a43813b8faa9273b27, type: 3}
+  json5: {fileID: 4900000, guid: 5eb110311e872c0448618ce748073f25, type: 3}
 --- !u!4 &1937660562
 Transform:
   m_ObjectHideFlags: 0

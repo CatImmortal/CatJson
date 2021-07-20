@@ -78,7 +78,7 @@ namespace CatJson
                         obj.status = int.Parse(token);
                         break;
                     default:
-                        lexer.GetNextToken(out _);
+                        JsonParser.ParseJsonValue(nextTokenType);
                         break;
                 }
 

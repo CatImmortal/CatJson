@@ -15,6 +15,9 @@ namespace CatJson
         /// </summary>
         private static JsonLexer lexer = new JsonLexer();
 
+        private static Dictionary<Type, Dictionary<string, PropertyInfo>> propertyInfoMap = new Dictionary<Type, Dictionary<string, PropertyInfo>>();
+        private static Dictionary<Type, Dictionary<string, FieldInfo>> fieldInfoMap = new Dictionary<Type, Dictionary<string, FieldInfo>>();
+
         /// <summary>
         /// 解析JsonObject的通用流程
         /// </summary>
@@ -97,6 +100,40 @@ namespace CatJson
         }
 
         /// <summary>
+        /// 将type的公有实例字段和属性都放入字典中缓存
+        /// </summary>
+        private static void AddToReflectionMap(Type type)
+        {
+            PropertyInfo[] pis = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            Dictionary<string, PropertyInfo> dict1 = null;
+            if (pis.Length > 0)
+            {
+                dict1 = new Dictionary<string, PropertyInfo>(pis.Length);
+                for (int i = 0; i < pis.Length; i++)
+                {
+                    PropertyInfo pi = pis[i];
+                    dict1.Add(pi.Name, pi);
+                }
+                
+            }
+            propertyInfoMap.Add(type, dict1);
+
+            FieldInfo[] fis = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
+            Dictionary<string, FieldInfo> dict2 = null;
+            if (fis.Length > 0)
+            {
+                dict2 = new Dictionary<string, FieldInfo>(fis.Length);
+                for (int i = 0; i < fis.Length; i++)
+                {
+                    FieldInfo fi = fis[i];
+                    dict2.Add(fi.Name, fi);
+                }
+
+            }
+            fieldInfoMap.Add(type, dict2);
+        }
+
+        /// <summary>
         /// 解析json文本为Json对象
         /// </summary>
         public static JsonObject ParseJson(string json)
@@ -109,7 +146,7 @@ namespace CatJson
         /// <summary>
         /// 解析json值
         /// </summary>
-        private static JsonValue ParseJsonValue(TokenType nextTokenType)
+        public static JsonValue ParseJsonValue(TokenType nextTokenType)
         {
             JsonValue value = new JsonValue();
 
@@ -311,29 +348,58 @@ namespace CatJson
         {
             object obj = Activator.CreateInstance(type);
 
+            if (!propertyInfoMap.ContainsKey(type))
+            {
+                AddToReflectionMap(type);
+            }
+
             ParseJsonObjectProcedure(obj,type, (userdata1,userdata2, key, nextTokenType) => {
+
                 Type t = (Type)userdata2;
-                PropertyInfo pi = t.GetProperty(key, BindingFlags.Instance | BindingFlags.Public);
-                if (pi != null)
+
+                Dictionary<string, PropertyInfo> dict1 = propertyInfoMap[type];
+                if (dict1 != null && dict1.TryGetValue(key,out PropertyInfo pi))
                 {
                     object value = ParseJsonValueByType(nextTokenType, pi.PropertyType);
                     pi.SetValue(userdata1, value);
                 }
                 else
                 {
-                    FieldInfo fi = t.GetField(key, BindingFlags.Instance | BindingFlags.Public);
-                    if (fi != null)
+                    Dictionary<string, FieldInfo> dict2 = fieldInfoMap[type];
+                    if (dict2 != null && dict2.TryGetValue(key,out FieldInfo fi))
                     {
                         object value = ParseJsonValueByType(nextTokenType, fi.FieldType);
                         fi.SetValue(userdata1, value);
-
                     }
                     else
                     {
                         //这个json key既不是数据类的字段也不是属性，跳过
-                        lexer.GetNextTokenByType(nextTokenType);
+                        ParseJsonValue(nextTokenType);
                     }
                 }
+
+
+                //PropertyInfo pi = t.GetProperty(key, BindingFlags.Instance | BindingFlags.Public);
+                //if (pi != null)
+                //{
+                //    object value = ParseJsonValueByType(nextTokenType, pi.PropertyType);
+                //    pi.SetValue(userdata1, value);
+                //}
+                //else
+                //{
+                //    FieldInfo fi = t.GetField(key, BindingFlags.Instance | BindingFlags.Public);
+                //    if (fi != null)
+                //    {
+                //        object value = ParseJsonValueByType(nextTokenType, fi.FieldType);
+                //        fi.SetValue(userdata1, value);
+
+                //    }
+                //    else
+                //    {
+                //        //这个json key既不是数据类的字段也不是属性，跳过
+                //        lexer.GetNextTokenByType(nextTokenType);
+                //    }
+                //}
             });
 
             return obj;
