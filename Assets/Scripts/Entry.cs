@@ -30,6 +30,11 @@ public class Entry : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            TestDeserializeJsonNodeTree();
+        }
+
         if (Input.GetKeyDown(KeyCode.A))
         {
             TestDeserializeJsonObject();
@@ -68,6 +73,34 @@ public class Entry : MonoBehaviour
 
         Json5_Root result5 = JsonParser.ParseJson<Json5_Root>(json5.text);
         Debug.Log(result5);
+    }
+
+    /// <summary>
+    /// 测试反序列化为Json节点树
+    /// </summary>
+    private void TestDeserializeJsonNodeTree()
+    {
+        Profiler.BeginSample("Cat Json");
+        for (int i = 0; i < 1000; i++)
+        {
+            JsonObject result2 = JsonParser.ParseJson(json2Text);
+        }
+        Profiler.EndSample();
+
+        Profiler.BeginSample("Lit Json");
+        for (int i = 0; i < 1000; i++)
+        {
+            JsonData result2 = JsonMapper.ToObject(json2Text);
+        }
+        Profiler.EndSample();
+
+
+        Profiler.BeginSample("Newtonsoft Json");
+        for (int i = 0; i < 1000; i++)
+        {
+           object result2 = JsonConvert.DeserializeObject(json2Text);
+        }
+        Profiler.EndSample();
     }
 
     /// <summary>
