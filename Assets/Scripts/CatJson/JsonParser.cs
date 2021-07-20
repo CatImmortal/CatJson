@@ -26,10 +26,10 @@ namespace CatJson
         /// </summary>
         private static JsonObject ParseJsonObject()
         {
+            JsonObject obj = new JsonObject();
+
             //跳过 {
             lexer.GetNextTokenByType(TokenType.LeftBrace);
-
-            JsonObject obj = new JsonObject();
 
             while (lexer.LookNextTokenType() != TokenType.RightBrace)
             {
@@ -74,7 +74,7 @@ namespace CatJson
         /// <summary>
         /// 解析json值
         /// </summary>
-        private static JsonValue ParseJsonValue(TokenType nextTokenType)
+        public static JsonValue ParseJsonValue(TokenType nextTokenType)
         {
             JsonValue value = new JsonValue();
 
@@ -312,18 +312,30 @@ namespace CatJson
         /// <summary>
         /// 解析json文本为指定类型的对象实例
         /// </summary>
-        public static T ParseJson<T>(string json)
+        public static T ParseJson<T>(string json,bool reflection = true)
         {
-            return (T)ParseJson(json, typeof(T));
+            return (T)ParseJson(json, typeof(T),reflection);
         }
 
         /// <summary>
         /// 解析json文本为指定类型的对象实例
         /// </summary>
-        public static object ParseJson(string json,Type type)
+        public static object ParseJson(string json,Type type, bool reflection = true)
         {
             lexer.SetJsonText(json);
-            return ParseJsonObjectByType(type);
+
+            if (reflection)
+            {
+                return ParseJsonObjectByType(type);
+            }
+
+            if (Gen.GenCodeDict.TryGetValue(type,out Func<JsonLexer, object> func))
+            {
+                return func(lexer);
+            }
+
+            throw new Exception($"没有{type}类型的预生成的反序列代码");
+            
         }
 
         /// <summary>
