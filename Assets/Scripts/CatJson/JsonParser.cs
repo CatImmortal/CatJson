@@ -349,7 +349,6 @@ namespace CatJson
         {
             IDictionary dict = (IDictionary)Activator.CreateInstance(dictType);
 
-            MethodInfo addMi = dictType.GetMethod("Add");
             ParseJsonObjectProcedure(dict, valueType, (userdata1, userdata2, key, nextTokenType) => {
                 Type t = (Type)userdata2;
                 object value = ParseJsonValueByType(nextTokenType, t);
