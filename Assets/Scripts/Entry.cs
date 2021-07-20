@@ -12,6 +12,7 @@ public class Entry : MonoBehaviour
     public TextAsset json2;
     public TextAsset json3;
     public TextAsset json4;
+    public TextAsset json5;
 
     private string json1Text;
     private string json2Text;
@@ -24,7 +25,7 @@ public class Entry : MonoBehaviour
         json1Text = json1.text;
         json2Text = json2.text;
 
-        //Test2();
+        Test2();
     }
 
     private void Update()
@@ -42,7 +43,7 @@ public class Entry : MonoBehaviour
 
     private void Test()
     {
-        JsonObject obj = JsonParser.ParseJson(json4.text);
+        JsonObject obj = JsonParser.ParseJson(json1.text);
         Debug.Log(obj);
 
         //Debug.Log(obj["array"]);
@@ -59,11 +60,14 @@ public class Entry : MonoBehaviour
         Json1_Root result1 = JsonParser.ParseJson<Json1_Root>(json1.text);
         Debug.Log(result1);
 
-        Json2_Root result2 = JsonParser.ParseJson<Json2_Root>(json2.text,false);
+        Json2_Root result2 = JsonParser.ParseJson<Json2_Root>(json2.text);
         Debug.Log(result2);
 
         Json3_Root result3 = JsonParser.ParseJson<Json3_Root>(json3.text);
         Debug.Log(result3);
+
+        Json5_Root result5 = JsonParser.ParseJson<Json5_Root>(json5.text);
+        Debug.Log(result5);
     }
 
     /// <summary>

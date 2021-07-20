@@ -165,7 +165,7 @@ namespace CatJson
                 return str;
             }
 
-            throw new Exception("json解析失败");
+            throw new Exception("json解析失败，当前字符:" + CurChar);
         }
 
         /// <summary>

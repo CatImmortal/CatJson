@@ -10,6 +10,8 @@ public class Json3_ListItem
 
 public class Json3_Root
 {
+    public int[] array { get; set; }
+
     /// <summary>
     /// 
     /// </summary>

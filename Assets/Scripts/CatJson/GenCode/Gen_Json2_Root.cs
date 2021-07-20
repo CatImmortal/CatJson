@@ -35,7 +35,7 @@ namespace CatJson
                         obj.error_code = int.Parse(token);
                         break;
                     default:
-                        JsonParser.ParseJsonValue(nextTokenType);
+                        lexer.GetNextToken(out _);
                         break;
                 }
 

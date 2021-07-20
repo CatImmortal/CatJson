@@ -39,7 +39,7 @@ namespace CatJson
                         break;
 
                     default:
-                        JsonParser.ParseJsonValue(nextTokenType);
+                        lexer.GetNextToken(out _);
                         break;
                 }
 

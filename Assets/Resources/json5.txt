@@ -1,0 +1,4 @@
+{
+	"item1" : {"dict" : {"key1" : 1}},
+	"item2" : {"dict" : {"key2" : "value2"}}
+}
