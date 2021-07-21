@@ -116,7 +116,7 @@ namespace CatJson
         /// </summary>
         private static void AddToReflectionMap(Type type)
         {
-            PropertyInfo[] pis = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            PropertyInfo[] pis = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.SetField);
             Dictionary<RangeString, PropertyInfo> dict1 = null;
             if (pis.Length > 0)
             {

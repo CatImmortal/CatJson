@@ -13,10 +13,20 @@ namespace CatJson
             JsonParser.ParseJsonObjectProcedure(obj, null, (userdata1, userdata2, key, nextTokenType) =>
             {
                 Json2_Root temp = (Json2_Root)userdata1;
+                RangeString? rs;
+                TokenType tokenType;
                 switch (key.ToString())
                 {
                     case "resultcode":
-                        temp.resultcode = JsonParser.Lexer.GetNextToken(out _).Value.ToString();
+                        rs = JsonParser.Lexer.GetNextToken(out tokenType);
+                        if (tokenType == TokenType.String)
+                        {
+                            temp.resultcode = rs.Value.ToString();
+                        }
+                        else
+                        {
+                            throw new Exception("resultcode的value类型不正确，当前解析到的是:" + tokenType);
+                        }
                         break;
                     case "reason":
                         temp.reason = JsonParser.Lexer.GetNextToken(out _).Value.ToString();
@@ -25,8 +35,11 @@ namespace CatJson
                         temp.result = Gen_Json2_Result();
                         break;
                     case "error_code":
-                        string token = JsonParser.Lexer.GetNextToken(out _).Value.ToString();
-                        temp.error_code = int.Parse(token);
+                        rs = JsonParser.Lexer.GetNextToken(out _);
+                        if (rs.HasValue)
+                        {
+                            temp.error_code = int.Parse(rs.Value.ToString());
+                        }
                         break;
                     default:
                         JsonParser.ParseJsonValue(nextTokenType);

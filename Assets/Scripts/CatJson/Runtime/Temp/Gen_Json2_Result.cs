@@ -26,10 +26,9 @@ namespace CatJson
                         temp.no = JsonParser.Lexer.GetNextToken(out _).Value.ToString();
                         break;
                     case "list":
-                        List<Json2_ListItem> list = new List<Json2_ListItem>();
-                        temp.list = list;
+                        temp.list = new List<Json2_ListItem>();
 
-                        JsonParser.ParseJsonArrayProcedure(list, null, (userdata11, userdata22, nextTokenType2) =>
+                        JsonParser.ParseJsonArrayProcedure(temp.list, null, (userdata11, userdata22, nextTokenType2) =>
                         {
                             Json2_ListItem item = Gen_Json2_ListItem();
                             ((List<Json2_ListItem>)userdata11).Add(item);

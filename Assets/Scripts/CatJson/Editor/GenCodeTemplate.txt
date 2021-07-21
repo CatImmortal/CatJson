@@ -1,0 +1,28 @@
+﻿namespace CatJson
+{
+    public static partial class Generator
+    {
+        private static #ClassName# Gen_#ClassName#()
+        {
+            #ClassName# obj = new #ClassName#();
+
+            JsonParser.ParseJsonObjectProcedure(obj, null, (userdata1, userdata2, key, nextTokenType) =>
+            {
+                #ClassName# temp = (#ClassName#)userdata1;
+                RangeString? rs;
+                TokenType tokenType;
+                switch (key.ToString())
+                {
+#SwitchCase#
+
+                    default:
+                        JsonParser.ParseJsonValue(nextTokenType);
+                        break;
+                }
+            });
+
+            return obj;
+        }
+    }
+
+}

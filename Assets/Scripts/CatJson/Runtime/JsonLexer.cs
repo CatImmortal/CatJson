@@ -66,7 +66,6 @@ namespace CatJson
         {
             type = default;
 
-            
             if (hasNextTokenCache)
             {
                 //有缓存下一个token的信息 直接返回
