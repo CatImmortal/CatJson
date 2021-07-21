@@ -8,15 +8,27 @@ namespace CatJson
     /// <summary>
     /// json解析器
     /// </summary>
-    public static class JsonParser
+    public static partial class JsonParser
     {
         /// <summary>
         /// Json词法分析器
         /// </summary>
         public static JsonLexer Lexer = new JsonLexer();
 
-        private static Dictionary<Type, Dictionary<RangeString, PropertyInfo>> propertyInfoMap = new Dictionary<Type, Dictionary<RangeString, PropertyInfo>>();
-        private static Dictionary<Type, Dictionary<RangeString, FieldInfo>> fieldInfoMap = new Dictionary<Type, Dictionary<RangeString, FieldInfo>>();
+        /// <summary>
+        /// 类型与其对应的属性信息
+        /// </summary>
+        private static Dictionary<Type, Dictionary<RangeString, PropertyInfo>> propertyInfoDict = new Dictionary<Type, Dictionary<RangeString, PropertyInfo>>();
+        
+        /// <summary>
+        /// 类型与其对应的字段信息
+        /// </summary>
+        private static Dictionary<Type, Dictionary<RangeString, FieldInfo>> fieldInfoDict = new Dictionary<Type, Dictionary<RangeString, FieldInfo>>();
+
+        /// <summary>
+        /// 扩展类型与其对应的解析方法
+        /// </summary>
+        private static Dictionary<Type, Func<object>> extendParseFuncDict = new Dictionary<Type, Func<object>>();
 
         /// <summary>
         /// 解析JsonObject的通用流程
@@ -116,7 +128,7 @@ namespace CatJson
                 }
                 
             }
-            propertyInfoMap.Add(type, dict1);
+            propertyInfoDict.Add(type, dict1);
 
             FieldInfo[] fis = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
             Dictionary<RangeString, FieldInfo> dict2 = null;
@@ -130,7 +142,7 @@ namespace CatJson
                 }
 
             }
-            fieldInfoMap.Add(type, dict2);
+            fieldInfoDict.Add(type, dict2);
         }
 
         /// <summary>
@@ -334,6 +346,13 @@ namespace CatJson
                         return ParseJsonObjectByDict(type,type.GetGenericArguments()[1]);
                     }
 
+
+                    if (extendParseFuncDict.TryGetValue(type,out Func<object> func))
+                    {
+                        //自定义扩展类型
+                        return func();
+                    }
+
                     //数据类
                     return ParseJsonObjectByType(type);
 
@@ -349,8 +368,9 @@ namespace CatJson
         {
             object obj = Activator.CreateInstance(type);
 
-            if (!propertyInfoMap.ContainsKey(type))
+            if (!propertyInfoDict.ContainsKey(type) && !fieldInfoDict.ContainsKey(type))
             {
+                //初始化反射信息
                 AddToReflectionMap(type);
             }
 
@@ -358,7 +378,7 @@ namespace CatJson
 
                 Type t = (Type)userdata2;
 
-                Dictionary<RangeString, PropertyInfo> dict1 = propertyInfoMap[type];
+                propertyInfoDict.TryGetValue(t, out Dictionary<RangeString, PropertyInfo> dict1);
                 if (dict1 != null && dict1.TryGetValue(key,out PropertyInfo pi))
                 {
                     //先尝试获取名为key的属性
@@ -368,7 +388,7 @@ namespace CatJson
                 else
                 {
                     //属性没有 再试试字段
-                    Dictionary<RangeString, FieldInfo> dict2 = fieldInfoMap[type];
+                    fieldInfoDict.TryGetValue(t, out Dictionary<RangeString, FieldInfo> dict2);
                     if (dict2 != null && dict2.TryGetValue(key,out FieldInfo fi))
                     {
                         object value = ParseJsonValueByType(nextTokenType, fi.FieldType);
