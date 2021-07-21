@@ -13,7 +13,7 @@ namespace CatJson
         /// <summary>
         /// Json词法分析器
         /// </summary>
-        private static JsonLexer lexer = new JsonLexer();
+        public static JsonLexer Lexer = new JsonLexer();
 
         private static Dictionary<Type, Dictionary<RangeString, PropertyInfo>> propertyInfoMap = new Dictionary<Type, Dictionary<RangeString, PropertyInfo>>();
         private static Dictionary<Type, Dictionary<RangeString, FieldInfo>> fieldInfoMap = new Dictionary<Type, Dictionary<RangeString, FieldInfo>>();
@@ -21,31 +21,31 @@ namespace CatJson
         /// <summary>
         /// 解析JsonObject的通用流程
         /// </summary>
-        private static void ParseJsonObjectProcedure(object userdata1,object userdata2,Action<object,object,RangeString, TokenType> action)
+        public static void ParseJsonObjectProcedure(object userdata1,object userdata2,Action<object,object,RangeString, TokenType> action)
         {
             //跳过 {
-            lexer.GetNextTokenByType(TokenType.LeftBrace);
+            Lexer.GetNextTokenByType(TokenType.LeftBrace);
 
-            while (lexer.LookNextTokenType() != TokenType.RightBrace)
+            while (Lexer.LookNextTokenType() != TokenType.RightBrace)
             {
                 //提取key
-                RangeString key = lexer.GetNextTokenByType(TokenType.String).Value;
+                RangeString key = Lexer.GetNextTokenByType(TokenType.String).Value;
 
                 //跳过 :
-                lexer.GetNextTokenByType(TokenType.Colon);
+                Lexer.GetNextTokenByType(TokenType.Colon);
 
                 //提取value
                 //array和json obj需要完整的[]和{}，所以只能look
-                TokenType nextTokenType = lexer.LookNextTokenType();
+                TokenType nextTokenType = Lexer.LookNextTokenType();
 
                 action(userdata1,userdata2,key, nextTokenType);
 
                 //有逗号就跳过逗号
-                if (lexer.LookNextTokenType() == TokenType.Comma)
+                if (Lexer.LookNextTokenType() == TokenType.Comma)
                 {
-                    lexer.GetNextTokenByType(TokenType.Comma);
+                    Lexer.GetNextTokenByType(TokenType.Comma);
 
-                    if (lexer.LookNextTokenType() == TokenType.RightBracket)
+                    if (Lexer.LookNextTokenType() == TokenType.RightBracket)
                     {
                         throw new Exception("Json对象不能以逗号结尾");
                     }
@@ -59,31 +59,31 @@ namespace CatJson
             }
 
             //跳过 }
-            lexer.GetNextTokenByType(TokenType.RightBrace);
+            Lexer.GetNextTokenByType(TokenType.RightBrace);
         }
 
         /// <summary>
         /// 解析Json数组的通用流程
         /// </summary>
-        private static void ParseJsonArrayProcedure(object userdata1,object userdata2, Action<object,object,TokenType> action)
+        public static void ParseJsonArrayProcedure(object userdata1,object userdata2, Action<object,object,TokenType> action)
         {
             //跳过[
-            lexer.GetNextTokenByType(TokenType.LeftBracket);
+            Lexer.GetNextTokenByType(TokenType.LeftBracket);
 
-            while (lexer.LookNextTokenType() != TokenType.RightBracket)
+            while (Lexer.LookNextTokenType() != TokenType.RightBracket)
             {
                 //提取value
                 //array和json obj需要完整的[]和{}，所以只能look
-                TokenType nextTokenType = lexer.LookNextTokenType();
+                TokenType nextTokenType = Lexer.LookNextTokenType();
 
                 action(userdata1,userdata2,nextTokenType);
 
                 //有逗号就跳过
-                if (lexer.LookNextTokenType() == TokenType.Comma)
+                if (Lexer.LookNextTokenType() == TokenType.Comma)
                 {
-                    lexer.GetNextTokenByType(TokenType.Comma);
+                    Lexer.GetNextTokenByType(TokenType.Comma);
 
-                    if (lexer.LookNextTokenType() == TokenType.RightBracket)
+                    if (Lexer.LookNextTokenType() == TokenType.RightBracket)
                     {
                         throw new Exception("数组不能以逗号结尾");
                     }
@@ -96,7 +96,7 @@ namespace CatJson
             }
 
             //跳过]
-            lexer.GetNextTokenByType(TokenType.RightBracket);
+            Lexer.GetNextTokenByType(TokenType.RightBracket);
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace CatJson
         /// </summary>
         public static JsonObject ParseJson(string json)
         {
-            lexer.SetJsonText(json);
+            Lexer.SetJsonText(json);
 
             return ParseJsonObject();
         }
@@ -154,26 +154,26 @@ namespace CatJson
             {
 
                 case TokenType.Null:
-                    lexer.GetNextToken(out _);
+                    Lexer.GetNextToken(out _);
                     value.Type = ValueType.Null;
                     break;
                 case TokenType.True:
-                    lexer.GetNextToken(out _);
+                    Lexer.GetNextToken(out _);
                     value.Type = ValueType.Boolean;
                     value.Boolean = true;
                     break;
                 case TokenType.False:
-                    lexer.GetNextToken(out _);
+                    Lexer.GetNextToken(out _);
                     value.Type = ValueType.Boolean;
                     value.Boolean = false;
                     break;
                 case TokenType.Number:
-                    RangeString? token = lexer.GetNextToken(out _);
+                    RangeString? token = Lexer.GetNextToken(out _);
                     value.Type = ValueType.Number;
                     value.Number = double.Parse(token.Value.ToString());
                     break;
                 case TokenType.String:
-                    token = lexer.GetNextToken(out _);
+                    token = Lexer.GetNextToken(out _);
                     value.Type = ValueType.String;
                     value.Str = token.Value.ToString();
                     break;
@@ -238,16 +238,16 @@ namespace CatJson
         /// </summary>
         public static object ParseJson(string json,Type type, bool reflection = true)
         {
-            lexer.SetJsonText(json);
+            Lexer.SetJsonText(json);
 
             if (reflection)
             {
                 return ParseJsonObjectByType(type);
             }
 
-            if (Generator.GenCodeDict.TryGetValue(type,out Func<JsonLexer, object> func))
+            if (Generator.GenCodeDict.TryGetValue(type,out Func<object> func))
             {
-                return func(lexer);
+                return func();
             }
 
             throw new Exception($"没有{type}类型预生成的反序列化代码");
@@ -264,7 +264,7 @@ namespace CatJson
             switch (nextTokenType)
             {
                 case TokenType.Null:
-                    lexer.GetNextToken(out _);
+                    Lexer.GetNextToken(out _);
                     if (!type.IsAssignableFrom(typeof(ValueType)))
                     {
                         return null;
@@ -272,14 +272,14 @@ namespace CatJson
                     break;
 
                 case TokenType.True:
-                    lexer.GetNextToken(out _);
+                    Lexer.GetNextToken(out _);
                     if (type == typeof(bool))
                     {
                         return true;
                     }
                     break;
                 case TokenType.False:
-                    lexer.GetNextToken(out _);
+                    Lexer.GetNextToken(out _);
                     if (type == typeof(bool))
                     {
                         return false;
@@ -287,7 +287,7 @@ namespace CatJson
                     break;
 
                 case TokenType.Number:
-                    RangeString? token = lexer.GetNextToken(out _);
+                    RangeString? token = Lexer.GetNextToken(out _);
                     string str = token.Value.ToString();
                     if (type == typeof(int))
                     {
@@ -304,7 +304,7 @@ namespace CatJson
                     break;
 
                 case TokenType.String:
-                    token = lexer.GetNextToken(out _);
+                    token = Lexer.GetNextToken(out _);
                     if (type == typeof(string))
                     {
                         return token.Value.ToString();

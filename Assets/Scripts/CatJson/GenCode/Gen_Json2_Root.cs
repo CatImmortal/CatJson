@@ -6,56 +6,33 @@ namespace CatJson
 {
     public static partial class Generator
     {
-        private static Json2_Root Gen_Json2_Root(JsonLexer lexer)
+        private static Json2_Root Gen_Json2_Root()
         {
             Json2_Root obj = new Json2_Root();
 
-            lexer.GetNextTokenByType(TokenType.LeftBrace);
-
-            while (lexer.LookNextTokenType() != TokenType.RightBrace)
+            JsonParser.ParseJsonObjectProcedure(obj, null, (userdata1, userdata2, key, nextTokenType) =>
             {
-                string key = lexer.GetNextTokenByType(TokenType.String).Value.ToString();
-
-                lexer.GetNextTokenByType(TokenType.Colon);
-
-                TokenType nextTokenType = lexer.LookNextTokenType();
-
-                switch (key)
+                Json2_Root temp = (Json2_Root)userdata1;
+                switch (key.ToString())
                 {
                     case "resultcode":
-                        obj.resultcode = lexer.GetNextToken(out _).Value.ToString();
+                        temp.resultcode = JsonParser.Lexer.GetNextToken(out _).Value.ToString();
                         break;
                     case "reason":
-                        obj.reason = lexer.GetNextToken(out _).Value.ToString();
+                        temp.reason = JsonParser.Lexer.GetNextToken(out _).Value.ToString();
                         break;
                     case "result":
-                        obj.result = Gen_Json2_Result(lexer);
+                        temp.result = Gen_Json2_Result();
                         break;
                     case "error_code":
-                        string token = lexer.GetNextToken(out _).Value.ToString();
-                        obj.error_code = int.Parse(token);
+                        string token = JsonParser.Lexer.GetNextToken(out _).Value.ToString();
+                        temp.error_code = int.Parse(token);
                         break;
                     default:
                         JsonParser.ParseJsonValue(nextTokenType);
                         break;
                 }
-
-                if (lexer.LookNextTokenType() == TokenType.Comma)
-                {
-                    lexer.GetNextTokenByType(TokenType.Comma);
-
-                    if (lexer.LookNextTokenType() == TokenType.RightBracket)
-                    {
-                        throw new Exception("Json对象不能以逗号结尾");
-                    }
-                }
-                else
-                {
-                    break;
-                }
-
-            }
-            lexer.GetNextTokenByType(TokenType.RightBrace);
+            });
 
             return obj;
         }

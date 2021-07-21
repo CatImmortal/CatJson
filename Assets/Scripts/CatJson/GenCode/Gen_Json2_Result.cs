@@ -7,103 +7,43 @@ namespace CatJson
 {
     public static partial class Generator
     {
-        private static Json2_Result Gen_Json2_Result(JsonLexer lexer)
+        private static Json2_Result Gen_Json2_Result()
         {
             Json2_Result obj = new Json2_Result();
 
-            //跳过 {
-            lexer.GetNextTokenByType(TokenType.LeftBrace);
-
-            while (lexer.LookNextTokenType() != TokenType.RightBrace)
+            JsonParser.ParseJsonObjectProcedure(obj, null, (userdata1, userdata2, key, nextTokenType) =>
             {
-                //提取key
-                string key = lexer.GetNextTokenByType(TokenType.String).Value.ToString();
-
-                //跳过 :
-                lexer.GetNextTokenByType(TokenType.Colon);
-
-                //提取value
-                //array和json obj需要完整的[]和{}，所以只能look
-                TokenType nextTokenType = lexer.LookNextTokenType();
-
-                switch (key)
+                Json2_Result temp = (Json2_Result)userdata1;
+                switch (key.ToString())
                 {
                     case "company":
-                        obj.company = lexer.GetNextToken(out _).Value.ToString();
+                        temp.company = JsonParser.Lexer.GetNextToken(out _).Value.ToString();
                         break;
                     case "com":
-                        obj.com = lexer.GetNextToken(out _).Value.ToString(); 
+                        temp.com = JsonParser.Lexer.GetNextToken(out _).Value.ToString();
                         break;
                     case "no":
-                        obj.no = lexer.GetNextToken(out _).Value.ToString();
+                        temp.no = JsonParser.Lexer.GetNextToken(out _).Value.ToString();
                         break;
                     case "list":
                         List<Json2_ListItem> list = new List<Json2_ListItem>();
-                        obj.list = list;
+                        temp.list = list;
 
-                        //跳过[
-                        lexer.GetNextTokenByType(TokenType.LeftBracket);
-
-                        while (lexer.LookNextTokenType() != TokenType.RightBracket)
+                        JsonParser.ParseJsonArrayProcedure(list, null, (userdata11, userdata22, nextTokenType2) =>
                         {
-                            //提取value
-                            //array和json obj需要完整的[]和{}，所以只能look
-                            Json2_ListItem item = Gen_Json2_ListItem(lexer);
-
-                            list.Add(item);
-
-                            //有逗号就跳过
-                            if (lexer.LookNextTokenType() == TokenType.Comma)
-                            {
-                                lexer.GetNextTokenByType(TokenType.Comma);
-
-                                if (lexer.LookNextTokenType() == TokenType.RightBracket)
-                                {
-                                    throw new Exception("数组不能以逗号结尾");
-                                }
-                            }
-                            else
-                            {
-                                //没有逗号就说明结束了
-                                break;
-                            }
-                        }
-
-                        //跳过]
-                        lexer.GetNextTokenByType(TokenType.RightBracket);
-
+                            Json2_ListItem item = Gen_Json2_ListItem();
+                            ((List<Json2_ListItem>)userdata11).Add(item);
+                        });
                         break;
                     case "status":
-                        string token = lexer.GetNextToken(out _).Value.ToString();
-                        obj.status = int.Parse(token);
+                        string token = JsonParser.Lexer.GetNextToken(out _).Value.ToString();
+                        temp.status = int.Parse(token);
                         break;
                     default:
                         JsonParser.ParseJsonValue(nextTokenType);
                         break;
                 }
-
-
-                //有逗号就跳过逗号
-                if (lexer.LookNextTokenType() == TokenType.Comma)
-                {
-                    lexer.GetNextTokenByType(TokenType.Comma);
-
-                    if (lexer.LookNextTokenType() == TokenType.RightBracket)
-                    {
-                        throw new Exception("Json对象不能以逗号结尾");
-                    }
-                }
-                else
-                {
-                    //没有逗号就说明结束了
-                    break;
-                }
-
-            }
-
-            //跳过 }
-            lexer.GetNextTokenByType(TokenType.RightBrace);
-
+            });
             return obj;
         }
     }

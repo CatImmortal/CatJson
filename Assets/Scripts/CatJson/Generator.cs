@@ -10,7 +10,7 @@ namespace CatJson
         /// <summary>
         /// 类型与对应反序列化代码
         /// </summary>
-        public static Dictionary<Type, Func<JsonLexer,object>> GenCodeDict = new Dictionary<Type, Func<JsonLexer, object>>();
+        public static Dictionary<Type, Func<object>> GenCodeDict = new Dictionary<Type, Func<object>>();
     }
 }
 
