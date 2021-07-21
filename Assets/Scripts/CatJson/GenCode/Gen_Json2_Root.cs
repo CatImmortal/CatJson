@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace CatJson
 {
-    public static partial class Gen
+    public static partial class Generator
     {
         private static Json2_Root Gen_Json2_Root(JsonLexer lexer)
         {
@@ -14,7 +14,8 @@ namespace CatJson
 
             while (lexer.LookNextTokenType() != TokenType.RightBrace)
             {
-                string key = lexer.GetNextTokenByType(TokenType.String);
+                string key = lexer.GetNextTokenByType(TokenType.String).Value.ToString();
+
                 lexer.GetNextTokenByType(TokenType.Colon);
 
                 TokenType nextTokenType = lexer.LookNextTokenType();
@@ -22,16 +23,16 @@ namespace CatJson
                 switch (key)
                 {
                     case "resultcode":
-                        obj.resultcode = lexer.GetNextToken(out _);
+                        obj.resultcode = lexer.GetNextToken(out _).Value.ToString();
                         break;
                     case "reason":
-                        obj.reason = lexer.GetNextToken(out _);
+                        obj.reason = lexer.GetNextToken(out _).Value.ToString();
                         break;
                     case "result":
                         obj.result = Gen_Json2_Result(lexer);
                         break;
                     case "error_code":
-                        string token = lexer.GetNextToken(out _);
+                        string token = lexer.GetNextToken(out _).Value.ToString();
                         obj.error_code = int.Parse(token);
                         break;
                     default:

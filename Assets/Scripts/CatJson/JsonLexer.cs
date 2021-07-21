@@ -14,7 +14,7 @@ namespace CatJson
 
         private bool hasNextTokenCache;
         private TokenType nextTokenType;
-        private string nextToken;
+        private RangeString? nextToken;
 
         public static StringBuilder sb = new StringBuilder();
 
@@ -49,9 +49,9 @@ namespace CatJson
         /// <summary>
         /// 获取下一个指定类型的token
         /// </summary>
-        public string GetNextTokenByType(TokenType type)
+        public RangeString? GetNextTokenByType(TokenType type)
         {
-            string token = GetNextToken(out TokenType resultType);
+            RangeString? token = GetNextToken(out TokenType resultType);
             if (type != resultType)
             {
                 throw new Exception($"NextTokenOfType调用失败，需求{type}但获取到的是{resultType}");
@@ -62,7 +62,7 @@ namespace CatJson
         /// <summary>
         /// 获取下一个token
         /// </summary>
-        public string GetNextToken(out TokenType type)
+        public RangeString? GetNextToken(out TokenType type)
         {
             type = default;
 
@@ -133,15 +133,15 @@ namespace CatJson
             {
                 string str = ScanNumber();
                 type = TokenType.Number;
-                return str;
+                return new RangeString(str);
             }
 
             //扫描字符串
             if (json[curIndex] == '"')
             {
-                string str = ScanString();
+                RangeString rs = ScanString();
                 type = TokenType.String;
-                return str;
+                return rs;
             }
 
             throw new Exception("json解析失败，当前字符:" + json[curIndex]);
@@ -244,65 +244,148 @@ namespace CatJson
             return result;
         }
 
+        ///// <summary>
+        ///// 扫描字符串
+        ///// </summary>
+        //private string ScanString()
+        //{
+
+        //    // 起始字符是 " 要跳过
+        //    Next();
+
+        //    while (!(curIndex >= json.Length) & json[curIndex] != '"')
+        //    {
+        //        //处理转义字符
+        //        if (json[curIndex] == '\\')
+        //        {
+        //            if (curIndex == json.Length - 1)
+        //            {
+        //                throw new Exception("处理转义字符失败，\\后没有剩余字符了");
+        //            }
+
+        //            Next();
+        //            switch (json[curIndex])
+        //            {
+        //                case '"':
+        //                    Util.CachedSB.Append('\"');
+        //                    break;
+        //                case '\\':
+        //                    Util.CachedSB.Append('\\');
+        //                    break;
+        //                case '/':
+        //                    Util.CachedSB.Append('/');
+        //                    break;
+        //                case 'b':
+        //                    Util.CachedSB.Append('\b');
+        //                    break;
+        //                case 'f':
+        //                    Util.CachedSB.Append('\f');
+        //                    break;
+        //                case 'n':
+        //                    Util.CachedSB.Append('\n');
+        //                    break;
+        //                case 'r':
+        //                    Util.CachedSB.Append('\r');
+        //                    break;
+        //                case 't':
+        //                    Util.CachedSB.Append('\t');
+        //                    break;
+        //                default:
+        //                    throw new Exception("处理转义字符失败，\\后的字符不在可转义范围内");
+        //            }
+
+        //            Next();
+
+        //            continue;
+        //        }
+
+        //        //处理普通字符
+        //        Util.CachedSB.Append(json[curIndex]);
+        //        Next();
+        //    }
+
+        //    if (curIndex >= json.Length)
+        //    {
+        //        throw new Exception("字符串扫描失败，不是以双引号结尾的");
+        //    }
+        //    else
+        //    {
+        //        // 末尾也是 " 也要跳过
+        //        Next();
+        //    }
+
+        //    string str = Util.CachedSB.ToString();
+        //    Util.CachedSB.Clear();
+
+        //    return str;
+        //}
+
+
         /// <summary>
         /// 扫描字符串
         /// </summary>
-        private string ScanString()
+        private RangeString ScanString()
         {
 
             // 起始字符是 " 要跳过
             Next();
 
+            int startIndex = curIndex;
+
             while (!(curIndex >= json.Length) & json[curIndex] != '"')
             {
-                //处理转义字符
-                if (json[curIndex] == '\\')
-                {
-                    if (curIndex == json.Length - 1)
-                    {
-                        throw new Exception("处理转义字符失败，\\后没有剩余字符了");
-                    }
+                ////处理转义字符
+                //if (json[curIndex] == '\\')
+                //{
+                //    if (curIndex == json.Length - 1)
+                //    {
+                //        throw new Exception("处理转义字符失败，\\后没有剩余字符了");
+                //    }
 
-                    Next();
-                    switch (json[curIndex])
-                    {
-                        case '"':
-                            Util.CachedSB.Append('\"');
-                            break;
-                        case '\\':
-                            Util.CachedSB.Append('\\');
-                            break;
-                        case '/':
-                            Util.CachedSB.Append('/');
-                            break;
-                        case 'b':
-                            Util.CachedSB.Append('\b');
-                            break;
-                        case 'f':
-                            Util.CachedSB.Append('\f');
-                            break;
-                        case 'n':
-                            Util.CachedSB.Append('\n');
-                            break;
-                        case 'r':
-                            Util.CachedSB.Append('\r');
-                            break;
-                        case 't':
-                            Util.CachedSB.Append('\t');
-                            break;
-                        default:
-                            throw new Exception("处理转义字符失败，\\后的字符不在可转义范围内");
-                    }
+                //    Next();
+                //    switch (json[curIndex])
+                //    {
+                //        case '"':
+                //            Util.CachedSB.Append('\"');
+                //            break;
+                //        case '\\':
+                //            Util.CachedSB.Append('\\');
+                //            break;
+                //        case '/':
+                //            Util.CachedSB.Append('/');
+                //            break;
+                //        case 'b':
+                //            Util.CachedSB.Append('\b');
+                //            break;
+                //        case 'f':
+                //            Util.CachedSB.Append('\f');
+                //            break;
+                //        case 'n':
+                //            Util.CachedSB.Append('\n');
+                //            break;
+                //        case 'r':
+                //            Util.CachedSB.Append('\r');
+                //            break;
+                //        case 't':
+                //            Util.CachedSB.Append('\t');
+                //            break;
+                //        default:
+                //            throw new Exception("处理转义字符失败，\\后的字符不在可转义范围内");
+                //    }
 
-                    Next();
+                //    Next();
 
-                    continue;
-                }
+                //    continue;
+                //}
 
-                //处理普通字符
-                Util.CachedSB.Append(json[curIndex]);
+                ////处理普通字符
+                //Util.CachedSB.Append(json[curIndex]);
+
+
                 Next();
             }
+
+            int endIndex = curIndex - 1;
 
             if (curIndex >= json.Length)
             {
@@ -314,12 +397,10 @@ namespace CatJson
                 Next();
             }
 
-            string str = Util.CachedSB.ToString();
-            Util.CachedSB.Clear();
+            RangeString rs = new RangeString(json, startIndex, endIndex);
 
-            return str;
+            return rs;
         }
-
     }
 
 }

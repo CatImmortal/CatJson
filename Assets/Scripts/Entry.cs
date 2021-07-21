@@ -14,7 +14,6 @@ public class Entry : MonoBehaviour
     public TextAsset json4;
     public TextAsset json5;
 
-    private string json1Text;
     private string json2Text;
 
     // Start is called before the first frame update
@@ -22,7 +21,6 @@ public class Entry : MonoBehaviour
     {
         Application.targetFrameRate = 30;
 
-        json1Text = json1.text;
         json2Text = json2.text;
 
         Test2();
@@ -71,8 +69,14 @@ public class Entry : MonoBehaviour
         Json3_Root result3 = JsonParser.ParseJson<Json3_Root>(json3.text);
         Debug.Log(result3);
 
+        Json4_Root result4 = JsonParser.ParseJson<Json4_Root>(json4.text);
+        Debug.Log(result4.str);
+
         Json5_Root result5 = JsonParser.ParseJson<Json5_Root>(json5.text);
         Debug.Log(result5);
+
+        Json2_Root result2_gen = JsonParser.ParseJson<Json2_Root>(json2.text,false);
+        Debug.Log(result2_gen);
     }
 
     /// <summary>

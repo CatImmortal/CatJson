@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace CatJson
 {
-    public static partial class Gen
+    public static partial class Generator
     {
         private static Json2_ListItem Gen_Json2_ListItem(JsonLexer lexer)
         {
@@ -17,7 +17,7 @@ namespace CatJson
             while (lexer.LookNextTokenType() != TokenType.RightBrace)
             {
                 //提取key
-                string key = lexer.GetNextTokenByType(TokenType.String);
+                string key = lexer.GetNextTokenByType(TokenType.String).Value.ToString();
 
                 //跳过 :
                 lexer.GetNextTokenByType(TokenType.Colon);
@@ -29,13 +29,13 @@ namespace CatJson
                 switch (key)
                 {
                     case "datetime":
-                        obj.datetime = lexer.GetNextToken(out _);
+                        obj.datetime = lexer.GetNextToken(out _).Value.ToString();
                         break;
                     case "remark":
-                        obj.remark = lexer.GetNextToken(out _);
+                        obj.remark = lexer.GetNextToken(out _).Value.ToString();
                         break;
                     case "zone":
-                        obj.zone = lexer.GetNextToken(out _);
+                        obj.zone = lexer.GetNextToken(out _).Value.ToString();
                         break;
 
                     default:

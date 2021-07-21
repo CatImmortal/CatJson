@@ -15,13 +15,13 @@ namespace CatJson
         /// </summary>
         private static JsonLexer lexer = new JsonLexer();
 
-        private static Dictionary<Type, Dictionary<string, PropertyInfo>> propertyInfoMap = new Dictionary<Type, Dictionary<string, PropertyInfo>>();
-        private static Dictionary<Type, Dictionary<string, FieldInfo>> fieldInfoMap = new Dictionary<Type, Dictionary<string, FieldInfo>>();
+        private static Dictionary<Type, Dictionary<RangeString, PropertyInfo>> propertyInfoMap = new Dictionary<Type, Dictionary<RangeString, PropertyInfo>>();
+        private static Dictionary<Type, Dictionary<RangeString, FieldInfo>> fieldInfoMap = new Dictionary<Type, Dictionary<RangeString, FieldInfo>>();
 
         /// <summary>
         /// 解析JsonObject的通用流程
         /// </summary>
-        private static void ParseJsonObjectProcedure(object userdata1,object userdata2,Action<object,object,string, TokenType> action)
+        private static void ParseJsonObjectProcedure(object userdata1,object userdata2,Action<object,object,RangeString, TokenType> action)
         {
             //跳过 {
             lexer.GetNextTokenByType(TokenType.LeftBrace);
@@ -29,7 +29,7 @@ namespace CatJson
             while (lexer.LookNextTokenType() != TokenType.RightBrace)
             {
                 //提取key
-                string key = lexer.GetNextTokenByType(TokenType.String);
+                RangeString key = lexer.GetNextTokenByType(TokenType.String).Value;
 
                 //跳过 :
                 lexer.GetNextTokenByType(TokenType.Colon);
@@ -105,28 +105,28 @@ namespace CatJson
         private static void AddToReflectionMap(Type type)
         {
             PropertyInfo[] pis = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-            Dictionary<string, PropertyInfo> dict1 = null;
+            Dictionary<RangeString, PropertyInfo> dict1 = null;
             if (pis.Length > 0)
             {
-                dict1 = new Dictionary<string, PropertyInfo>(pis.Length);
+                dict1 = new Dictionary<RangeString, PropertyInfo>(pis.Length);
                 for (int i = 0; i < pis.Length; i++)
                 {
                     PropertyInfo pi = pis[i];
-                    dict1.Add(pi.Name, pi);
+                    dict1.Add(new RangeString(pi.Name), pi);
                 }
                 
             }
             propertyInfoMap.Add(type, dict1);
 
             FieldInfo[] fis = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
-            Dictionary<string, FieldInfo> dict2 = null;
+            Dictionary<RangeString, FieldInfo> dict2 = null;
             if (fis.Length > 0)
             {
-                dict2 = new Dictionary<string, FieldInfo>(fis.Length);
+                dict2 = new Dictionary<RangeString, FieldInfo>(fis.Length);
                 for (int i = 0; i < fis.Length; i++)
                 {
                     FieldInfo fi = fis[i];
-                    dict2.Add(fi.Name, fi);
+                    dict2.Add(new RangeString(fi.Name), fi);
                 }
 
             }
@@ -168,14 +168,14 @@ namespace CatJson
                     value.Boolean = false;
                     break;
                 case TokenType.Number:
-                    string token = lexer.GetNextToken(out _);
+                    RangeString? token = lexer.GetNextToken(out _);
                     value.Type = ValueType.Number;
-                    value.Number = double.Parse(token);
+                    value.Number = double.Parse(token.Value.ToString());
                     break;
                 case TokenType.String:
                     token = lexer.GetNextToken(out _);
                     value.Type = ValueType.String;
-                    value.Str = token;
+                    value.Str = token.Value.ToString();
                     break;
                 case TokenType.LeftBracket:
                     value.Type = ValueType.Array;
@@ -202,7 +202,7 @@ namespace CatJson
             ParseJsonObjectProcedure(obj,null, (userdata1,userdata2,key, nextTokenType) => {
                 JsonValue value = ParseJsonValue(nextTokenType);
                 JsonObject jo = (JsonObject)userdata1;
-                jo[key] = value;
+                jo[key.ToString()] = value;
             });
 
             return obj;
@@ -245,12 +245,12 @@ namespace CatJson
                 return ParseJsonObjectByType(type);
             }
 
-            if (Gen.GenCodeDict.TryGetValue(type,out Func<JsonLexer, object> func))
+            if (Generator.GenCodeDict.TryGetValue(type,out Func<JsonLexer, object> func))
             {
                 return func(lexer);
             }
 
-            throw new Exception($"没有{type}类型的预生成的反序列代码");
+            throw new Exception($"没有{type}类型预生成的反序列化代码");
             
         }
 
@@ -287,18 +287,19 @@ namespace CatJson
                     break;
 
                 case TokenType.Number:
-                    string token = lexer.GetNextToken(out _);
+                    RangeString? token = lexer.GetNextToken(out _);
+                    string str = token.Value.ToString();
                     if (type == typeof(int))
                     {
-                        return int.Parse(token);
+                        return int.Parse(str);
                     }
                     if (type == typeof(float))
                     {
-                        return float.Parse(token);
+                        return float.Parse(str);
                     }
                     if (type == typeof(double))
                     {
-                        return double.Parse(token);
+                        return double.Parse(str);
                     }
                     break;
 
@@ -306,7 +307,7 @@ namespace CatJson
                     token = lexer.GetNextToken(out _);
                     if (type == typeof(string))
                     {
-                        return token;
+                        return token.Value.ToString();
                     }
                     break;
 
@@ -357,15 +358,17 @@ namespace CatJson
 
                 Type t = (Type)userdata2;
 
-                Dictionary<string, PropertyInfo> dict1 = propertyInfoMap[type];
+                Dictionary<RangeString, PropertyInfo> dict1 = propertyInfoMap[type];
                 if (dict1 != null && dict1.TryGetValue(key,out PropertyInfo pi))
                 {
+                    //先尝试获取名为key的属性
                     object value = ParseJsonValueByType(nextTokenType, pi.PropertyType);
                     pi.SetValue(userdata1, value);
                 }
                 else
                 {
-                    Dictionary<string, FieldInfo> dict2 = fieldInfoMap[type];
+                    //属性没有 再试试字段
+                    Dictionary<RangeString, FieldInfo> dict2 = fieldInfoMap[type];
                     if (dict2 != null && dict2.TryGetValue(key,out FieldInfo fi))
                     {
                         object value = ParseJsonValueByType(nextTokenType, fi.FieldType);
@@ -377,29 +380,6 @@ namespace CatJson
                         ParseJsonValue(nextTokenType);
                     }
                 }
-
-
-                //PropertyInfo pi = t.GetProperty(key, BindingFlags.Instance | BindingFlags.Public);
-                //if (pi != null)
-                //{
-                //    object value = ParseJsonValueByType(nextTokenType, pi.PropertyType);
-                //    pi.SetValue(userdata1, value);
-                //}
-                //else
-                //{
-                //    FieldInfo fi = t.GetField(key, BindingFlags.Instance | BindingFlags.Public);
-                //    if (fi != null)
-                //    {
-                //        object value = ParseJsonValueByType(nextTokenType, fi.FieldType);
-                //        fi.SetValue(userdata1, value);
-
-                //    }
-                //    else
-                //    {
-                //        //这个json key既不是数据类的字段也不是属性，跳过
-                //        lexer.GetNextTokenByType(nextTokenType);
-                //    }
-                //}
             });
 
             return obj;
@@ -416,7 +396,7 @@ namespace CatJson
             ParseJsonObjectProcedure(dict, valueType, (userdata1, userdata2, key, nextTokenType) => {
                 Type t = (Type)userdata2;
                 object value = ParseJsonValueByType(nextTokenType, t);
-                dict.Add(key, value);
+                dict.Add(key.ToString(), value);
             });
 
             return dict;
