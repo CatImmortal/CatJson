@@ -349,11 +349,11 @@ namespace CatJson
 
                     if (extendParseFuncDict.TryGetValue(type,out Func<object> func))
                     {
-                        //自定义扩展类型
+                        //自定义扩展解析
                         return func();
                     }
 
-                    //数据类
+                    //类对象
                     return ParseJsonObjectByType(type);
 
             }
