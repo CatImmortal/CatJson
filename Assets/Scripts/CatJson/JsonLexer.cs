@@ -190,16 +190,16 @@ namespace CatJson
         /// <summary>
         /// 扫描字面量 null true false
         /// </summary>
-        private void ScanLiteral(string keyword)
+        private void ScanLiteral(string prefix)
         {
-            if (IsPrefix(keyword))
+            if (IsPrefix(prefix))
             {
 
-                Next(keyword.Length);
+                Next(prefix.Length);
                 return;
             }
 
-            throw new Exception($"Json语法错误,{keyword}解析失败");
+            throw new Exception($"Json语法错误,{prefix}解析失败");
         }
 
         /// <summary>
@@ -243,83 +243,6 @@ namespace CatJson
 
             return result;
         }
-
-        ///// <summary>
-        ///// 扫描字符串
-        ///// </summary>
-        //private string ScanString()
-        //{
-
-        //    // 起始字符是 " 要跳过
-        //    Next();
-
-        //    while (!(curIndex >= json.Length) & json[curIndex] != '"')
-        //    {
-        //        //处理转义字符
-        //        if (json[curIndex] == '\\')
-        //        {
-        //            if (curIndex == json.Length - 1)
-        //            {
-        //                throw new Exception("处理转义字符失败，\\后没有剩余字符了");
-        //            }
-
-        //            Next();
-        //            switch (json[curIndex])
-        //            {
-        //                case '"':
-        //                    Util.CachedSB.Append('\"');
-        //                    break;
-        //                case '\\':
-        //                    Util.CachedSB.Append('\\');
-        //                    break;
-        //                case '/':
-        //                    Util.CachedSB.Append('/');
-        //                    break;
-        //                case 'b':
-        //                    Util.CachedSB.Append('\b');
-        //                    break;
-        //                case 'f':
-        //                    Util.CachedSB.Append('\f');
-        //                    break;
-        //                case 'n':
-        //                    Util.CachedSB.Append('\n');
-        //                    break;
-        //                case 'r':
-        //                    Util.CachedSB.Append('\r');
-        //                    break;
-        //                case 't':
-        //                    Util.CachedSB.Append('\t');
-        //                    break;
-        //                default:
-        //                    throw new Exception("处理转义字符失败，\\后的字符不在可转义范围内");
-        //            }
-
-        //            Next();
-
-        //            continue;
-        //        }
-
-        //        //处理普通字符
-        //        Util.CachedSB.Append(json[curIndex]);
-        //        Next();
-        //    }
-
-        //    if (curIndex >= json.Length)
-        //    {
-        //        throw new Exception("字符串扫描失败，不是以双引号结尾的");
-        //    }
-        //    else
-        //    {
-        //        // 末尾也是 " 也要跳过
-        //        Next();
-        //    }
-
-        //    string str = Util.CachedSB.ToString();
-        //    Util.CachedSB.Clear();
-
-        //    return str;
-        //}
-
 
         /// <summary>
         /// 扫描字符串
