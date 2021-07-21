@@ -18,27 +18,6 @@ namespace CatJson
 
         public static StringBuilder sb = new StringBuilder();
 
-        /// <summary>
-        /// 当前剩余的json文本的首字符
-        /// </summary>
-        public char CurChar
-        {
-            get
-            {
-                return json[curIndex];
-            }
-        }
-
-        /// <summary>
-        /// Json文本是否已结束
-        /// </summary>
-        private bool IsEnd
-        {
-            get
-            {
-                return curIndex >= json.Length;
-            }
-        }
 
         /// <summary>
         /// 设置Json文本
@@ -101,7 +80,7 @@ namespace CatJson
             //跳过空白字符
             SkipWhiteSpace();
 
-            if (IsEnd)
+            if (curIndex >= json.Length)
             {
                 //文本结束
                 type = TokenType.Eof;
@@ -109,7 +88,7 @@ namespace CatJson
             }
 
             //扫描字面量 分隔符
-            switch (CurChar)
+            switch (json[curIndex])
             {
                 case 'n':
                     type = TokenType.Null;
@@ -150,7 +129,7 @@ namespace CatJson
             }
 
             //扫描数字
-            if (char.IsDigit(CurChar) || CurChar == '-')
+            if (char.IsDigit(json[curIndex]) || json[curIndex] == '-')
             {
                 string str = ScanNumber();
                 type = TokenType.Number;
@@ -158,14 +137,14 @@ namespace CatJson
             }
 
             //扫描字符串
-            if (CurChar == '"')
+            if (json[curIndex] == '"')
             {
                 string str = ScanString();
                 type = TokenType.String;
                 return str;
             }
 
-            throw new Exception("json解析失败，当前字符:" + CurChar);
+            throw new Exception("json解析失败，当前字符:" + json[curIndex]);
         }
 
         /// <summary>
@@ -182,20 +161,12 @@ namespace CatJson
         /// </summary>
         private void SkipWhiteSpace()
         {
-
-            while (!IsEnd && IsWhiteSpace(CurChar))
+            char c = json[curIndex];
+            while (!(curIndex >= json.Length) && (c == ' ' || c == '\t' || c == '\n' || c == '\r'))
             {
                 Next();
+                c = json[curIndex];
             }
-        }
-
-        /// <summary>
-        /// 是否是空白字符
-        /// </summary>
-        private bool IsWhiteSpace(char c)
-        {
-            bool result = c == ' ' || c == '\t' || c == '\n' || c == '\r';
-            return result;
         }
 
         /// <summary>
@@ -240,12 +211,12 @@ namespace CatJson
             bool hasDot = false;
 
             //第一个字符是0-9或者-
-            sb.Append(CurChar);
+            sb.Append(json[curIndex]);
             Next();
 
-            while (!IsEnd && (char.IsDigit(CurChar) || CurChar == '.'))
+            while (!(curIndex >= json.Length) && (char.IsDigit(json[curIndex]) || json[curIndex] == '.'))
             {
-                if (CurChar == '.')
+                if (json[curIndex] == '.')
                 {
                     if (!hasDot)
                     {
@@ -257,7 +228,7 @@ namespace CatJson
                     }
                 }
 
-                sb.Append(CurChar);
+                sb.Append(json[curIndex]);
                 Next();
 
             }
@@ -282,10 +253,10 @@ namespace CatJson
             // 起始字符是 " 要跳过
             Next();
 
-            while (!IsEnd & CurChar != '"')
+            while (!(curIndex >= json.Length) & json[curIndex] != '"')
             {
                 //处理转义字符
-                if (CurChar == '\\')
+                if (json[curIndex] == '\\')
                 {
                     if (curIndex == json.Length - 1)
                     {
@@ -293,7 +264,7 @@ namespace CatJson
                     }
 
                     Next();
-                    switch (CurChar)
+                    switch (json[curIndex])
                     {
                         case '"':
                             Util.CachedSB.Append('\"');
@@ -329,11 +300,11 @@ namespace CatJson
                 }
 
                 //处理普通字符
-                Util.CachedSB.Append(CurChar);
+                Util.CachedSB.Append(json[curIndex]);
                 Next();
             }
 
-            if (IsEnd)
+            if (curIndex >= json.Length)
             {
                 throw new Exception("字符串扫描失败，不是以双引号结尾的");
             }

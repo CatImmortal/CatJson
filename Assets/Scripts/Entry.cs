@@ -51,12 +51,12 @@ public class Entry : MonoBehaviour
         JsonObject obj = JsonParser.ParseJson(json1.text);
         Debug.Log(obj);
 
-        //Debug.Log(obj["array"]);
-        //Debug.Log(obj["type"]);
-        //Debug.Log(obj["null"]);
-        //Debug.Log(obj["number"]);
-        //Debug.Log(obj["object"]);
-        //Debug.Log(obj["string"]);
+        Debug.Log(obj["array"]);
+        Debug.Log(obj["type"]);
+        Debug.Log(obj["null"]);
+        Debug.Log(obj["number"]);
+        Debug.Log(obj["object"]);
+        Debug.Log(obj["string"]);
 
     }
 
