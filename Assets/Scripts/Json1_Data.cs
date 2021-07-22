@@ -25,10 +25,6 @@ public class Json1_Root
     /// <summary>
     /// 
     /// </summary>
-    public string n;
-    /// <summary>
-    /// 
-    /// </summary>
     public int number;
     /// <summary>
     /// 

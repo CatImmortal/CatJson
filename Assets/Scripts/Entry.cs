@@ -26,7 +26,7 @@ public class Entry : MonoBehaviour
         json2Text = json2.text;
         json6Text = json6.text;
 
-        Test2();
+        TestGenParseCode();
     }
 
     private void Update()
@@ -93,6 +93,13 @@ public class Entry : MonoBehaviour
 
         Json6_Root result6 = JsonParser.ParseJson<Json6_Root>(json6.text);
         Debug.Log(result6.v3);
+    }
+
+    private void TestGenParseCode()
+    {
+        Json1_Root result1 = JsonParser.ParseJson<Json1_Root>(json1.text, false);
+        Debug.Log(result1);
+      
     }
 
     /// <summary>

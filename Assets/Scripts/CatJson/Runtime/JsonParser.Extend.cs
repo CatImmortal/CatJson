@@ -31,7 +31,8 @@ namespace CatJson
                     //跳过 :
                     Lexer.GetNextTokenByType(TokenType.Colon);
 
-                    //识别需要反序列化的字段值
+                    //主要手写这段
+                    //识别需要反序列化的字段值 
                     switch (key.ToString())
                     {
                         case "x":

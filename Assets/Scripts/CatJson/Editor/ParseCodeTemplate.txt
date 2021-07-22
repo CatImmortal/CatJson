@@ -4,7 +4,7 @@ namespace CatJson
 {
     public static partial class Generator
     {
-        private static #ClassName# Gen_#ClassName#()
+        private static #ClassName# Parse_#ClassName#()
         {
             #ClassName# obj = new #ClassName#();
 
@@ -20,8 +20,6 @@ namespace CatJson
                         JsonParser.ParseJsonValue(nextTokenType);
                         break;
                 }
-
-
             });
 
 

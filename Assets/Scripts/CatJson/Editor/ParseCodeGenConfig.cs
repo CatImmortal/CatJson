@@ -5,10 +5,11 @@ using UnityEngine;
 
 namespace CatJson.Editor
 {
-    public static class ParseCodeConfig
+    public static class ParseCodeGenConfig
     {
         public static string GenCodeDirPath = Application.dataPath + "/Scripts/CatJson/Runtime/GenParseCode";
-        public static string TemplateFilePath = Application.dataPath + "/Scripts/CatJson/Editor/CodeTemplate.txt";
+        public static string ParseCodeTemplateFilePath = Application.dataPath + "/Scripts/CatJson/Editor/ParseCodeTemplate.txt";
+        public static string StaticCtorTemplateFilePath = Application.dataPath + "/Scripts/CatJson/Editor/StaticCtorTemplate.txt";
 
         public static Type[] Types = {
             typeof(Json1_Root) ,

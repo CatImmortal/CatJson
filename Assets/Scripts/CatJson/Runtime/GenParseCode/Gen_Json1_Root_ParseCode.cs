@@ -6,7 +6,7 @@ namespace CatJson
 {
     public static partial class Generator
     {
-        private static Json1_Root Gen_Json1_Root()
+        private static Json1_Root Parse_Json1_Root()
         {
             Json1_Root obj = new Json1_Root();
 
@@ -19,74 +19,38 @@ namespace CatJson
                 {
 					case "array":
 					List<System.Int32> list = new List<System.Int32>();
-					JsonParser.ParseJsonArrayProcedure(temp.array, null, (userdata11, userdata22, nextTokenType2) =>
+					JsonParser.ParseJsonArrayProcedure(list, null, (userdata11, userdata22, nextTokenType2) =>
 					{
 					rs = JsonParser.Lexer.GetNextToken(out tokenType);
-					if (tokenType == TokenType.Number)
-					{
 					((List<System.Int32>)userdata11).Add(System.Int32.Parse(rs.Value.ToString()));
-					}
-					else if(tokenType != TokenType.Null)
-					{
-					throw new System.Exception("array的value类型不正确，当前解析到的是: " + tokenType);
-					}
 					});
 					temp.array = list.ToArray();
 					break;
+					
 					case "type":
 					rs = JsonParser.Lexer.GetNextToken(out tokenType);
-					if (tokenType == TokenType.True|| tokenType == TokenType.False)
-					{
 					temp.type = tokenType == TokenType.True;
-					}
-					else if(tokenType != TokenType.Null)
-					{
-					throw new System.Exception("type的value类型不正确，当前解析到的是: " + tokenType);
-					}
 					break;
-					case "n":
-					rs = JsonParser.Lexer.GetNextToken(out tokenType);
-					if (tokenType == TokenType.String)
-					{
-					temp.n = rs.Value.ToString();
-					}
-					else if(tokenType != TokenType.Null)
-					{
-					throw new System.Exception("n的value类型不正确，当前解析到的是: " + tokenType);
-					}
-					break;
+					
 					case "number":
 					rs = JsonParser.Lexer.GetNextToken(out tokenType);
-					if (tokenType == TokenType.Number)
-					{
 					temp.number = System.Int32.Parse(rs.Value.ToString());
-					}
-					else if(tokenType != TokenType.Null)
-					{
-					throw new System.Exception("number的value类型不正确，当前解析到的是: " + tokenType);
-					}
 					break;
+					
 					case "obj":
+					temp.obj = Parse_Json1_Obj();
 					break;
+					
 					case "str":
 					rs = JsonParser.Lexer.GetNextToken(out tokenType);
-					if (tokenType == TokenType.String)
-					{
 					temp.str = rs.Value.ToString();
-					}
-					else if(tokenType != TokenType.Null)
-					{
-					throw new System.Exception("str的value类型不正确，当前解析到的是: " + tokenType);
-					}
 					break;
+					
 
-                        
                     default:
                         JsonParser.ParseJsonValue(nextTokenType);
                         break;
                 }
-
-
             });
 
 

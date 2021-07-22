@@ -4,10 +4,8 @@
     2,
     3
   ],
-  "f1":null,
-  "f2":null,
+
   "type": true,
-  "n": null,
   "number": 123,
   "obj": {
     "a": "b",

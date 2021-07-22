@@ -1,0 +1,14 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+
+namespace CatJson
+{
+    public static partial class Generator
+    {
+        static Generator()
+        {
+#AddParseCode#
+        }
+    }
+}
+
