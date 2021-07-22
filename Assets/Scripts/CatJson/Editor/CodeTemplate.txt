@@ -1,0 +1,17 @@
+﻿#Using#
+
+namespace CatJson
+{
+    public static partial class Generator
+    {
+        private static #ClassName# Gen_#ClassName#()
+        {
+            #ClassName# obj = new #ClassName#();
+
+#ParseObj#
+
+            return obj;
+        }
+    }
+
+}

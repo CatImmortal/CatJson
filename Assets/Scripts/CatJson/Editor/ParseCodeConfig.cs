@@ -7,8 +7,8 @@ namespace CatJson.Editor
 {
     public static class ParseCodeConfig
     {
-        public static string GenCodeDirPath = Application.dataPath + "/Scripts/CatJson/Runtime/GenCode";
-        public static string TemplateFilePath = Application.dataPath + "/Scripts/CatJson/Editor/GenCodeTemplate.txt";
+        public static string GenCodeDirPath = Application.dataPath + "/Scripts/CatJson/Runtime/GenParseCode";
+        public static string TemplateFilePath = Application.dataPath + "/Scripts/CatJson/Editor/CodeTemplate.txt";
 
         public static Type[] Types = {
             typeof(Json1_Root) ,

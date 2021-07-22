@@ -23,7 +23,7 @@ namespace CatJson
                         {
                             temp.resultcode = rs.Value.ToString();
                         }
-                        else
+                        else if(tokenType != TokenType.Null)
                         {
                             throw new Exception("resultcode的value类型不正确，当前解析到的是:" + tokenType);
                         }
@@ -41,6 +41,18 @@ namespace CatJson
                             temp.error_code = int.Parse(rs.Value.ToString());
                         }
                         break;
+                    //case "boolean":
+                    //    rs = JsonParser.Lexer.GetNextToken(out tokenType);
+                    //    if (tokenType == TokenType.True || tokenType == TokenType.False)
+                    //    {
+                    //        temp.boolean = tokenType == TokenType.True;
+                    //    }
+                    //    else if (tokenType != TokenType.Null)
+                    //    {
+                    //        throw new Exception("resultcode的value类型不正确，当前解析到的是:" + tokenType);
+                    //    }
+                    //    break;
+                        
                     default:
                         JsonParser.ParseJsonValue(nextTokenType);
                         break;

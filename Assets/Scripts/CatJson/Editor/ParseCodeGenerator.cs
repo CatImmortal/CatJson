@@ -5,7 +5,7 @@ using UnityEditor;
 using System;
 using System.Reflection;
 using System.IO;
-
+using System.Text;
 namespace CatJson.Editor
 {
     public static class ParseCodeGenerator
@@ -14,16 +14,24 @@ namespace CatJson.Editor
 
         private static Queue<Type> genCodeTypes = new Queue<Type>();
 
+        private static StringBuilder sb = new StringBuilder();
+
         [MenuItem("CatJson/预生成Json解析代码")]
         private static void GenParseCode()
         {
-            //清空旧文件
-            DirectoryInfo di = new DirectoryInfo(ParseCodeConfig.GenCodeDirPath);
-
-
-            foreach (FileInfo item in di.GetFiles())
+            
+            if (!Directory.Exists(ParseCodeConfig.GenCodeDirPath))
             {
-                item.Delete();
+                Directory.CreateDirectory(ParseCodeConfig.GenCodeDirPath);
+            }
+            else
+            {
+                //清空旧文件
+                DirectoryInfo di = new DirectoryInfo(ParseCodeConfig.GenCodeDirPath);
+                foreach (FileInfo fi in di.GetFiles())
+                {
+                    fi.Delete();
+                }
             }
 
             for (int i = 0; i < ParseCodeConfig.Types.Length; i++)
@@ -47,113 +55,178 @@ namespace CatJson.Editor
             string template = sr.ReadToEnd();
             sr.Close();
 
+            //写入using
+            template = template.Replace("#Using#", GenUsingCode());
+
             //写入类名
             template = template.Replace("#ClassName#", type.FullName);
-            template = template.Replace("#SwitchCase#", GetSwitchCaseCode(type));
+
+            //生成parse代码
+            template = template.Replace("#ParseObj#", GenParseObjectCode(type));
 
             Debug.Log(template);
 
+            StreamWriter sw = new StreamWriter($"{ParseCodeConfig.GenCodeDirPath}/Gen_{type.FullName}_ParseCode.cs");
+            sw.Write(template);
+            sw.Close();
         }
 
-        private static string GetSwitchCaseCode(Type type)
+        /// <summary>
+        /// 生成using代码
+        /// </summary>
+        private static string GenUsingCode()
         {
-            foreach (FieldInfo fi in type.GetFields(BindingFlags.Instance | BindingFlags.Public))
+            sb.AppendLine("using System;");
+            sb.AppendLine("using System.Collections.Generic;");
+            string result = sb.ToString();
+            sb.Clear();
+            return result;
+        }
+
+        /// <summary>
+        /// 生成解析json数据对象的代码
+        /// </summary>
+        private static string GenParseObjectCode(Type type)
+        {
+            sb.AppendLine($"JsonParser.ParseJsonObjectProcedure(obj, null, (userdata1, userdata2, key, nextTokenType) =>");
+            sb.AppendLine("{");
+
+            sb.AppendLine($"{type.FullName} temp = ({type.FullName})userdata1;");
+            sb.AppendLine("RangeString? rs;");
+            sb.AppendLine("TokenType tokenType;");
+
+            sb.AppendLine("switch (key.ToString())");
+            sb.AppendLine("{");
+
+            foreach (PropertyInfo pi in type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty | BindingFlags.GetProperty))
             {
-
-
-                Util.CachedSB.AppendLine($"case \"{fi.Name}\":");
-
-                GetAssignmentCode(fi.FieldType, fi.Name);
-
-
-                Util.CachedSB.AppendLine("break;");
+                GenCaseCode(pi.PropertyType,pi.Name);
             }
 
-            string str = Util.CachedSB.ToString();
-            Util.CachedSB.Clear();
+            foreach (FieldInfo fi in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
+            {
+                GenCaseCode(fi.FieldType,fi.Name);
+            }
 
-            return str;
+            sb.AppendLine("}");
+
+            sb.AppendLine("});");
+
+            string result = sb.ToString();
+            sb.Clear();
+
+            return result;
         }
 
-        private static void GetAssignmentCode(Type type,string name)
+     
+        /// <summary>
+        /// 生成case属性和字段名的代码
+        /// </summary>
+        private static void GenCaseCode(Type type,string name)
         {
+            sb.AppendLine($"case \"{name}\":");
 
-
+            //基础类型
             if (type == typeof(string))
             {
-                GetCaseCode("String", $"temp.{name} = rs.Value.ToString();");
-                return;
+                GenTokenTypeCheckCode(name,"String", $"temp.{name} = rs.Value.ToString();");
             }
-
-            if (type == typeof(bool))
+            else if (type == typeof(bool))
             {
-                GetCaseCode("True", $"temp.{name} = tokenType == TokenType.True", " || tokenType == TokenType.False");
-                return;
+                GenTokenTypeCheckCode(name,"True", $"temp.{name} = tokenType == TokenType.True;", "|| tokenType == TokenType.False");
             }
-
-            if (type == typeof(int))
+            else if (type == typeof(int) || type == typeof(float) || type == typeof(double))
             {
-                GetCaseCode("Number", $"temp.{name} = int.Parse(rs.Value.ToString());");
-                return;
+                GenTokenTypeCheckCode(name, "Number", $"temp.{name} = {type.FullName}.Parse(rs.Value.ToString());");
             }
-
-            if (type == typeof(float))
+            //数组和List<T>
+            else if (type.IsArray || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)))
             {
-                GetCaseCode("Number", $"temp.{name} = float.Parse(rs.Value.ToString());");
-                return;
-            }
+                Type elementType;
+                if (type.IsArray)
+                {
+                    elementType = type.GetElementType();
+                }
+                else
+                {
+                    elementType = type.GetGenericArguments()[0];
+                }
 
-            if (type == typeof(double))
+                sb.AppendLine($"List<{elementType.FullName}> list = new List<{elementType.FullName}>();");
+
+                GenParseArrayCode(name, elementType);
+
+                if (type.IsArray)
+                {
+                    sb.AppendLine($"temp.{name} = list.ToArray();");
+                }
+                else
+                {
+                    sb.AppendLine($"temp.{name} = list;");
+                }
+            }
+            //字典
+            else if(type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
-                GetCaseCode("Number", $"temp.{name} = double.Parse(rs.Value.ToString());");
-                return;
+              
             }
-
-
-
-            //List<T>
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+            //其他类型
+            else
             {
-                Type elementType = type.GetGenericArguments()[0];
-                Util.CachedSB.AppendLine($"temp.{name} = new List<{elementType.FullName}>();");
-                Util.CachedSB.AppendLine($"JsonParser.ParseJsonArrayProcedure(temp.{name}, null, (userdata11, userdata22, nextTokenType2) =>");
-                Util.CachedSB.AppendLine("{");
-                //Util.CachedSB.AppendLine($"{elementType.FullName} item = Gen_{elementType.FullName}();");
-                Util.CachedSB.AppendLine($"((List<{elementType}>)userdata11).Add(item);");
-                Util.CachedSB.AppendLine("}");
-                return;
+
             }
 
-            //自定义类型
-            Util.CachedSB.AppendLine($"temp.{name} = Gen_{type.FullName}();");
-            genCodeTypes.Enqueue(type);
+            sb.AppendLine("break;");
         }
 
-        private static void GetCaseCode(string tokenType,string assgimentCode,string ex = "")
+        /// <summary>
+        /// 生成token类型检查代码
+        /// </summary>
+        private static void GenTokenTypeCheckCode(string name, string tokenType,string insertCode,string exCheckCode = "")
         {
-
-            Util.CachedSB.AppendLine("rs = JsonParser.Lexer.GetNextToken(out tokenType);");
-
- 
-            Util.CachedSB.AppendLine($"if(tokenType == TokenType.{tokenType}{ex})");
-
-
-            Util.CachedSB.AppendLine("{");
-
-
-            Util.CachedSB.AppendLine(assgimentCode);
-
-
-            Util.CachedSB.AppendLine("}");
-
-            Util.CachedSB.AppendLine("else");
-
-            Util.CachedSB.AppendLine("{");
-
-            Util.CachedSB.AppendLine("throw new Exception(\"resultcode的value类型不正确，当前解析到的是:\" + tokenType);");
-
-            Util.CachedSB.AppendLine("}");
+            sb.AppendLine("rs = JsonParser.Lexer.GetNextToken(out tokenType);");
+            sb.AppendLine($"if (tokenType == TokenType.{tokenType}{exCheckCode})");
+            sb.AppendLine("{");
+            sb.AppendLine(insertCode);
+            sb.AppendLine("}");
+            sb.AppendLine("else if(tokenType != TokenType.Null)");
+            sb.AppendLine("{");
+            sb.AppendLine($"throw new System.Exception(\"{name}的value类型不正确，当前解析到的是: \" + tokenType);");
+            sb.AppendLine("}");
         }
+
+        /// <summary>
+        /// 生成解析json数组的代码
+        /// </summary>
+        private static void GenParseArrayCode(string name,Type elementType)
+        {
+            sb.AppendLine($"JsonParser.ParseJsonArrayProcedure(temp.{name}, null, (userdata11, userdata22, nextTokenType2) =>");
+            sb.AppendLine("{");
+
+            //基础类型
+            if (elementType == typeof(string))
+            {
+                GenTokenTypeCheckCode(name, "String", $"((List<{elementType.FullName}>)userdata11).Add(rs.Value.ToString());");
+            }
+            else if (elementType == typeof(bool))
+            {
+                GenTokenTypeCheckCode(name, "True", $"((List<{elementType.FullName}>)userdata11).Add(tokenType == TokenType.True);", "|| tokenType == TokenType.False");
+            }
+            else if (elementType == typeof(int) || elementType == typeof(float) || elementType == typeof(double))
+            {
+                GenTokenTypeCheckCode(name, "Number", $"((List<{elementType.FullName}>)userdata11).Add({elementType.FullName}.Parse(rs.Value.ToString()));");
+            }
+            //不支持数组 List 字典 互相直接嵌套 只能用一个class包装一下
+            //自定义类型
+            else
+            {
+
+            }
+
+            sb.AppendLine("});");
+        }
+
+
     }
 }
 
