@@ -62,7 +62,7 @@ namespace CatJson.Editor
             template = template.Replace("#ClassName#", type.FullName);
 
             //生成parse代码
-            template = template.Replace("#ParseObj#", GenParseObjectCode(type));
+            template = template.Replace("#SwitchCaseParse#", GenSwitchCaseParseCode(type));
 
             Debug.Log(template);
 
@@ -76,27 +76,18 @@ namespace CatJson.Editor
         /// </summary>
         private static string GenUsingCode()
         {
-            sb.AppendLine("using System;");
-            sb.AppendLine("using System.Collections.Generic;");
+            AppendLine("using System;",0);
+            AppendLine("using System.Collections.Generic;",0);
             string result = sb.ToString();
             sb.Clear();
             return result;
         }
 
         /// <summary>
-        /// 生成解析json数据对象的代码
+        /// 生成使用switch case进行解析的代码
         /// </summary>
-        private static string GenParseObjectCode(Type type)
+        private static string GenSwitchCaseParseCode(Type type)
         {
-            sb.AppendLine($"JsonParser.ParseJsonObjectProcedure(obj, null, (userdata1, userdata2, key, nextTokenType) =>");
-            sb.AppendLine("{");
-
-            sb.AppendLine($"{type.FullName} temp = ({type.FullName})userdata1;");
-            sb.AppendLine("RangeString? rs;");
-            sb.AppendLine("TokenType tokenType;");
-
-            sb.AppendLine("switch (key.ToString())");
-            sb.AppendLine("{");
 
             foreach (PropertyInfo pi in type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty | BindingFlags.GetProperty))
             {
@@ -107,10 +98,6 @@ namespace CatJson.Editor
             {
                 GenCaseCode(fi.FieldType,fi.Name);
             }
-
-            sb.AppendLine("}");
-
-            sb.AppendLine("});");
 
             string result = sb.ToString();
             sb.Clear();
@@ -124,7 +111,7 @@ namespace CatJson.Editor
         /// </summary>
         private static void GenCaseCode(Type type,string name)
         {
-            sb.AppendLine($"case \"{name}\":");
+            AppendLine($"case \"{name}\":");
 
             //基础类型
             if (type == typeof(string))
@@ -152,17 +139,17 @@ namespace CatJson.Editor
                     elementType = type.GetGenericArguments()[0];
                 }
 
-                sb.AppendLine($"List<{elementType.FullName}> list = new List<{elementType.FullName}>();");
+                AppendLine($"List<{elementType.FullName}> list = new List<{elementType.FullName}>();");
 
                 GenParseArrayCode(name, elementType);
 
                 if (type.IsArray)
                 {
-                    sb.AppendLine($"temp.{name} = list.ToArray();");
+                    AppendLine($"temp.{name} = list.ToArray();");
                 }
                 else
                 {
-                    sb.AppendLine($"temp.{name} = list;");
+                    AppendLine($"temp.{name} = list;");
                 }
             }
             //字典
@@ -176,7 +163,7 @@ namespace CatJson.Editor
 
             }
 
-            sb.AppendLine("break;");
+            AppendLine("break;");
         }
 
         /// <summary>
@@ -184,15 +171,15 @@ namespace CatJson.Editor
         /// </summary>
         private static void GenTokenTypeCheckCode(string name, string tokenType,string insertCode,string exCheckCode = "")
         {
-            sb.AppendLine("rs = JsonParser.Lexer.GetNextToken(out tokenType);");
-            sb.AppendLine($"if (tokenType == TokenType.{tokenType}{exCheckCode})");
-            sb.AppendLine("{");
-            sb.AppendLine(insertCode);
-            sb.AppendLine("}");
-            sb.AppendLine("else if(tokenType != TokenType.Null)");
-            sb.AppendLine("{");
-            sb.AppendLine($"throw new System.Exception(\"{name}的value类型不正确，当前解析到的是: \" + tokenType);");
-            sb.AppendLine("}");
+            AppendLine("rs = JsonParser.Lexer.GetNextToken(out tokenType);");
+            AppendLine($"if (tokenType == TokenType.{tokenType}{exCheckCode})");
+            AppendLine("{");
+            AppendLine(insertCode);
+            AppendLine("}");
+            AppendLine("else if(tokenType != TokenType.Null)");
+            AppendLine("{");
+            AppendLine($"throw new System.Exception(\"{name}的value类型不正确，当前解析到的是: \" + tokenType);");
+            AppendLine("}");
         }
 
         /// <summary>
@@ -200,8 +187,8 @@ namespace CatJson.Editor
         /// </summary>
         private static void GenParseArrayCode(string name,Type elementType)
         {
-            sb.AppendLine($"JsonParser.ParseJsonArrayProcedure(temp.{name}, null, (userdata11, userdata22, nextTokenType2) =>");
-            sb.AppendLine("{");
+            AppendLine($"JsonParser.ParseJsonArrayProcedure(temp.{name}, null, (userdata11, userdata22, nextTokenType2) =>");
+            AppendLine("{");
 
             //基础类型
             if (elementType == typeof(string))
@@ -223,10 +210,18 @@ namespace CatJson.Editor
 
             }
 
-            sb.AppendLine("});");
+            AppendLine("});");
         }
 
 
+        private static void AppendLine(string str,int tabNum = 5)
+        {
+            for (int i = 0; i < tabNum; i++)
+            {
+                sb.Append("\t");
+            }
+            sb.AppendLine(str);
+        }
     }
 }
 

@@ -8,7 +8,22 @@ namespace CatJson
         {
             #ClassName# obj = new #ClassName#();
 
-#ParseObj#
+            JsonParser.ParseJsonObjectProcedure(obj, null, (userdata1, userdata2, key, nextTokenType) =>
+            {
+                #ClassName# temp = (#ClassName#)userdata1;
+                RangeString? rs;
+                TokenType tokenType;
+                switch (key.ToString())
+                {
+#SwitchCaseParse#
+                    default:
+                        JsonParser.ParseJsonValue(nextTokenType);
+                        break;
+                }
+
+
+            });
+
 
             return obj;
         }
