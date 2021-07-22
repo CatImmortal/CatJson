@@ -349,7 +349,7 @@ namespace CatJson
 
                     if (extendParseFuncDict.TryGetValue(type,out Func<object> func))
                     {
-                        //自定义扩展解析
+                        //自定义解析
                         return func();
                     }
 
@@ -364,7 +364,7 @@ namespace CatJson
         /// <summary>
         /// 解析json对象为指定类型的对象实例
         /// </summary>
-        private static object ParseJsonObjectByType(Type type)
+        public static object ParseJsonObjectByType(Type type)
         {
             object obj = Activator.CreateInstance(type);
 

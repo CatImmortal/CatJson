@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using CatJson;
+
 
 public class Json2_ListItem
 {
@@ -15,6 +17,7 @@ public class Json2_ListItem
     /// </summary>
     public string zone { get; set; }
 }
+
 
 public class Json2_Result
 {
@@ -40,6 +43,7 @@ public class Json2_Result
     public int status { get; set; }
 }
 
+[GenParseCodeRoot]
 public class Json2_Root
 {
     /// <summary>

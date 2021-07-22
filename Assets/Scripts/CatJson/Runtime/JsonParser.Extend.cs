@@ -13,7 +13,7 @@ namespace CatJson
             //自定义扩展主要针对json object格式的json文本，即{"key":value,...}
             //添加自定义扩展的用处主要有2个
             //1.key value不能直接用反射解析为类对象的字段名和值
-            //2.需要通过手写解析代码来加速解析运行
+            //2.通过添加手写解析代码来加速解析运行，可以作为自动生成的解析代码出现fallback时的补充
 
             //加速Vector3的解析
             extendParseFuncDict.Add(typeof(Vector3), () =>
@@ -31,7 +31,7 @@ namespace CatJson
                     //跳过 :
                     Lexer.GetNextTokenByType(TokenType.Colon);
 
-                    //主要手写这段
+                    //主要手写这段switch case
                     //识别需要反序列化的字段值 
                     switch (key.ToString())
                     {

@@ -8,11 +8,16 @@ namespace CatJson.Editor
     public static class ParseCodeGenConfig
     {
         public static string GenCodeDirPath = Application.dataPath + "/Scripts/CatJson/Runtime/GenParseCode";
-        public static string ParseCodeTemplateFilePath = Application.dataPath + "/Scripts/CatJson/Editor/ParseCodeTemplate.txt";
+        public static string ParseClassCodeTemplateFilePath = Application.dataPath + "/Scripts/CatJson/Editor/ParseClassCodeTemplate.txt";
+        public static string ParseStructCodeTemplateFilePath = Application.dataPath + "/Scripts/CatJson/Editor/ParseStructCodeTemplate.txt";
         public static string StaticCtorTemplateFilePath = Application.dataPath + "/Scripts/CatJson/Editor/StaticCtorTemplate.txt";
 
-        public static Type[] Types = {
-            typeof(Json1_Root) ,
+        /// <summary>
+        /// 需要生成解析代码的json数据类的程序集名字
+        /// </summary>
+        public static string[] Assemblies =
+        {
+            "Assembly-CSharp"
         };
     }
 

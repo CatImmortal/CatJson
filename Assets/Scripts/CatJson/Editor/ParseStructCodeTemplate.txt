@@ -1,0 +1,55 @@
+﻿#Using#
+
+using UnityEngine;
+namespace CatJson
+{
+    public static partial class Generator
+    {
+        private static #ClassName# #MethodName#()
+        {
+            #ClassName# temp = new #ClassName#();
+            RangeString? rs;
+            TokenType tokenType;
+
+            JsonParser.Lexer.GetNextTokenByType(TokenType.LeftBrace);
+
+            while (JsonParser.Lexer.LookNextTokenType() != TokenType.RightBrace)
+            {
+               
+
+                RangeString key = JsonParser.Lexer.GetNextTokenByType(TokenType.String).Value;
+
+                JsonParser.Lexer.GetNextTokenByType(TokenType.Colon);
+
+                switch (key.ToString())
+                {
+#SwitchCaseParse#
+                    default:
+                        JsonParser.ParseJsonValue(JsonParser.Lexer.LookNextTokenType());
+                        break;
+                }
+
+
+                if (JsonParser.Lexer.LookNextTokenType() == TokenType.Comma)
+                {
+                    JsonParser.Lexer.GetNextTokenByType(TokenType.Comma);
+
+                    if (JsonParser.Lexer.LookNextTokenType() == TokenType.RightBracket)
+                    {
+                        throw new System.Exception("Json对象不能以逗号结尾");
+                    }
+                }
+                else
+                {
+                    break;
+                }
+
+            }
+
+            JsonParser.Lexer.GetNextTokenByType(TokenType.RightBrace);
+
+            return temp;
+        }
+    }
+
+}

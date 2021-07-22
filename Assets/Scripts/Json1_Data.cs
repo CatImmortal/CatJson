@@ -1,4 +1,4 @@
-﻿
+﻿using CatJson;
 
 public class Json1_Obj
 {
@@ -12,6 +12,7 @@ public class Json1_Obj
     public string c;
 }
 
+[GenParseCodeRoot]
 public class Json1_Root
 {
     /// <summary>

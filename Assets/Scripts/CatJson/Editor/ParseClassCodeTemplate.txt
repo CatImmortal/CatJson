@@ -4,7 +4,7 @@ namespace CatJson
 {
     public static partial class Generator
     {
-        private static #ClassName# Parse_#ClassName#()
+        private static #ClassName# #MethodName#()
         {
             #ClassName# obj = new #ClassName#();
 
