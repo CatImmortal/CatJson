@@ -8,6 +8,9 @@ using System.IO;
 using System.Text;
 namespace CatJson.Editor
 {
+    /// <summary>
+    /// 解析代码生成器
+    /// </summary>
     public static class ParseCodeGenerator
     {
 
@@ -50,6 +53,18 @@ namespace CatJson.Editor
             GenStaticCtorCode();
 
             AssetDatabase.Refresh();
+        }
+
+        /// <summary>
+        /// 带制表符的AppendLine
+        /// </summary>
+        private static void AppendLine(string str, int tabNum = 5)
+        {
+            for (int i = 0; i < tabNum; i++)
+            {
+                sb.Append("\t");
+            }
+            sb.AppendLine(str);
         }
 
         /// <summary>
@@ -237,17 +252,7 @@ namespace CatJson.Editor
             AppendLine("});");
         }
 
-        /// <summary>
-        /// 带制表符的AppendLine
-        /// </summary>
-        private static void AppendLine(string str,int tabNum = 5)
-        {
-            for (int i = 0; i < tabNum; i++)
-            {
-                sb.Append("\t");
-            }
-            sb.AppendLine(str);
-        }
+       
     }
 }
 
