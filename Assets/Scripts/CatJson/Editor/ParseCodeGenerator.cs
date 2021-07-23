@@ -104,7 +104,7 @@ namespace CatJson.Editor
             template = template.Replace("#MethodName#", GetParseMethodName(type));
 
             //生成解析代码
-            template = template.Replace("#SwitchCaseParse#", AppendSwitchCaseParseCode(type));
+            template = template.Replace("#IfElseParse#", AppendIfElseParseCode(type));
 
             StreamWriter sw = new StreamWriter($"{ParseCodeGenConfig.GenCodeDirPath}/Gen_{type.FullName.Replace(".", "_")}_ParseCode.cs");
             sw.Write(template);
@@ -124,24 +124,36 @@ namespace CatJson.Editor
         }
 
         /// <summary>
-        /// 生成使用switch case进行字段/属性解析的代码
+        /// 生成使用if else进行字段/属性解析的代码
         /// </summary>
-        private static string AppendSwitchCaseParseCode(Type type)
+        private static string AppendIfElseParseCode(Type type)
         {
-
+            bool isElseIf = false;
             foreach (PropertyInfo pi in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
                 //属性必须同时具有get set，并且不能是Item
                 if (pi.SetMethod != null && pi.GetMethod != null && pi.Name != "Item")
                 {
-                     AppendCaseCode(pi.PropertyType,pi.Name);
+                    AppendIfElseCode(pi.PropertyType, pi.Name,isElseIf);
+
+                    if (!isElseIf)
+                    {
+                        isElseIf = true;
+                    }
+                   
                 }
                
             }
 
+            isElseIf = false;
             foreach (FieldInfo fi in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
             {
-                AppendCaseCode(fi.FieldType,fi.Name);
+                AppendIfElseCode(fi.FieldType, fi.Name,isElseIf);
+
+                if (!isElseIf)
+                {
+                    isElseIf = true;
+                }
             }
 
             string result = sb.ToString();
@@ -150,13 +162,21 @@ namespace CatJson.Editor
             return result;
         }
 
-     
         /// <summary>
-        /// 生成case代码
+        /// 生成if或else if代码
         /// </summary>
-        private static void AppendCaseCode(Type type,string name)
+        private static void AppendIfElseCode(Type type,string name,bool isElseIf)
         {
-            AppendLine($"case \"{name}\":");
+            if (isElseIf)
+            {
+                AppendLine($"else if (key.Equals(new RangeString(\"{name}\")))");
+            }
+            else
+            {
+                AppendLine($"if (key.Equals(new RangeString(\"{name}\")))");
+            }
+
+            AppendLine("{");
 
             //基础类型
             if (type == typeof(string))
@@ -197,7 +217,7 @@ namespace CatJson.Editor
                     AppendLine($"temp.{name} = list;");
                 }
             }
-            else if(Util.IsDictionary(type))
+            else if (Util.IsDictionary(type))
             {
                 //字典 todo:
             }
@@ -212,9 +232,8 @@ namespace CatJson.Editor
                 }
             }
 
+            AppendLine("}");
 
-            AppendLine("break;");
-            AppendLine("");
         }
 
         /// <summary>
@@ -270,6 +289,28 @@ namespace CatJson.Editor
             AppendLine("});");
         }
 
+        /// <summary>
+        /// 生成静态构造器文件
+        /// </summary>
+        private static void GenStaticCtorCode(List<Type> types)
+        {
+            //读取模板文件
+            StreamReader sr = new StreamReader(ParseCodeGenConfig.StaticCtorTemplateFilePath);
+            string template = sr.ReadToEnd();
+            sr.Close();
+
+            foreach (Type type in types)
+            {
+                AppendLine($"ParseCodeFuncDict.Add(typeof({type.FullName}),{GetParseMethodName(type)});", 3);
+            }
+
+            template = template.Replace("#AddParseCodeFunc#", sb.ToString());
+            sb.Clear();
+
+            StreamWriter sw = new StreamWriter($"{ParseCodeGenConfig.GenCodeDirPath}/Gen_ParseCodeStaticCtor.cs");
+            sw.Write(template);
+            sw.Close();
+        }
 
         /// <summary>
         /// 获取需要生成解析代码的json数据类
@@ -292,10 +333,12 @@ namespace CatJson.Editor
             return types;
         }
 
+     
+
         /// <summary>
         /// 带制表符的AppendLine
         /// </summary>
-        private static void AppendLine(string str, int tabNum = 5)
+        private static void AppendLine(string str, int tabNum = 4)
         {
             for (int i = 0; i < tabNum; i++)
             {
@@ -312,28 +355,7 @@ namespace CatJson.Editor
             return $"Parse_{type.FullName.Replace(".", "_")}";
         }
 
-        /// <summary>
-        /// 生成静态构造器文件
-        /// </summary>
-        private static void GenStaticCtorCode(List<Type> types)
-        {
-            //读取模板文件
-            StreamReader sr = new StreamReader(ParseCodeGenConfig.StaticCtorTemplateFilePath);
-            string template = sr.ReadToEnd();
-            sr.Close();
-
-            foreach (Type type in types)
-            {
-                AppendLine($"GenCodeDict.Add(typeof({type.FullName}),{GetParseMethodName(type)});", 3);
-            }
-
-            template = template.Replace("#AddParseCode#", sb.ToString());
-            sb.Clear();
-
-            StreamWriter sw = new StreamWriter($"{ParseCodeGenConfig.GenCodeDirPath}/Gen_ParserStaticCtor.cs");
-            sw.Write(template);
-            sw.Close();
-        }
+     
     }
 }
 

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace CatJson
 {
-    public static partial class Generator
+    public static partial class ParseCode
     {
         private static Json2_ListItem Parse_Json2_ListItem()
         {
@@ -15,28 +15,27 @@ namespace CatJson
                 Json2_ListItem temp = (Json2_ListItem)userdata1;
                 RangeString? rs;
                 TokenType tokenType;
-                switch (key.ToString())
-                {
-					case "datetime":
-					rs = JsonParser.Lexer.GetNextToken(out tokenType);
-					temp.datetime = rs.Value.ToString();
-					break;
-					
-					case "remark":
-					rs = JsonParser.Lexer.GetNextToken(out tokenType);
-					temp.remark = rs.Value.ToString();
-					break;
-					
-					case "zone":
-					rs = JsonParser.Lexer.GetNextToken(out tokenType);
-					temp.zone = rs.Value.ToString();
-					break;
-					
+                
+				if (key.Equals(new RangeString("datetime")))
+				{
+				rs = JsonParser.Lexer.GetNextToken(out tokenType);
+				temp.datetime = rs.Value.ToString();
+				}
+				else if (key.Equals(new RangeString("remark")))
+				{
+				rs = JsonParser.Lexer.GetNextToken(out tokenType);
+				temp.remark = rs.Value.ToString();
+				}
+				else if (key.Equals(new RangeString("zone")))
+				{
+				rs = JsonParser.Lexer.GetNextToken(out tokenType);
+				temp.zone = rs.Value.ToString();
+				}
 
-                    default:
-                        JsonParser.ParseJsonValue(nextTokenType);
-                        break;
+                else{
+                    JsonParser.ParseJsonValue(nextTokenType);
                 }
+                
             });
 
 

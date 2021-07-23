@@ -257,7 +257,7 @@ namespace CatJson
                 return ParseJsonObjectByType(type);
             }
 
-            if (Generator.GenCodeDict.TryGetValue(type,out Func<object> func))
+            if (ParseCode.ParseCodeFuncDict.TryGetValue(type,out Func<object> func))
             {
                 return func();
             }

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace CatJson
@@ -7,7 +7,9 @@ namespace CatJson
     {
         static ParseCode()
         {
-#AddParseCodeFunc#
+			ParseCodeFuncDict.Add(typeof(Json1_Root),Parse_Json1_Root);
+			ParseCodeFuncDict.Add(typeof(Json2_Root),Parse_Json2_Root);
+
         }
     }
 }

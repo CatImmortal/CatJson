@@ -33,16 +33,19 @@ public class Entry : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Q))
         {
+            //节点树
             TestDeserializeJsonNodeTree();
         }
 
         if (Input.GetKeyDown(KeyCode.A))
         {
+            //反射
             TestDeserializeJsonObject();
         }
 
         if (Input.GetKeyDown(KeyCode.S))
         {
+            //预生成代码
             TestDeserializeJsonObject2();
         }
 

@@ -1,9 +1,8 @@
 ﻿#Using#
 
-using UnityEngine;
 namespace CatJson
 {
-    public static partial class Generator
+    public static partial class ParseCode
     {
         private static #ClassName# #MethodName#()
         {
@@ -21,12 +20,9 @@ namespace CatJson
 
                 JsonParser.Lexer.GetNextTokenByType(TokenType.Colon);
 
-                switch (key.ToString())
-                {
-#SwitchCaseParse#
-                    default:
-                        JsonParser.ParseJsonValue(JsonParser.Lexer.LookNextTokenType());
-                        break;
+#IfElseParse#
+                else{
+                    JsonParser.ParseJsonValue(JsonParser.Lexer.LookNextTokenType());
                 }
 
 

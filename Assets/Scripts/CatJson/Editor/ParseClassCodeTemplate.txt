@@ -2,7 +2,7 @@
 
 namespace CatJson
 {
-    public static partial class Generator
+    public static partial class ParseCode
     {
         private static #ClassName# #MethodName#()
         {
@@ -13,13 +13,12 @@ namespace CatJson
                 #ClassName# temp = (#ClassName#)userdata1;
                 RangeString? rs;
                 TokenType tokenType;
-                switch (key.ToString())
-                {
-#SwitchCaseParse#
-                    default:
-                        JsonParser.ParseJsonValue(nextTokenType);
-                        break;
+                
+#IfElseParse#
+                else{
+                    JsonParser.ParseJsonValue(nextTokenType);
                 }
+                
             });
 
 
