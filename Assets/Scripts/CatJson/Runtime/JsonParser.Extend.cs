@@ -13,69 +13,72 @@ namespace CatJson
             //自定义扩展主要针对json object格式的json文本，即{"key":value,...}
             //添加自定义扩展的用处主要有2个
             //1.key value不能直接用反射解析为类对象的字段名和值
-            //2.通过添加手写解析代码来加速解析运行，可以作为自动生成的解析代码出现fallback时的补充
+            //2.通过添加手写解析代码来加速反射解析运行
 
             //加速Vector3的解析
-            extendParseFuncDict.Add(typeof(Vector3), () =>
-            {
-                Vector3 v3 = new Vector3();
-
-                //跳过 {
-                Lexer.GetNextTokenByType(TokenType.LeftBrace);
-
-                while (Lexer.LookNextTokenType() != TokenType.RightBrace)
+            extendParseFuncDict.Add(
+                typeof(Vector3), () =>
                 {
-                    //提取key
-                    RangeString key = Lexer.GetNextTokenByType(TokenType.String).Value;
+                    Vector3 v3 = new Vector3();
 
-                    //跳过 :
-                    Lexer.GetNextTokenByType(TokenType.Colon);
+                    //跳过 {
+                    Lexer.GetNextTokenByType(TokenType.LeftBrace);
 
-                    //主要手写这段switch case
-                    //识别需要反序列化的字段值 
-                    switch (key.ToString())
+                    while (Lexer.LookNextTokenType() != TokenType.RightBrace)
                     {
-                        case "x":
-                            string token = Lexer.GetNextToken(out _).Value.ToString();
-                            v3.x = float.Parse(token);
-                            break;
-                        case "y":
-                            token = Lexer.GetNextToken(out _).Value.ToString();
-                            v3.y = float.Parse(token);
-                            break;
-                        case "z":
-                            token = Lexer.GetNextToken(out _).Value.ToString();
-                            v3.z = float.Parse(token);
-                            break;
+                        //提取key
+                        RangeString key = Lexer.GetNextTokenByType(TokenType.String).Value;
 
-                        default:
-                            throw new Exception("Vector3解析中发现了额外key");
-                    }
+                        //跳过 :
+                        Lexer.GetNextTokenByType(TokenType.Colon);
 
-
-                    //有逗号就跳过逗号
-                    if (Lexer.LookNextTokenType() == TokenType.Comma)
-                    {
-                        Lexer.GetNextTokenByType(TokenType.Comma);
-
-                        if (Lexer.LookNextTokenType() == TokenType.RightBracket)
+                        //主要手写这段switch case
+                        //识别需要反序列化的字段值 
+                        switch (key.ToString())
                         {
-                            throw new Exception("Json对象不能以逗号结尾");
+                            case "x":
+                                string token = Lexer.GetNextToken(out _).Value.ToString();
+                                v3.x = float.Parse(token);
+                                break;
+                            case "y":
+                                token = Lexer.GetNextToken(out _).Value.ToString();
+                                v3.y = float.Parse(token);
+                                break;
+                            case "z":
+                                token = Lexer.GetNextToken(out _).Value.ToString();
+                                v3.z = float.Parse(token);
+                                break;
+
+                            default:
+                                throw new Exception("Vector3解析中发现了额外key");
                         }
-                    }
-                    else
-                    {
-                        //没有逗号就说明结束了
-                        break;
+
+
+                        //有逗号就跳过逗号
+                        if (Lexer.LookNextTokenType() == TokenType.Comma)
+                        {
+                            Lexer.GetNextTokenByType(TokenType.Comma);
+
+                            if (Lexer.LookNextTokenType() == TokenType.RightBracket)
+                            {
+                                throw new Exception("Json对象不能以逗号结尾");
+                            }
+                        }
+                        else
+                        {
+                            //没有逗号就说明结束了
+                            break;
+                        }
+
                     }
 
+                    //跳过 }
+                    Lexer.GetNextTokenByType(TokenType.RightBrace);
+
+                    return v3;
                 }
-
-                //跳过 }
-                Lexer.GetNextTokenByType(TokenType.RightBrace);
-
-                return v3;
-            });
+            
+            );
 
         }
     }

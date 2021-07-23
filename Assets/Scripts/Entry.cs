@@ -26,9 +26,8 @@ public class Entry : MonoBehaviour
 
         json2Text = json2.text;
 
-        Json7_Data result7 = JsonParser.ParseJson<Json7_Data>(json7.text);
-        Debug.Log(result7);
 
+        Json2_Root result2 = JsonConvert.DeserializeObject<Json2_Root>(json2Text);
     }
 
     private void Update()
@@ -131,6 +130,7 @@ public class Entry : MonoBehaviour
             Json2_Root result2 = JsonMapper.ToObject<Json2_Root>(json2Text);
         }
         Profiler.EndSample();
+
 
 
         Profiler.BeginSample("Newtonsoft Json");

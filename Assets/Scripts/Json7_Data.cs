@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using CatJson;
 
-[GenParseCodeRoot]
+//[GenParseCodeRoot]
 public class Json7_Data
 {
     public Dictionary<string,string> dict1;
     public Dictionary<string, Dictionary<string, int>> dict2;
-    public Dictionary<string, Dictionary<string, Dictionary<string,bool>>> dict3;
+    public Dictionary<string, Dictionary<string, Dictionary<string, bool>>> dict3;
+
+    public Dictionary<string, int[]> dict4;
+    public Dictionary<string, List<int>> dict5;
 }

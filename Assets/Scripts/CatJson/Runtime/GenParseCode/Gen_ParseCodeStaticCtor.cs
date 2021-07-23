@@ -7,7 +7,7 @@ namespace CatJson
     {
         static ParseCode()
         {
-			ParseCodeFuncDict.Add(typeof(Json7_Data),Parse_Json7_Data);
+			ParseCodeFuncDict.Add(typeof(Json2_Root),Parse_Json2_Root);
 
         }
     }

@@ -230,9 +230,11 @@ namespace CatJson.Editor
                     elementType = type.GetGenericArguments()[0];
                 }
 
-                AppendLine($"List<{elementType.FullName}> list = new List<{elementType.FullName}>();");
+                string typeFullName = GetTypeFullName(elementType);  //获取正确的数组元素类型名
+                AppendLine($"List<{typeFullName}> list = new List<{typeFullName}>();");
 
-                AppendParseArrayCode(name, elementType);
+                //解析数组
+                AppendParseArrayCode(elementType);
 
                 if (type.IsArray)
                 {
@@ -247,9 +249,9 @@ namespace CatJson.Editor
             {
                 //字典
                 Type valueType = type.GetGenericArguments()[1];
-                string valueTypeName = GetDictValueTypeName(type);
-                AppendLine($"Dictionary<string, {valueTypeName}> dict = new Dictionary<string, {valueTypeName}>();");
-                AppendParseDictCode("dict", "userdata11", "userdata21", "key1", "nextTokenType1", valueType);
+                string typeFullName = GetTypeFullName(type);  //获取正确的字典类型名
+                AppendLine($"{typeFullName} dict = new {typeFullName}();");
+                AppendParseDictCode(valueType);
                 AppendLine($"temp.{name} = dict;");
             }
             else
@@ -279,36 +281,67 @@ namespace CatJson.Editor
         /// <summary>
         /// 生成解析json数组的代码
         /// </summary>
-        private static void AppendParseArrayCode(string name,Type elementType)
+        private static void AppendParseArrayCode(Type elementType, string listName = "list", string userdata1Name = "userdata11", string userdata2Name = "userdata21", string nextTokenTypeName = "nextTokenType1", string dictName = "dict",string keyName = "key1")
         {
-            AppendLine($"JsonParser.ParseJsonArrayProcedure(list, null, (userdata11, userdata21, nextTokenType1) =>");
+            AppendLine($"JsonParser.ParseJsonArrayProcedure({listName}, null, ({userdata1Name}, {userdata2Name}, {nextTokenTypeName}) =>");
             AppendLine("{");
 
             //基础类型
             if (elementType == typeof(string))
             {
-                AppendAssignmentCode( $"((List<{elementType.FullName}>)userdata11).Add(rs.Value.ToString());");
+                AppendAssignmentCode( $"((List<{elementType.FullName}>){userdata1Name}).Add(rs.Value.ToString());");
             }
             else if (elementType == typeof(bool))
             {
-                AppendAssignmentCode($"((List<{elementType.FullName}>)userdata11).Add(tokenType == TokenType.True);");
+                AppendAssignmentCode($"((List<{elementType.FullName}>){userdata1Name}).Add(tokenType == TokenType.True);");
             }
             else if (Util.IsNumber(elementType))
             {
-                AppendAssignmentCode( $"((List<{elementType.FullName}>)userdata11).Add({elementType.FullName}.Parse(rs.Value.ToString()));");
+                AppendAssignmentCode( $"((List<{elementType.FullName}>){userdata1Name}).Add({elementType.FullName}.Parse(rs.Value.ToString()));");
             }
             else if (Util.IsArrayOrList(elementType))
             {
-                //数组 List<T> todo:
+                //数组 List<T>
+                Type newElementType;
+                if (elementType.IsArray)
+                {
+                    newElementType = elementType.GetElementType();
+                }
+                else
+                {
+                    newElementType = elementType.GetGenericArguments()[0];
+                }
+
+                string typeFullName = GetTypeFullName(newElementType);
+
+                AppendLine($"List<{typeFullName}> {listName}1 = new List<{typeFullName}>();");
+
+                AppendParseArrayCode(newElementType,$"{listName}1", $"{userdata1Name}1", $"{userdata2Name}1", $"{nextTokenTypeName}1",$"{dictName}1",$"{keyName}1");
+
+
+
+                if (elementType.IsArray)
+                {
+                    AppendLine($"{listName}.Add({listName}1.ToArray());");
+                }
+                else
+                {
+                    AppendLine($"{listName}.Add({listName}1);");
+                }
             }
             else if (Util.IsDictionary(elementType))
             {
-                //字典 todo:
+                //字典
+                Type valueType = elementType.GetGenericArguments()[1];
+                string typeFullName = GetTypeFullName(elementType);
+                AppendLine($"{typeFullName} {dictName} = new {typeFullName}();");
+                AppendParseDictCode(valueType,$"{dictName}", $"{userdata1Name}1", $"{userdata2Name}1", $"{keyName}1", $"{nextTokenTypeName}1");
+                AppendLine($"{listName}.Add({dictName});");
             }
             else
             {
                 //自定义类型
-                AppendLine($"((List<{elementType.FullName}>)userdata11).Add({GetParseMethodName(elementType)}());");
+                AppendLine($"((List<{elementType.FullName}>){userdata1Name}).Add({GetParseMethodName(elementType)}());");
 
                 if (!GenParseCodeTypes.Contains(elementType))
                 {
@@ -323,7 +356,7 @@ namespace CatJson.Editor
         /// <summary>
         /// 生成解析字典的代码
         /// </summary>
-        private static void AppendParseDictCode(string dictName,string userdata1Name,string userdata2Name,string keyName,string nextTokenTypeName,Type valueType)
+        private static void AppendParseDictCode(Type valueType,string dictName = "dict",string userdata1Name = "userdata11",string userdata2Name = "userdata21",string keyName = "key1",string nextTokenTypeName = "nextTokenType1",string listName = "list")
         {
             AppendLine($"JsonParser.ParseJsonObjectProcedure({dictName}, null, ({userdata1Name}, {userdata2Name},{keyName}, {nextTokenTypeName}) =>");
             AppendLine("{");
@@ -344,16 +377,41 @@ namespace CatJson.Editor
             }
             else if (Util.IsArrayOrList(valueType))
             {
-                //数组 List<T> todo:
+                //数组 List<T>
+                Type elementType;
+                if (valueType.IsArray)
+                {
+                    elementType = valueType.GetElementType();
+                }
+                else
+                {
+                    elementType = valueType.GetGenericArguments()[0];
+                }
+
+                string typeFullName = GetTypeFullName(elementType);
+
+                AppendLine($"List<{typeFullName}> {listName}1 = new List<{typeFullName}>();");
+
+                AppendParseArrayCode(elementType, $"{listName}1", $"{userdata1Name}1", $"{userdata2Name}1", $"{nextTokenTypeName}1", $"{dictName}1", $"{keyName}1");
+
+                
+                if (valueType.IsArray)
+                {
+                    AppendLine($"((Dictionary<string, {GetTypeFullName(valueType)}>){userdata1Name}).Add({keyName}.ToString(), {listName}1.ToArray());");
+                }
+                else
+                {
+                    AppendLine($"((Dictionary<string, {GetTypeFullName(valueType)}>){userdata1Name}).Add({keyName}.ToString(), {listName}1);");
+                }
             }
             else if (Util.IsDictionary(valueType))
             {
                 //字典
                 Type newValueType = valueType.GetGenericArguments()[1];
-                string newValueTypeName = GetDictValueTypeName(valueType);
-                AppendLine($"Dictionary<string, {newValueTypeName}> {dictName}1 = new Dictionary<string, {newValueTypeName}>();");
-                AppendParseDictCode($"{dictName}1", $"{userdata1Name}1", $"{userdata2Name}1", $"{keyName}1", $"{nextTokenTypeName}1", newValueType);
-                AppendLine($"((Dictionary<string, Dictionary<string,{newValueTypeName}>>){userdata1Name}).Add({keyName}.ToString(),{dictName}1);");
+                string typeFullName = GetTypeFullName(valueType);
+                AppendLine($"{typeFullName} {dictName}1 = new {typeFullName}();");
+                AppendParseDictCode(newValueType,$"{dictName}1", $"{userdata1Name}1", $"{userdata2Name}1", $"{keyName}1", $"{nextTokenTypeName}1");
+                AppendLine($"((Dictionary<string, {typeFullName}>){userdata1Name}).Add({keyName}.ToString(),{dictName}1);");
             }
             else
             {
@@ -413,17 +471,32 @@ namespace CatJson.Editor
         }
 
         /// <summary>
-        /// 获取字典的正确value类型名
+        /// 获取类型全名，特殊处理字典与List<T>
         /// </summary>
-        private static string GetDictValueTypeName(Type dictType)
+        private static string GetTypeFullName(Type type)
         {
-            Type valueType = dictType.GetGenericArguments()[1];
-            if (!Util.IsDictionary(valueType))
+            if (!type.IsGenericType)
             {
-                return valueType.FullName;
+                return type.FullName;
             }
 
-            return $"Dictionary<string,{GetDictValueTypeName(valueType)}>";
+            if (Util.IsDictionary(type))
+            {
+                Type valueType = type.GetGenericArguments()[1];
+                return $"Dictionary<string,{GetTypeFullName(valueType)}>";
+            }
+
+            Type elementType;
+            if (type.IsArray)
+            {
+                elementType = type.GetElementType();
+            }
+            else
+            {
+                elementType = type.GetGenericArguments()[0];
+            }
+
+            return $"List<{GetTypeFullName(elementType)}>";
         }
     }
 }

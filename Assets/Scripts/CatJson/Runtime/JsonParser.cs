@@ -262,7 +262,7 @@ namespace CatJson
                 return func();
             }
 
-            throw new Exception($"没有{type}类型预生成的反序列化代码");
+            throw new Exception($"没有为{type}类型预生成的解析代码");
             
         }
 
