@@ -6,6 +6,12 @@ using UnityEngine.Profiling;
 using LitJson;
 using Newtonsoft.Json;
 using System;
+using MiniJSON;
+using SimpleJSON;
+using System.IO;
+using System.Text;
+using NetJSON;
+
 public class Entry : MonoBehaviour
 {
     public TextAsset json1;
@@ -25,9 +31,6 @@ public class Entry : MonoBehaviour
         Application.targetFrameRate = 30;
 
         json2Text = json2.text;
-
-
-        Json2_Root result2 = JsonConvert.DeserializeObject<Json2_Root>(json2Text);
     }
 
     private void Update()
@@ -40,15 +43,10 @@ public class Entry : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.A))
         {
-            //反射
+
             TestDeserializeJsonObject();
         }
 
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            //预生成代码
-            TestDeserializeJsonObject2();
-        }
 
 
     }
@@ -82,20 +80,48 @@ public class Entry : MonoBehaviour
            object result2 = JsonConvert.DeserializeObject(json2Text);
         }
         Profiler.EndSample();
+
+        Profiler.BeginSample("Mini Json");
+        for (int i = 0; i < 1000; i++)
+        {
+           var result2 = Json.Deserialize(json2Text) as Dictionary<string,object>;
+        }
+        Profiler.EndSample();
+
+        Profiler.BeginSample("Simple Json");
+        for (int i = 0; i < 1000; i++)
+        {
+            JSONNode result2 = JSON.Parse(json2Text);
+        }
+        Profiler.EndSample();
+
+        Profiler.BeginSample("Net Json");
+        for (int i = 0; i < 1000; i++)
+        {
+            Dictionary<string,object> result2 = (Dictionary<string, object>)NetJSON.NetJSON.DeserializeObject(json2Text);
+        }
+        Profiler.EndSample();
     }
 
     /// <summary>
-    /// 测试反序列化json数据对象，统一基于反射
+    /// 测试反序列化json数据对象
     /// </summary>
     private void TestDeserializeJsonObject()
     {
-        Profiler.BeginSample("Cat Json");
+        Profiler.BeginSample("Cat Json Reflection");
         for (int i = 0; i < 1000; i++)
         {
             Json2_Root result2 = JsonParser.ParseJson<Json2_Root>(json2Text);
         }
         Profiler.EndSample();
 
+        Profiler.BeginSample("Cat Json ParseCode");
+        for (int i = 0; i < 1000; i++)
+        {
+            Json2_Root result2 = JsonParser.ParseJson<Json2_Root>(json2Text, false);
+        }
+        Profiler.EndSample();
+
         Profiler.BeginSample("Lit Json");
         for (int i = 0; i < 1000; i++)
         {
@@ -110,35 +136,15 @@ public class Entry : MonoBehaviour
             Json2_Root result2 = JsonConvert.DeserializeObject<Json2_Root>(json2Text);
         }
         Profiler.EndSample();
-    }
 
-    /// <summary>
-    /// 测试反序列化json数据对象，CatJson基于预生成代码，其他库基于反射
-    /// </summary>
-    private void TestDeserializeJsonObject2()
-    {
-        Profiler.BeginSample("Cat Json");
+        Profiler.BeginSample("Net Json");
         for (int i = 0; i < 1000; i++)
         {
-            Json2_Root result2 = JsonParser.ParseJson<Json2_Root>(json2Text,false);
-        }
-        Profiler.EndSample();
-
-        Profiler.BeginSample("Lit Json");
-        for (int i = 0; i < 1000; i++)
-        {
-            Json2_Root result2 = JsonMapper.ToObject<Json2_Root>(json2Text);
+            Json2_Root result2 = NetJSON.NetJSON.Deserialize<Json2_Root>(json2Text);
         }
         Profiler.EndSample();
 
 
-
-        Profiler.BeginSample("Newtonsoft Json");
-        for (int i = 0; i < 1000; i++)
-        {
-            Json2_Root result2 = JsonConvert.DeserializeObject<Json2_Root>(json2Text);
-        }
-        Profiler.EndSample();
     }
 
 }
