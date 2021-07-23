@@ -1,16 +1,41 @@
 {
     "dict1" : {
-        "dict2":{
-            "key1" : "value1",
-            
-            "key2" : "value2"
+        "key1" : "value1",
+        "key2" : "value2",
+        "key3" : "value3",
+        "key4" : "value4"
+    },
+    "dict2" : {
+        "key5" : {
+            "key51": 51,
+            "key52": 52
         },
-        "dict3":{
-            "key3" : "value3",
-            
-            "key4" : "value4"
+        "key6" : {
+            "key61": 61,
+            "key62": 62
         }
-        
+    },
+    "dict3" : {
+        "key7" : {
+           "key71" :{
+                "key711" : true,
+                "key712" : false
+           },
+           "key72":{
+                "key721" : true,
+                "key722" : false
+           }
+        },
+        "key8" : {
+             "key81" :{
+                "key811" : true,
+                "key812" : false
+           },
+           "key82":{
+                "key821" : true,
+                "key822" : false
+           }
+        }
     }
     
 }

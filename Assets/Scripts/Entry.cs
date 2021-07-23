@@ -14,6 +14,7 @@ public class Entry : MonoBehaviour
     public TextAsset json4;
     public TextAsset json5;
     public TextAsset json6;
+    public TextAsset json7;
 
     private string json2Text;
 
@@ -25,9 +26,8 @@ public class Entry : MonoBehaviour
 
         json2Text = json2.text;
 
-        Type type = typeof(Dictionary<string, string>);
-
-        Debug.Log(type.FullName);
+        Json7_Data result7 = JsonParser.ParseJson<Json7_Data>(json7.text);
+        Debug.Log(result7);
 
     }
 

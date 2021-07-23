@@ -351,9 +351,9 @@ namespace CatJson.Editor
                 //字典
                 Type newValueType = valueType.GetGenericArguments()[1];
                 string newValueTypeName = GetDictValueTypeName(valueType);
-                AppendLine($"Dictionary<string, Dictionary<string,{newValueTypeName}>> {dictName}1 = new Dictionary<string, {newValueTypeName}>();");
+                AppendLine($"Dictionary<string, {newValueTypeName}> {dictName}1 = new Dictionary<string, {newValueTypeName}>();");
                 AppendParseDictCode($"{dictName}1", $"{userdata1Name}1", $"{userdata2Name}1", $"{keyName}1", $"{nextTokenTypeName}1", newValueType);
-                AppendLine($"((Dictionary<string, {newValueTypeName}>){userdata1Name}).Add({dictName}1);");
+                AppendLine($"((Dictionary<string, Dictionary<string,{newValueTypeName}>>){userdata1Name}).Add({keyName}.ToString(),{dictName}1);");
             }
             else
             {

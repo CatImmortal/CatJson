@@ -6,6 +6,7 @@ using CatJson;
 [GenParseCodeRoot]
 public class Json7_Data
 {
-    //Dictionary<string, string>
-    public Dictionary<string, Dictionary<string, string>> dict1;
+    public Dictionary<string,string> dict1;
+    public Dictionary<string, Dictionary<string, int>> dict2;
+    public Dictionary<string, Dictionary<string, Dictionary<string,bool>>> dict3;
 }
