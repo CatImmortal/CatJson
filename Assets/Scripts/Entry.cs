@@ -5,7 +5,7 @@ using CatJson;
 using UnityEngine.Profiling;
 using LitJson;
 using Newtonsoft.Json;
-
+using System;
 public class Entry : MonoBehaviour
 {
     public TextAsset json1;
@@ -25,7 +25,9 @@ public class Entry : MonoBehaviour
 
         json2Text = json2.text;
 
+        Type type = typeof(Dictionary<string, string>);
 
+        Debug.Log(type.FullName);
 
     }
 

@@ -12,7 +12,7 @@ public class Json1_Obj
     public string c;
 }
 
-[GenParseCodeRoot]
+//[GenParseCodeRoot]
 public class Json1_Root
 {
     /// <summary>

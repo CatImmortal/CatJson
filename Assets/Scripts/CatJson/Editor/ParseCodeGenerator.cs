@@ -112,6 +112,30 @@ namespace CatJson.Editor
         }
 
         /// <summary>
+        /// 生成静态构造器文件
+        /// </summary>
+        private static void GenStaticCtorCode(List<Type> types)
+        {
+            //读取模板文件
+            StreamReader sr = new StreamReader(ParseCodeGenConfig.StaticCtorTemplateFilePath);
+            string template = sr.ReadToEnd();
+            sr.Close();
+
+            foreach (Type type in types)
+            {
+                AppendLine($"ParseCodeFuncDict.Add(typeof({type.FullName}),{GetParseMethodName(type)});", 3);
+            }
+
+            template = template.Replace("#AddParseCodeFunc#", sb.ToString());
+            sb.Clear();
+
+            StreamWriter sw = new StreamWriter($"{ParseCodeGenConfig.GenCodeDirPath}/Gen_ParseCodeStaticCtor.cs");
+            sw.Write(template);
+            sw.Close();
+        }
+
+
+        /// <summary>
         /// 生成using代码
         /// </summary>
         private static string AppendUsingCode()
@@ -124,10 +148,11 @@ namespace CatJson.Editor
         }
 
         /// <summary>
-        /// 生成使用if else进行字段/属性解析的代码
+        /// 生成使用ifelse进行所有字段/属性解析的代码
         /// </summary>
         private static string AppendIfElseParseCode(Type type)
         {
+            //处理属性
             bool isElseIf = false;
             foreach (PropertyInfo pi in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
@@ -145,6 +170,7 @@ namespace CatJson.Editor
                
             }
 
+            //处理字段
             isElseIf = false;
             foreach (FieldInfo fi in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
             {
@@ -163,7 +189,7 @@ namespace CatJson.Editor
         }
 
         /// <summary>
-        /// 生成if或else if代码
+        /// 生成解析单个字段/属性的ifelse代码
         /// </summary>
         private static void AppendIfElseCode(Type type,string name,bool isElseIf)
         {
@@ -219,7 +245,12 @@ namespace CatJson.Editor
             }
             else if (Util.IsDictionary(type))
             {
-                //字典 todo:
+                //字典
+                Type valueType = type.GetGenericArguments()[1];
+                string valueTypeName = GetDictValueTypeName(type);
+                AppendLine($"Dictionary<string, {valueTypeName}> dict = new Dictionary<string, {valueTypeName}>();");
+                AppendParseDictCode("dict", "userdata11", "userdata21", "key1", "nextTokenType1", valueType);
+                AppendLine($"temp.{name} = dict;");
             }
             else
             {
@@ -250,7 +281,7 @@ namespace CatJson.Editor
         /// </summary>
         private static void AppendParseArrayCode(string name,Type elementType)
         {
-            AppendLine($"JsonParser.ParseJsonArrayProcedure(list, null, (userdata11, userdata22, nextTokenType2) =>");
+            AppendLine($"JsonParser.ParseJsonArrayProcedure(list, null, (userdata11, userdata21, nextTokenType1) =>");
             AppendLine("{");
 
             //基础类型
@@ -290,26 +321,52 @@ namespace CatJson.Editor
         }
 
         /// <summary>
-        /// 生成静态构造器文件
+        /// 生成解析字典的代码
         /// </summary>
-        private static void GenStaticCtorCode(List<Type> types)
+        private static void AppendParseDictCode(string dictName,string userdata1Name,string userdata2Name,string keyName,string nextTokenTypeName,Type valueType)
         {
-            //读取模板文件
-            StreamReader sr = new StreamReader(ParseCodeGenConfig.StaticCtorTemplateFilePath);
-            string template = sr.ReadToEnd();
-            sr.Close();
+            AppendLine($"JsonParser.ParseJsonObjectProcedure({dictName}, null, ({userdata1Name}, {userdata2Name},{keyName}, {nextTokenTypeName}) =>");
+            AppendLine("{");
 
-            foreach (Type type in types)
+            //基础类型
+            if (valueType == typeof(string))
             {
-                AppendLine($"ParseCodeFuncDict.Add(typeof({type.FullName}),{GetParseMethodName(type)});", 3);
+                AppendLine($"((Dictionary<string, {valueType.FullName}>){userdata1Name}).Add({keyName}.ToString(),JsonParser.Lexer.GetNextToken(out _).Value.ToString());");
+            }
+            else if (valueType == typeof(bool))
+            {
+                AppendLine("JsonParser.Lexer.GetNextToken(out tokenType);");
+                AppendLine($"((Dictionary<string, {valueType.FullName}>){userdata1Name}).Add({keyName}.ToString(),tokenType == TokenType.True);");
+            }
+            else if (Util.IsNumber(valueType))
+            {
+                AppendLine($"((Dictionary<string, {valueType.FullName}>){userdata1Name}).Add({keyName}.ToString(), {valueType.FullName}.Parse(JsonParser.Lexer.GetNextToken(out _).Value.ToString()));");
+            }
+            else if (Util.IsArrayOrList(valueType))
+            {
+                //数组 List<T> todo:
+            }
+            else if (Util.IsDictionary(valueType))
+            {
+                //字典
+                Type newValueType = valueType.GetGenericArguments()[1];
+                string newValueTypeName = GetDictValueTypeName(valueType);
+                AppendLine($"Dictionary<string, Dictionary<string,{newValueTypeName}>> {dictName}1 = new Dictionary<string, {newValueTypeName}>();");
+                AppendParseDictCode($"{dictName}1", $"{userdata1Name}1", $"{userdata2Name}1", $"{keyName}1", $"{nextTokenTypeName}1", newValueType);
+                AppendLine($"((Dictionary<string, {newValueTypeName}>){userdata1Name}).Add({dictName}1);");
+            }
+            else
+            {
+                //自定义类型
+                AppendLine($"((Dictionary<string, {valueType.FullName}>){userdata1Name}).Add({keyName}.ToString(),{GetParseMethodName(valueType)}());");
+
+                if (!GenParseCodeTypes.Contains(valueType))
+                {
+                    needGenTypes.Enqueue(valueType);
+                }
             }
 
-            template = template.Replace("#AddParseCodeFunc#", sb.ToString());
-            sb.Clear();
-
-            StreamWriter sw = new StreamWriter($"{ParseCodeGenConfig.GenCodeDirPath}/Gen_ParseCodeStaticCtor.cs");
-            sw.Write(template);
-            sw.Close();
+            AppendLine("});");
         }
 
         /// <summary>
@@ -355,7 +412,19 @@ namespace CatJson.Editor
             return $"Parse_{type.FullName.Replace(".", "_")}";
         }
 
-     
+        /// <summary>
+        /// 获取字典的正确value类型名
+        /// </summary>
+        private static string GetDictValueTypeName(Type dictType)
+        {
+            Type valueType = dictType.GetGenericArguments()[1];
+            if (!Util.IsDictionary(valueType))
+            {
+                return valueType.FullName;
+            }
+
+            return $"Dictionary<string,{GetDictValueTypeName(valueType)}>";
+        }
     }
 }
 
