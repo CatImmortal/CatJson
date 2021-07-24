@@ -28,7 +28,7 @@ namespace CatJson
         /// <summary>
         /// 扩展类型与其对应的解析方法
         /// </summary>
-        private static Dictionary<Type, Func<object>> extendParseFuncDict = new Dictionary<Type, Func<object>>();
+        private static Dictionary<Type, Func<object>> extensionParseFuncDict = new Dictionary<Type, Func<object>>();
 
         /// <summary>
         /// 解析Json对象的通用流程

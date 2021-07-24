@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 
+
 namespace CatJson.Editor
 {
     public static class ParseCodeGenConfig
@@ -18,6 +19,14 @@ namespace CatJson.Editor
         public static string[] Assemblies =
         {
             "Assembly-CSharp"
+        };
+
+        /// <summary>
+        /// 使用扩展解析而不生成解析代码的类型，比如DateTime
+        /// </summary>
+        public static Type[] ExtensionParseTypes =
+        {
+            typeof(DateTime)
         };
     }
 

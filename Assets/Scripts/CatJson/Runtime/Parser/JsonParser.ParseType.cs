@@ -43,7 +43,7 @@ namespace CatJson
         /// </summary>
         private static object ParseJsonValueByType(TokenType nextTokenType, Type type)
         {
-            if (extendParseFuncDict.TryGetValue(type, out Func<object> func))
+            if (extensionParseFuncDict.TryGetValue(type, out Func<object> func))
             {
                 //自定义解析
                 return func();

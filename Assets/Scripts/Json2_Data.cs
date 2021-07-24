@@ -43,7 +43,7 @@ public class Json2_Result
     public int status { get; set; }
 }
 
-[GenParseCodeRoot]
+//[GenParseCodeRoot]
 public class Json2_Root
 {
     /// <summary>
