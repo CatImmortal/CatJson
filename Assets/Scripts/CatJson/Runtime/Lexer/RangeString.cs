@@ -148,6 +148,12 @@ namespace CatJson
                     case 't':
                         Util.CachedSB.Append('\t');
                         break;
+                    case 'u':
+                        //unicode字符
+                        char codePoint = Util.GetUnicodeCodePoint(source[i + 1], source[i + 2], source[i + 3], source[i + 4]);
+                        Util.CachedSB.Append(codePoint);
+                        i += 4;
+                        break;
                     default:
                         throw new Exception("处理转义字符失败，\\后的字符不在可转义范围内");
                 }
@@ -161,5 +167,7 @@ namespace CatJson
 
             return str;
         }
+    
+       
     }
 }

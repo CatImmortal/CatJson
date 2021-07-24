@@ -43,6 +43,11 @@ namespace CatJson
         /// </summary>
         private static object ParseJsonValueByType(TokenType nextTokenType, Type type)
         {
+            if (extendParseFuncDict.TryGetValue(type, out Func<object> func))
+            {
+                //自定义解析
+                return func();
+            }
 
             switch (nextTokenType)
             {
@@ -115,19 +120,12 @@ namespace CatJson
                         return ParseJsonObjectByDict(type, type.GetGenericArguments()[1]);
                     }
 
-
-                    if (extendParseFuncDict.TryGetValue(type, out Func<object> func))
-                    {
-                        //自定义解析
-                        return func();
-                    }
-
                     //类对象
                     return ParseJsonObjectByType(type);
 
             }
 
-            throw new Exception("ParseJsonValueByType调用失败，tokenType == " + nextTokenType);
+            throw new Exception("ParseJsonValueByType调用失败，tokenType == " + nextTokenType + ",type == " + type.FullName);
         }
 
         /// <summary>

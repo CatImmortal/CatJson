@@ -160,6 +160,11 @@ namespace CatJson
         /// </summary>
         private void SkipWhiteSpace()
         {
+            if (curIndex >= json.Length)
+            {
+                return;
+            }
+
             char c = json[curIndex];
             while (!(curIndex >= json.Length) && (c == ' ' || c == '\t' || c == '\n' || c == '\r'))
             {
@@ -206,35 +211,18 @@ namespace CatJson
         /// </summary>
         private string ScanNumber()
         {
-
-            bool hasDot = false;
-
             //第一个字符是0-9或者-
             sb.Append(json[curIndex]);
             Next();
 
-            while (!(curIndex >= json.Length) && (char.IsDigit(json[curIndex]) || json[curIndex] == '.'))
+            while (
+                !(curIndex >= json.Length)&&
+                (
+                char.IsDigit(json[curIndex]) || json[curIndex] == '+'|| json[curIndex] == '-'|| json[curIndex] == 'e'|| json[curIndex] == 'E')
+                )
             {
-                if (json[curIndex] == '.')
-                {
-                    if (!hasDot)
-                    {
-                        hasDot = true;
-                    }
-                    else
-                    {
-                        throw new Exception("数字扫描失败，出现了2次小数点");
-                    }
-                }
-
                 sb.Append(json[curIndex]);
                 Next();
-
-            }
-
-            if (sb.Length == 1 && sb[0] == '-')
-            {
-                throw new Exception("数字扫描失败,只有1个-号");
             }
 
             string result = sb.ToString();

@@ -26,7 +26,7 @@ public class Json1_Root
     /// <summary>
     /// 
     /// </summary>
-    public int number;
+    public float number;
     /// <summary>
     /// 
     /// </summary>

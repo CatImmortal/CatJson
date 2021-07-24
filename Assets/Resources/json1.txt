@@ -6,10 +6,10 @@
   ],
 
   "type": true,
-  "number": 123,
+  "number": 1E+10,
   "obj": {
     "a": "b",
     "c": "d"
   },
-  "str": "welcome to json"
+  "str": "hello world"
 }

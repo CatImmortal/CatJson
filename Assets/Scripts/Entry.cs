@@ -22,6 +22,7 @@ public class Entry : MonoBehaviour
     public TextAsset json5;
     public TextAsset json6;
     public TextAsset json7;
+    public TextAsset json9;
 
     private string json2Text;
 
