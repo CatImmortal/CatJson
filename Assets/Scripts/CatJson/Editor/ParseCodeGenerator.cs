@@ -156,7 +156,7 @@ namespace CatJson.Editor
             bool isElseIf = false;
             foreach (PropertyInfo pi in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
-                //属性必须同时具有get set，并且不能是Item
+                //属性必须同时具有get set 并且不能是索引器item
                 if (pi.SetMethod != null && pi.GetMethod != null && pi.Name != "Item")
                 {
                     AppendIfElseCode(pi.PropertyType, pi.Name,isElseIf);

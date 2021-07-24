@@ -34,25 +34,26 @@ namespace CatJson
 
                         //主要手写这段switch case
                         //识别需要反序列化的字段值 
-                        switch (key.ToString())
+                        if (key.Equals(new RangeString("x")))
                         {
-                            case "x":
-                                string token = Lexer.GetNextToken(out _).Value.ToString();
-                                v3.x = float.Parse(token);
-                                break;
-                            case "y":
-                                token = Lexer.GetNextToken(out _).Value.ToString();
-                                v3.y = float.Parse(token);
-                                break;
-                            case "z":
-                                token = Lexer.GetNextToken(out _).Value.ToString();
-                                v3.z = float.Parse(token);
-                                break;
-
-                            default:
-                                throw new Exception("Vector3解析中发现了额外key");
+                            string token = Lexer.GetNextToken(out _).Value.ToString();
+                            v3.x = float.Parse(token);
                         }
-
+                        else if (key.Equals(new RangeString("y")))
+                        {
+                            string token = Lexer.GetNextToken(out _).Value.ToString();
+                            v3.y = float.Parse(token);
+                        }
+                        else if (key.Equals(new RangeString("z")))
+                        {
+                            string token = Lexer.GetNextToken(out _).Value.ToString();
+                            v3.z = float.Parse(token);
+                        }
+                        else
+                        {
+                            //跳过
+                            ParseJsonValue(Lexer.LookNextTokenType());
+                        }
 
                         //有逗号就跳过逗号
                         if (Lexer.LookNextTokenType() == TokenType.Comma)
