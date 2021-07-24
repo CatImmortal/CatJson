@@ -83,10 +83,17 @@ public class Entry : MonoBehaviour
         }
         Profiler.EndSample();
 
+        Profiler.BeginSample("Net Json");
+        for (int i = 0; i < TestCount; i++)
+        {
+            Dictionary<string, object> result2 = (Dictionary<string, object>)NetJSON.NetJSON.DeserializeObject(json2Text);
+        }
+        Profiler.EndSample();
+
         Profiler.BeginSample("Mini Json");
         for (int i = 0; i < TestCount; i++)
         {
-           var result2 = MiniJSON.Json.Deserialize(json2Text) as Dictionary<string,object>;
+            Dictionary<string, object> result2 = MiniJSON.Json.Deserialize(json2Text) as Dictionary<string,object>;
         }
         Profiler.EndSample();
 
@@ -94,13 +101,6 @@ public class Entry : MonoBehaviour
         for (int i = 0; i < TestCount; i++)
         {
             JSONNode result2 = JSON.Parse(json2Text);
-        }
-        Profiler.EndSample();
-
-        Profiler.BeginSample("Net Json");
-        for (int i = 0; i < TestCount; i++)
-        {
-            Dictionary<string,object> result2 = (Dictionary<string, object>)NetJSON.NetJSON.DeserializeObject(json2Text);
         }
         Profiler.EndSample();
 
