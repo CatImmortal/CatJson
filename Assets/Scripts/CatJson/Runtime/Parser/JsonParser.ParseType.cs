@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using UnityEngine;
 
 namespace CatJson
 {
@@ -11,7 +10,7 @@ namespace CatJson
         /// <summary>
         /// 解析json文本为指定类型的对象实例
         /// </summary>
-        public static T ParseJson<T>(string json, bool reflection = true)
+        public static T ParseJson<T>(string json, bool reflection = true) where T : new()
         {
             return (T)ParseJson(json, typeof(T), reflection);
         }
@@ -23,25 +22,34 @@ namespace CatJson
         {
             Lexer.SetJsonText(json);
 
+            object result = null;
+
             if (reflection)
             {
-                return ParseJsonObjectByType(type);
+                //使用反射解析
+                result = ParseJsonObjectByType(type);
+            }
+            else if (ParseCode.ParseCodeFuncDict.TryGetValue(type, out Func<object> func))
+            {
+                //使用预生成代码解析
+                result = func();
             }
 
-            if (ParseCode.ParseCodeFuncDict.TryGetValue(type, out Func<object> func))
+            if (result != null && result is IJsonParserCallbackReceiver receiver)
             {
-                return func();
+                //触发解析结束回调
+                receiver.OnParseJsonEnd();
+                return result;
             }
 
             throw new Exception($"没有为{type}类型预生成的解析代码");
-
         }
 
 
         /// <summary>
         /// 解析json值为指定类型的实例值
         /// </summary>
-        private static object ParseJsonValueByType(TokenType nextTokenType, Type type)
+        public static object ParseJsonValueByType(TokenType nextTokenType, Type type)
         {
             if (extensionParseFuncDict.TryGetValue(type, out Func<object> func))
             {
@@ -69,8 +77,8 @@ namespace CatJson
                     break;
 
                 case TokenType.Number:
-                    RangeString? token = Lexer.GetNextToken(out _);
-                    string str = token.Value.ToString();
+                    RangeString token = Lexer.GetNextToken(out _);
+                    string str = token.ToString();
                     if (type == typeof(int))
                     {
                         return int.Parse(str);
@@ -93,7 +101,7 @@ namespace CatJson
                     token = Lexer.GetNextToken(out _);
                     if (type == typeof(string))
                     {
-                        return token.Value.ToString();
+                        return token.ToString();
                     }
                     break;
 
@@ -103,7 +111,6 @@ namespace CatJson
                         //数组
                         return ParseJsonArrayByType(type.GetElementType());
                     }
-
                     if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
                     {
                         //List<T>

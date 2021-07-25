@@ -7,7 +7,6 @@ namespace CatJson
         private static #ClassName# #MethodName#()
         {
             #ClassName# temp = new #ClassName#();
-            RangeString? rs;
             TokenType tokenType;
 
             JsonParser.Lexer.GetNextTokenByType(TokenType.LeftBrace);

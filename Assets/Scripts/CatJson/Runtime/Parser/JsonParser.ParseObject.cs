@@ -42,14 +42,14 @@ namespace CatJson
                     value.Boolean = false;
                     break;
                 case TokenType.Number:
-                    RangeString? token = Lexer.GetNextToken(out _);
+                    RangeString token = Lexer.GetNextToken(out _);
                     value.Type = ValueType.Number;
-                    value.Number = double.Parse(token.Value.ToString());
+                    value.Number = double.Parse(token.ToString());
                     break;
                 case TokenType.String:
                     token = Lexer.GetNextToken(out _);
                     value.Type = ValueType.String;
-                    value.Str = token.Value.ToString();
+                    value.Str = token.ToString();
                     break;
                 case TokenType.LeftBracket:
                     value.Type = ValueType.Array;

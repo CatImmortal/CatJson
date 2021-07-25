@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace CatJson
 {
     /// <summary>
-    /// Json值类型
+    /// Json值的类型
     /// </summary>
     public enum ValueType
     {

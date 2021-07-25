@@ -17,8 +17,8 @@ namespace CatJson
             //解析DateTime
             extensionParseFuncDict.Add(typeof(DateTime), () =>
             {
-                RangeString? rs = Lexer.GetNextTokenByType(TokenType.String);
-                return DateTime.Parse(rs.Value.ToString());
+                RangeString rs = Lexer.GetNextTokenByType(TokenType.String);
+                return DateTime.Parse(rs.ToString());
             });
 
 
@@ -33,7 +33,7 @@ namespace CatJson
                  while (Lexer.LookNextTokenType() != TokenType.RightBrace)
                  {
                      //提取key
-                     RangeString key = Lexer.GetNextTokenByType(TokenType.String).Value;
+                     RangeString key = Lexer.GetNextTokenByType(TokenType.String);
 
                      //跳过 :
                      Lexer.GetNextTokenByType(TokenType.Colon);
@@ -42,17 +42,17 @@ namespace CatJson
                      //识别需要反序列化的字段值 
                      if (key.Equals(new RangeString("x")))
                      {
-                         string token = Lexer.GetNextToken(out _).Value.ToString();
+                         string token = Lexer.GetNextToken(out _).ToString();
                          v3.x = float.Parse(token);
                      }
                      else if (key.Equals(new RangeString("y")))
                      {
-                         string token = Lexer.GetNextToken(out _).Value.ToString();
+                         string token = Lexer.GetNextToken(out _).ToString();
                          v3.y = float.Parse(token);
                      }
                      else if (key.Equals(new RangeString("z")))
                      {
-                         string token = Lexer.GetNextToken(out _).Value.ToString();
+                         string token = Lexer.GetNextToken(out _).ToString();
                          v3.z = float.Parse(token);
                      }
                      else

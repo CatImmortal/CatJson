@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace CatJson
 {
     /// <summary>
-    /// Json词法单元类型
+    /// Json词法单元的类型
     /// </summary>
     public enum TokenType
     {

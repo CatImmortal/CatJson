@@ -41,7 +41,7 @@ namespace CatJson
             while (Lexer.LookNextTokenType() != TokenType.RightBrace)
             {
                 //提取key
-                RangeString key = Lexer.GetNextTokenByType(TokenType.String).Value;
+                RangeString key = Lexer.GetNextTokenByType(TokenType.String);
 
                 //跳过 :
                 Lexer.GetNextTokenByType(TokenType.Colon);

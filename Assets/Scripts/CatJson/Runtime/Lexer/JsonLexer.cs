@@ -14,7 +14,7 @@ namespace CatJson
 
         private bool hasNextTokenCache;
         private TokenType nextTokenType;
-        private RangeString? nextToken;
+        private RangeString nextToken;
 
         public static StringBuilder sb = new StringBuilder();
 
@@ -49,9 +49,9 @@ namespace CatJson
         /// <summary>
         /// 获取下一个指定类型的token
         /// </summary>
-        public RangeString? GetNextTokenByType(TokenType type)
+        public RangeString GetNextTokenByType(TokenType type)
         {
-            RangeString? token = GetNextToken(out TokenType resultType);
+            RangeString token = GetNextToken(out TokenType resultType);
             if (type != resultType)
             {
                 throw new Exception($"NextTokenOfType调用失败，需求{type}但获取到的是{resultType}");
@@ -62,7 +62,7 @@ namespace CatJson
         /// <summary>
         /// 获取下一个token
         /// </summary>
-        public RangeString? GetNextToken(out TokenType type)
+        public RangeString GetNextToken(out TokenType type)
         {
             type = default;
 
@@ -83,7 +83,7 @@ namespace CatJson
             {
                 //文本结束
                 type = TokenType.Eof;
-                return null;
+                return default;
             }
 
             //扫描字面量 分隔符
@@ -92,39 +92,39 @@ namespace CatJson
                 case 'n':
                     type = TokenType.Null;
                     ScanLiteral("null");
-                    return null;
+                    return default;
                 case 't':
                     type = TokenType.True;
                     ScanLiteral("true");
-                    return null;
+                    return default;
                 case 'f':
                     type = TokenType.False;
                     ScanLiteral("false");
-                    return null;
+                    return default;
                 case '[':
                     type = TokenType.LeftBracket;
                     Next();
-                    return null;
+                    return default;
                 case ']':
                     type = TokenType.RightBracket;
                     Next();
-                    return null;
+                    return default;
                 case '{':
                     type = TokenType.LeftBrace;
                     Next();
-                    return null;
+                    return default;
                 case '}':
                     type = TokenType.RightBrace;
                     Next();
-                    return null;
+                    return default;
                 case ':':
                     type = TokenType.Colon;
                     Next();
-                    return null;
+                    return default;
                 case ',':
                     type = TokenType.Comma;
                     Next();
-                    return null;
+                    return default;
             }
 
             //扫描数字

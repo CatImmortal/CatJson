@@ -34,6 +34,9 @@ public class Entry : MonoBehaviour
         Application.targetFrameRate = 30;
 
         json2Text = json2.text;
+
+        var result = JsonParser.ParseJson<Json9_Root>(json9.text, false);
+        Debug.Log(result.dateTime);
     }
 
     private void Update()

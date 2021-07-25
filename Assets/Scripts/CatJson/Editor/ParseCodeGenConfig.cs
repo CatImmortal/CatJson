@@ -22,11 +22,11 @@ namespace CatJson.Editor
         };
 
         /// <summary>
-        /// 使用扩展解析而不生成解析代码的类型，比如DateTime
+        /// 使用JsonParser.Extension里的扩展解析而不生成解析代码的类型，比如DateTime
         /// </summary>
-        public static Type[] ExtensionParseTypes =
+        public static HashSet<Type> ExtensionParseTypes = new HashSet<Type>()
         {
-            typeof(DateTime)
+            typeof(DateTime),
         };
     }
 
