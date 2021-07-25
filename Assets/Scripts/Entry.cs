@@ -15,29 +15,37 @@ using MojoJson;
 
 public class Entry : MonoBehaviour
 {
-    public TextAsset json1;
-    public TextAsset json2;
-    public TextAsset json3;
-    public TextAsset json4;
-    public TextAsset json5;
-    public TextAsset json6;
-    public TextAsset json7;
-    public TextAsset json9;
-
-    private string json2Text;
-
+    
     public int TestCount = 1000;
 
-    // Start is called before the first frame update
+    private string testJson1Text;
+    
     void Start()
     {
         Application.targetFrameRate = 30;
 
-        json2Text = json2.text;
+        testJson1Text = Resources.Load<TextAsset>("testjson1").text;
 
-        var result = JsonParser.ParseJson<Json9_Root>(json9.text, false);
-        Debug.Log(result.dateTime);
+
     }
+
+    //private void Check(TestJson1_Root data)
+    //{
+    //    if (data.b != true || data.num != 3.14 || data.str != "hello world")
+    //    {
+    //        throw new Exception("Check TestJson1 失败");
+    //    }
+
+    //    if (data.intList.Count != 5 || data.intList[0] != 1 || data.intList[4] != 5)
+    //    {
+    //        throw new Exception("Check TestJson1 失败");
+    //    }
+
+    //    if (data.intDict.Count != 3 || data.intDict["key1"] != 6 || data.intDict["key3"] != 8)
+    //    {
+    //        throw new Exception("Check TestJson1 失败");
+    //    }
+    //}
 
     private void Update()
     {
@@ -68,14 +76,14 @@ public class Entry : MonoBehaviour
         Profiler.BeginSample("Cat Json");
         for (int i = 0; i < TestCount; i++)
         {
-            JsonObject result2 = JsonParser.ParseJson(json2Text);
+            JsonObject result2 = JsonParser.ParseJson(testJson1Text);
         }
         Profiler.EndSample();
 
         Profiler.BeginSample("Lit Json");
         for (int i = 0; i < TestCount; i++)
         {
-            JsonData result2 = JsonMapper.ToObject(json2Text);
+            JsonData result2 = JsonMapper.ToObject(testJson1Text);
         }
         Profiler.EndSample();
 
@@ -83,35 +91,35 @@ public class Entry : MonoBehaviour
         Profiler.BeginSample("Newtonsoft Json");
         for (int i = 0; i < TestCount; i++)
         {
-           object result2 = JsonConvert.DeserializeObject(json2Text);
+            object result2 = JsonConvert.DeserializeObject(testJson1Text);
         }
         Profiler.EndSample();
 
         Profiler.BeginSample("Net Json");
         for (int i = 0; i < TestCount; i++)
         {
-            Dictionary<string, object> result2 = (Dictionary<string, object>)NetJSON.NetJSON.DeserializeObject(json2Text);
+            Dictionary<string, object> result2 = (Dictionary<string, object>)NetJSON.NetJSON.DeserializeObject(testJson1Text);
         }
         Profiler.EndSample();
 
         Profiler.BeginSample("Mini Json");
         for (int i = 0; i < TestCount; i++)
         {
-            Dictionary<string, object> result2 = MiniJSON.Json.Deserialize(json2Text) as Dictionary<string,object>;
+            Dictionary<string, object> result2 = MiniJSON.Json.Deserialize(testJson1Text) as Dictionary<string, object>;
         }
         Profiler.EndSample();
 
         Profiler.BeginSample("Simple Json");
         for (int i = 0; i < TestCount; i++)
         {
-            JSONNode result2 = JSON.Parse(json2Text);
+            JSONNode result2 = JSON.Parse(testJson1Text);
         }
         Profiler.EndSample();
 
         Profiler.BeginSample("Mojo Json");
         for (int i = 0; i < TestCount; i++)
         {
-           MojoJson.JsonValue result2 = MojoJson.Json.Parse(json2Text);
+            MojoJson.JsonValue result2 = MojoJson.Json.Parse(testJson1Text);
         }
         Profiler.EndSample();
     }
@@ -124,21 +132,21 @@ public class Entry : MonoBehaviour
         Profiler.BeginSample("Cat Json Reflection");
         for (int i = 0; i < TestCount; i++)
         {
-            Json2_Root result2 = JsonParser.ParseJson<Json2_Root>(json2Text);
+            TestJson1_Root result = JsonParser.ParseJson<TestJson1_Root>(testJson1Text);
         }
         Profiler.EndSample();
 
         Profiler.BeginSample("Cat Json ParseCode");
         for (int i = 0; i < TestCount; i++)
         {
-            Json2_Root result2 = JsonParser.ParseJson<Json2_Root>(json2Text, false);
+            TestJson1_Root result = JsonParser.ParseJson<TestJson1_Root>(testJson1Text, false);
         }
         Profiler.EndSample();
 
         Profiler.BeginSample("Lit Json");
         for (int i = 0; i < TestCount; i++)
         {
-            Json2_Root result2 = JsonMapper.ToObject<Json2_Root>(json2Text);
+            TestJson1_Root result = JsonMapper.ToObject<TestJson1_Root>(testJson1Text);
         }
         Profiler.EndSample();
 
@@ -146,14 +154,14 @@ public class Entry : MonoBehaviour
         Profiler.BeginSample("Newtonsoft Json");
         for (int i = 0; i < TestCount; i++)
         {
-            Json2_Root result2 = JsonConvert.DeserializeObject<Json2_Root>(json2Text);
+            TestJson1_Root result = JsonConvert.DeserializeObject<TestJson1_Root>(testJson1Text);
         }
         Profiler.EndSample();
 
         Profiler.BeginSample("Net Json");
         for (int i = 0; i < TestCount; i++)
         {
-            Json2_Root result2 = NetJSON.NetJSON.Deserialize<Json2_Root>(json2Text);
+            TestJson1_Root result = NetJSON.NetJSON.Deserialize<TestJson1_Root>(testJson1Text);
         }
         Profiler.EndSample();
 

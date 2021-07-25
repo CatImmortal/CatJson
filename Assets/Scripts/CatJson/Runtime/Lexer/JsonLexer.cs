@@ -218,7 +218,7 @@ namespace CatJson
             while (
                 !(curIndex >= json.Length)&&
                 (
-                char.IsDigit(json[curIndex]) || json[curIndex] == '+'|| json[curIndex] == '-'|| json[curIndex] == 'e'|| json[curIndex] == 'E')
+                char.IsDigit(json[curIndex]) || json[curIndex] == '.' || json[curIndex] == '+'|| json[curIndex] == '-'|| json[curIndex] == 'e'|| json[curIndex] == 'E')
                 )
             {
                 sb.Append(json[curIndex]);

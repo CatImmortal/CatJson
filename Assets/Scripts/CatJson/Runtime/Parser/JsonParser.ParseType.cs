@@ -35,10 +35,13 @@ namespace CatJson
                 result = func();
             }
 
-            if (result != null && result is IJsonParserCallbackReceiver receiver)
+            if (result != null)
             {
-                //触发解析结束回调
-                receiver.OnParseJsonEnd();
+                if (result is IJsonParserCallbackReceiver receiver)
+                {
+                    //触发解析结束回调
+                    receiver.OnParseJsonEnd();
+                }
                 return result;
             }
 
