@@ -20,7 +20,7 @@ namespace CatJson
         private int startIndex;
 
         /// <summary>
-        /// 结束范围
+        /// 结束索引
         /// </summary>
         private int endIndex;
 
