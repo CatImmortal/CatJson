@@ -8,49 +8,81 @@ namespace CatJson
     /// </summary>
     public class JsonObject
     {
-        private Dictionary<string, JsonValue> values;
+        private Dictionary<string, JsonValue> valueDict;
 
         public JsonValue this[string key]
         {
             get
             {
-                if (values == null)
+                if (valueDict == null)
                 {
                     return null;
                 }
 
-                return values[key];
+                return valueDict[key];
             }
 
             set
             {
-                if (values == null)
+                if (valueDict == null)
                 {
-                    values = new Dictionary<string, JsonValue>();
+                    valueDict = new Dictionary<string, JsonValue>();
                 }
-                values[key] = value;
+                valueDict[key] = value;
             }
         }
 
         public override string ToString()
         {
-            if (values == null)
+            if (valueDict == null)
             {
                 return "{} ";
             }
             string str = "{";
             int count = 0;
-            foreach (KeyValuePair<string, JsonValue> item in values)
+            foreach (KeyValuePair<string, JsonValue> item in valueDict)
             {
                 count++;
                 str += "\"" + item.Key + "\"" + " : " + item.Value;
-                if (count < values.Count)
+                if (count < valueDict.Count)
                 {
                     str += ", ";
                 }
             }
             str += "} ";
             return str;
+        }
+  
+        public void ToJson(int depth)
+        {
+            Util.AppendLine("{");
+            int count = 0;
+            foreach (KeyValuePair<string, JsonValue> item in valueDict)
+            {
+                count++;
+                Util.Append("\"", depth);
+
+                Util.Append(item.Key);
+                Util.Append("\"");
+
+                //Util.Append(" ");
+                Util.Append(":");
+                //Util.Append(" ");
+
+                item.Value.ToJson(depth + 1);
+
+                if (count != valueDict.Count)
+                {
+                    //不是最后一个
+                    Util.AppendLine(",");
+                }
+                else
+                {
+                    Util.AppendLine(string.Empty);
+                }
+            }
+           
+            Util.Append("}", depth - 1);
         }
     }
 }

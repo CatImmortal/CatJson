@@ -9,6 +9,36 @@ namespace CatJson
     {
         public static StringBuilder CachedSB = new StringBuilder();
 
+        public static void AppendTab(int tabNum)
+        {
+            for (int i = 0; i < tabNum; i++)
+            {
+                CachedSB.Append("\t");
+            }
+        }
+
+        public static void Append(string str,int tabNum = 0)
+        {
+            if (tabNum > 0)
+            {
+                AppendTab(tabNum);
+            }
+           
+            CachedSB.Append(str);
+        }
+
+        public static void AppendLine(string str, int tabNum = 0)
+        {
+            if (tabNum > 0)
+            {
+                AppendTab(tabNum);
+            }
+
+            CachedSB.AppendLine(str);
+        }
+
+
+
         /// <summary>
         /// type是否为数字类型（int float double)
         /// </summary>

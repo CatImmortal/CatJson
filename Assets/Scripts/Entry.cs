@@ -24,28 +24,19 @@ public class Entry : MonoBehaviour
     {
         Application.targetFrameRate = 30;
 
-        testJson1Text = Resources.Load<TextAsset>("testjson1").text;
+        testJson1Text = Resources.Load<TextAsset>("TestJson1").text;
 
+        string toJsonTest = Resources.Load<TextAsset>("ToJsonTest").text;
+        JsonObject jo = JsonParser.ParseJson(testJson1Text);
+        string json = JsonParser.ToJson(jo);
+        Debug.Log(json);
 
+        StreamWriter sw = File.CreateText(Application.dataPath + "/ToJsonResult.txt");
+        sw.Write(json);
+        sw.Close();
     }
 
-    //private void Check(TestJson1_Root data)
-    //{
-    //    if (data.b != true || data.num != 3.14 || data.str != "hello world")
-    //    {
-    //        throw new Exception("Check TestJson1 失败");
-    //    }
-
-    //    if (data.intList.Count != 5 || data.intList[0] != 1 || data.intList[4] != 5)
-    //    {
-    //        throw new Exception("Check TestJson1 失败");
-    //    }
-
-    //    if (data.intDict.Count != 3 || data.intDict["key1"] != 6 || data.intDict["key3"] != 8)
-    //    {
-    //        throw new Exception("Check TestJson1 失败");
-    //    }
-    //}
+ 
 
     private void Update()
     {

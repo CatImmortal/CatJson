@@ -49,7 +49,55 @@ namespace CatJson
 
             return "";
         }
-  
+        public void ToJson(int depth)
+        {
+            switch (Type)
+            {
+                case ValueType.Null:
+                    break;
+                case ValueType.Boolean:
+                    if (Boolean == true)
+                    {
+                        Util.Append("true");
+                    }
+                    else
+                    {
+                        Util.Append("false");
+                    }
+                    break;
+                case ValueType.Number:
+                    Util.Append(Number.ToString());
+                    break;
+                case ValueType.String:
+                    Util.Append("\"");
+                    Util.Append(Str);
+                    Util.Append("\"");
+                    break;
+                case ValueType.Array:
+                    Util.AppendLine("[");
+                    for (int i = 0; i < Array.Length; i++)
+                    {
+                        Util.AppendTab(depth);
+                        JsonValue jv = Array[i];
+                        jv.ToJson(depth + 1);
+                        if (i != Array.Length - 1)
+                        {
+                            Util.AppendLine(",");
+                        }
+                        else
+                        {
+                            Util.AppendLine(string.Empty);
+                        }
+                    }
+                    Util.Append("]",depth - 1);
+                    break;
+                case ValueType.Object:
+                    Obj.ToJson(depth);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
 }
