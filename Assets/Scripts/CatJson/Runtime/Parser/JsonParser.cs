@@ -150,16 +150,6 @@ namespace CatJson
             fieldInfoDict.Add(type, dict2);
         }
 
-        /// <summary>
-        /// 将Json对象转换为Json文本
-        /// </summary>
-        public static string ToJson(JsonObject jo)
-        {
-            jo.ToJson(1);
-            string json = Util.CachedSB.ToString();
-            Util.CachedSB.Clear();
-            return json;
-        }
 
 
     }

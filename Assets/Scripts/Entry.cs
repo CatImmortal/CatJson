@@ -26,14 +26,49 @@ public class Entry : MonoBehaviour
 
         testJson1Text = Resources.Load<TextAsset>("TestJson1").text;
 
-        string toJsonTest = Resources.Load<TextAsset>("ToJsonTest").text;
-        JsonObject jo = JsonParser.ParseJson(testJson1Text);
-        string json = JsonParser.ToJson(jo);
-        Debug.Log(json);
+        //string toJsonTest = Resources.Load<TextAsset>("ToJsonTest").text;
+        //JsonObject jo = JsonParser.ParseJson(testJson1Text);
+        //string json = JsonParser.ToJson(jo);
+        //Debug.Log(json);
+
+        ToJson1_Data item = new ToJson1_Data();
+        item.b = true;
+        item.n = 3.14f;
+        item.s = "to json";
+
+        ToJson1_Data child = new ToJson1_Data();
+        child.b = false;
+        child.n = 9.99f;
+        child.s = "child";
+
+        item.child = child;
+
+        item.intDict = new Dictionary<string, int>() { { "key1", 1 }, { "key2", 2 } };
+
+        ToJson1_Data value1 = new ToJson1_Data();
+        value1.b = true;
+        value1.n = 666.66f;
+        value1.s = "value1";
+
+        ToJson1_Data value2 = new ToJson1_Data();
+        value2.b = true;
+        value2.n = 666.66f;
+        value2.s = "value2";
+
+        item.dataDict = new Dictionary<string, ToJson1_Data>() { { "key3",value1},{ "key4",value2} };
+
+        item.ints = new int[] { 1, 2, 3 };
+        item.boolList = new List<bool>() { true, false, true };
+        item.dataList = new List<ToJson1_Data>() { value1, value2 };
+
+        string json = JsonParser.ToJson(item);
 
         StreamWriter sw = File.CreateText(Application.dataPath + "/ToJsonResult.txt");
         sw.Write(json);
         sw.Close();
+
+        ToJson1_Data result = JsonParser.ParseJson<ToJson1_Data>(json);
+        Debug.Log(result.n);
     }
 
  

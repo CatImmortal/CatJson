@@ -44,7 +44,7 @@ namespace CatJson
         /// </summary>
         public static bool IsNumber(Type type)
         {
-            return type == typeof(int) || type == typeof(float) || type == typeof(double);
+            return type == typeof(int) || type == typeof(long) || type == typeof(float) || type == typeof(double);
         }
 
         /// <summary>
@@ -93,6 +93,32 @@ namespace CatJson
             }
 
             throw new Exception("Char2Int调用失败，当前字符为：" + c);
+        }
+    
+        /// <summary>
+        /// value是否为该类型的默认值
+        /// </summary>
+        public static bool IsDefaultValue(Type type,object value)
+        {
+            if (!type.IsValueType)
+            {
+                return value == null;
+            }
+
+            if (IsNumber(type))
+            {
+                return (int)value == 0;
+            }
+
+            if (value is bool temp)
+            {
+                return temp == false;
+            }
+
+
+
+            return false;
+
         }
     }
 
