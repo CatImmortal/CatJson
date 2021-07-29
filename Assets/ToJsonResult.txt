@@ -1,48 +1,41 @@
 {
 	"b":true,
-	"n":3.14,
-	"s":"to json",
-	"child":{
-		"b":false,
-		"n":9.99,
-		"s":"child"
-	},
-	"intDict":{
-		"key1":1,
-		"key2":2
-	},
-	"dataDict":{
-		"key3":{
-			"b":true,
-			"n":666.66,
-			"s":"value1"
-		},
-		"key4":{
-			"b":true,
-			"n":666.66,
-			"s":"value2"
-		}
-	},
-	"ints":[
+	"num":3.14,
+	"str":"hello world",
+	"intList":[
 		1,
 		2,
-		3
+		3,
+		4,
+		5
 	],
-	"boolList":[
-		true,
-		false,
-		true
-	],
-	"dataList":[
+	"intDict":{
+		"key1":6,
+		"key2":7,
+		"key3":8
+	},
+	"item":{
+		"num":6.66,
+		"str":"str1"
+	},
+	"itemList":[
 		{
-		"b":true,
-		"n":666.66,
-		"s":"value1"
+		"num":7.77,
+		"str":"str21"
 	},
 		{
-		"b":true,
-		"n":666.66,
-		"s":"value2"
+		"num":8.88,
+		"str":"str22"
 	}
-	]
+	],
+	"itemDict":{
+		"key4":{
+			"num":9.99,
+			"str":"str31"
+		},
+		"key5":{
+			"num":10.101,
+			"str":"str32"
+		}
+	}
 }

@@ -105,14 +105,26 @@ namespace CatJson
                 return value == null;
             }
 
-            if (IsNumber(type))
+            if (value is int i)
             {
-                return (int)value == 0;
+                return (int)value == default;
+            }
+            if (value is long l)
+            {
+                return (long)value == default;
+            }
+            if (value is float f)
+            {
+                return (float)value == default;
+            }
+            if (value is double d)
+            {
+                return (double)value == default;
             }
 
-            if (value is bool temp)
+            if (value is bool b)
             {
-                return temp == false;
+                return b == default;
             }
 
 
