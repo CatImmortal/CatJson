@@ -127,6 +127,13 @@ namespace CatJson
                 return;
             }
 
+            if (extensionToJsonFuncDict.TryGetValue(valueType, out Action<object> action))
+            {
+                //自定义转换Json文本方法
+                action(value);
+                return;
+            }
+
             //根据属性值的不同类型进行序列化
             if (Util.IsNumber(valueType))
             {

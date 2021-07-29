@@ -30,11 +30,10 @@ public class Entry : MonoBehaviour
 
         result = JsonParser.ParseJson<TestJson1_Root>(testJson1Text);
 
-
-
-        //StreamWriter sw = File.CreateText(Application.dataPath + "/ToJsonResult.txt");
-        //sw.Write(json);
-        //sw.Close();
+        string json = JsonParser.ToJson(result);
+        StreamWriter sw = File.CreateText(Application.dataPath + "/ToJsonResult.txt");
+        sw.Write(json);
+        sw.Close();
 
 
     }

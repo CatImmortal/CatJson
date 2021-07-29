@@ -31,6 +31,11 @@ namespace CatJson
         private static Dictionary<Type, Func<object>> extensionParseFuncDict = new Dictionary<Type, Func<object>>();
 
         /// <summary>
+        /// 扩展类型与其对应的转换Json文本方法
+        /// </summary>
+        private static Dictionary<Type, Action<object>> extensionToJsonFuncDict = new Dictionary<Type, Action<object>>();
+
+        /// <summary>
         /// 解析Json对象的通用流程
         /// </summary>
         public static void ParseJsonObjectProcedure(object userdata1,object userdata2,Action<object,object,RangeString, TokenType> action)
