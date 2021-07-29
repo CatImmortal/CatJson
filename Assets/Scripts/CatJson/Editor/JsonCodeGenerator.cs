@@ -9,44 +9,44 @@ using System.Text;
 namespace CatJson.Editor
 {
     /// <summary>
-    /// 解析代码生成器
+    /// Json解析/转换代码生成器
     /// </summary>
-    public static class ParseCodeGenerator
+    public static class JsonCodeGenerator
     {
 
         private static StringBuilder sb = new StringBuilder();
 
         /// <summary>
-        /// 存放已生成过解析代码的Type
+        /// 存放已生成过代码的Type
         /// </summary>
-        private static HashSet<Type> GenParseCodeTypes = new HashSet<Type>();
+        private static HashSet<Type> GenCodeTypes = new HashSet<Type>();
 
         /// <summary>
-        /// 存放待生成解析代码的被Root依赖的Type
+        /// 存放待生成代码的被Root依赖的Type
         /// </summary>
         private static Queue<Type> needGenTypes = new Queue<Type>();
 
 
 
-        [MenuItem("CatJson/预生成Json解析代码")]
-        private static void GenParseCode()
+        [MenuItem("CatJson/预生成Json解析/转换代码")]
+        private static void GenJsonCode()
         {
 
-            if (!Directory.Exists(ParseCodeGenConfig.GenCodeDirPath))
+            if (!Directory.Exists(JsonCodeGenConfig.ParseJsonCodeDirPath))
             {
-                Directory.CreateDirectory(ParseCodeGenConfig.GenCodeDirPath);
+                Directory.CreateDirectory(JsonCodeGenConfig.ParseJsonCodeDirPath);
             }
             else
             {
                 //清空旧文件
-                DirectoryInfo di = new DirectoryInfo(ParseCodeGenConfig.GenCodeDirPath);
+                DirectoryInfo di = new DirectoryInfo(JsonCodeGenConfig.ParseJsonCodeDirPath);
                 foreach (FileInfo fi in di.GetFiles())
                 {
                     fi.Delete();
                 }
             }
 
-            GenParseCodeTypes.Clear();
+            GenCodeTypes.Clear();
             needGenTypes.Clear();
 
             //生成Root的解析代码
@@ -54,15 +54,15 @@ namespace CatJson.Editor
             for (int i = 0; i < types.Count; i++)
             {
                 Type type = types[i];
-                GenParseCode(type);
-                GenParseCodeTypes.Add(type);
+                GenJsonParseCode(type);
+                GenCodeTypes.Add(type);
             }
 
             //生成被Root依赖的Type的解析代码
             while (needGenTypes.Count > 0)
             {
                 Type type = needGenTypes.Dequeue();
-                GenParseCode(type);
+                GenJsonParseCode(type);
             }
 
             //生成静态构造器文件
@@ -73,9 +73,9 @@ namespace CatJson.Editor
 
 
         /// <summary>
-        /// 生成解析代码文件
+        /// 生成Json解析代码文件
         /// </summary>
-        private static void GenParseCode(Type type)
+        private static void GenJsonParseCode(Type type)
         {
             //读取模板文件
             StreamReader sr;
@@ -83,12 +83,12 @@ namespace CatJson.Editor
             if (type.IsValueType)
             {
                 //值类型
-                sr = new StreamReader(ParseCodeGenConfig.ParseStructCodeTemplateFilePath);
+                sr = new StreamReader(JsonCodeGenConfig.ParseStructCodeTemplateFilePath);
             }
             else
             {
                 //引用类型
-                sr = new StreamReader(ParseCodeGenConfig.ParseClassCodeTemplateFilePath);
+                sr = new StreamReader(JsonCodeGenConfig.ParseClassCodeTemplateFilePath);
             }
 
             string template = sr.ReadToEnd();
@@ -101,12 +101,12 @@ namespace CatJson.Editor
             template = template.Replace("#ClassName#", type.FullName);
 
             //写入解析方法名
-            template = template.Replace("#MethodName#", GetParseCodeMethodName(type));
+            template = template.Replace("#MethodName#", GetParseJsonCodeMethodName(type));
 
             //生成解析代码
             template = template.Replace("#IfElseParse#", AppendIfElseParseCode(type));
 
-            StreamWriter sw = new StreamWriter($"{ParseCodeGenConfig.GenCodeDirPath}/Gen_{type.FullName.Replace(".", "_")}_ParseCode.cs");
+            StreamWriter sw = new StreamWriter($"{JsonCodeGenConfig.ParseJsonCodeDirPath}/Gen_{type.FullName.Replace(".", "_")}_ParseJsonCode.cs");
             sw.Write(template);
             sw.Close();
         }
@@ -117,19 +117,19 @@ namespace CatJson.Editor
         private static void GenStaticCtorCode(List<Type> types)
         {
             //读取模板文件
-            StreamReader sr = new StreamReader(ParseCodeGenConfig.StaticCtorTemplateFilePath);
+            StreamReader sr = new StreamReader(JsonCodeGenConfig.StaticCtorTemplateFilePath);
             string template = sr.ReadToEnd();
             sr.Close();
 
             foreach (Type type in types)
             {
-                AppendLine($"ParseCodeFuncDict.Add(typeof({type.FullName}),{GetParseCodeMethodName(type)});", 3);
+                AppendLine($"ParseCodeFuncDict.Add(typeof({type.FullName}),{GetParseJsonCodeMethodName(type)});", 3);
             }
 
             template = template.Replace("#AddParseCodeFunc#", sb.ToString());
             sb.Clear();
 
-            StreamWriter sw = new StreamWriter($"{ParseCodeGenConfig.GenCodeDirPath}/Gen_ParseCodeStaticCtor.cs");
+            StreamWriter sw = new StreamWriter($"{JsonCodeGenConfig.ParseJsonCodeDirPath}/Gen_ParseCodeStaticCtor.cs");
             sw.Write(template);
             sw.Close();
         }
@@ -256,7 +256,7 @@ namespace CatJson.Editor
                 AppendParseDictCode(valueType);
                 AppendLine($"temp.{name} = dict;");
             }
-            else if (ParseCodeGenConfig.ExtensionParseTypes.Contains(type))
+            else if (JsonCodeGenConfig.ExtensionParseTypes.Contains(type))
             {
                 //其他类型 使用JsonParser.Extension里的扩展
                 AppendLine($"temp.{name} = ({typeFullName})JsonParser.ParseJsonValueByType(nextTokenType,typeof({typeFullName}));");
@@ -265,9 +265,9 @@ namespace CatJson.Editor
             {
 
                 //其他类型 生成解析代码
-                AppendLine($"temp.{name} = {GetParseCodeMethodName(type)}();");
+                AppendLine($"temp.{name} = {GetParseJsonCodeMethodName(type)}();");
 
-                if (!GenParseCodeTypes.Contains(type))
+                if (!GenCodeTypes.Contains(type))
                 {
                     needGenTypes.Enqueue(type);
                 }
@@ -338,7 +338,7 @@ namespace CatJson.Editor
                 AppendParseDictCode(valueType, $"{dictName}", $"{userdata1Name}1", $"{userdata2Name}1", $"{keyName}1", $"{nextTokenTypeName}1");
                 AppendLine($"{listName}.Add({dictName});");
             }
-            else if (ParseCodeGenConfig.ExtensionParseTypes.Contains(elementType))
+            else if (JsonCodeGenConfig.ExtensionParseTypes.Contains(elementType))
             {
                 //其他类型 使用JsonParser.Extension里的扩展
                 AppendLine($"((List<{elementType.FullName}>){userdata1Name}).Add(({elementType.FullName})JsonParser.ParseJsonValueByType(nextTokenType,typeof({elementType.FullName})));");
@@ -347,9 +347,9 @@ namespace CatJson.Editor
             else
             {
                 //自定义类型 使用生成的解析代码
-                AppendLine($"((List<{elementType.FullName}>){userdata1Name}).Add({GetParseCodeMethodName(elementType)}());");
+                AppendLine($"((List<{elementType.FullName}>){userdata1Name}).Add({GetParseJsonCodeMethodName(elementType)}());");
 
-                if (!GenParseCodeTypes.Contains(elementType))
+                if (!GenCodeTypes.Contains(elementType))
                 {
                     needGenTypes.Enqueue(elementType);
                 }
@@ -419,7 +419,7 @@ namespace CatJson.Editor
                 AppendParseDictCode(newValueType,$"{dictName}1", $"{userdata1Name}1", $"{userdata2Name}1", $"{keyName}1", $"{nextTokenTypeName}1");
                 AppendLine($"((Dictionary<string, {valueTypeFullName}>){userdata1Name}).Add({keyName}.ToString(),{dictName}1);");
             }
-            else if (ParseCodeGenConfig.ExtensionParseTypes.Contains(valueType))
+            else if (JsonCodeGenConfig.ExtensionParseTypes.Contains(valueType))
             {
                 //其他类型 使用JsonParser.Extension里的扩展
                 AppendLine($"((Dictionary<string, {valueTypeFullName}>){userdata1Name}).Add({keyName}.ToString(),({valueType.FullName})JsonParser.ParseJsonValueByType(nextTokenType,typeof({valueTypeFullName})));");
@@ -427,9 +427,9 @@ namespace CatJson.Editor
             else
             {
                 //自定义类型 使用生成的解析代码
-                AppendLine($"((Dictionary<string, {valueTypeFullName}>){userdata1Name}).Add({keyName}.ToString(),{GetParseCodeMethodName(valueType)}());");
+                AppendLine($"((Dictionary<string, {valueTypeFullName}>){userdata1Name}).Add({keyName}.ToString(),{GetParseJsonCodeMethodName(valueType)}());");
 
-                if (!GenParseCodeTypes.Contains(valueType))
+                if (!GenCodeTypes.Contains(valueType))
                 {
                     needGenTypes.Enqueue(valueType);
                 }
@@ -444,12 +444,12 @@ namespace CatJson.Editor
         private static List<Type> GetGenParseCodeTypes()
         {
             List<Type> types = new List<Type>();
-            foreach (string item in ParseCodeGenConfig.Assemblies)
+            foreach (string item in JsonCodeGenConfig.Assemblies)
             {
                 Assembly assembly = Assembly.Load(item);
                 foreach (Type type in assembly.GetTypes())
                 {
-                    if (type.GetCustomAttribute<GenParseCodeRootAttribute>() != null)
+                    if (type.GetCustomAttribute<GenCodeRootAttribute>() != null)
                     {
                         types.Add(type);
                     }
@@ -476,9 +476,9 @@ namespace CatJson.Editor
         /// <summary>
         /// 获取类型对应的解析方法名
         /// </summary>
-        private static string GetParseCodeMethodName(Type type)
+        private static string GetParseJsonCodeMethodName(Type type)
         {
-            return $"Parse_{type.FullName.Replace(".", "_")}";
+            return $"ParseJson_{type.FullName.Replace(".", "_")}";
         }
 
         /// <summary>

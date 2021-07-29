@@ -28,12 +28,12 @@ public class Entry : MonoBehaviour
 
         testJson1Text = Resources.Load<TextAsset>("TestJson1").text;
 
-        result = JsonParser.ParseJson<TestJson1_Root>(testJson1Text);
+        //result = JsonParser.ParseJson<TestJson1_Root>(testJson1Text);
 
-        string json = JsonParser.ToJson(result);
-        StreamWriter sw = File.CreateText(Application.dataPath + "/ToJsonResult.txt");
-        sw.Write(json);
-        sw.Close();
+        //string json = JsonMapper.ToJson(result);
+        //StreamWriter sw = File.CreateText(Application.dataPath + "/ToJsonResult.txt");
+        //sw.Write(json);
+        //sw.Close();
 
 
     }

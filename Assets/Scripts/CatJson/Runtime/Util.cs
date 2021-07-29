@@ -38,6 +38,14 @@ namespace CatJson
         }
 
 
+        public static void AppendJsonKey(string key,int depth)
+        {
+            Append("\"", depth);
+            Append(key);
+            Append("\"");
+            Append(":");
+        }
+
 
         /// <summary>
         /// type是否为数字类型（int float double)

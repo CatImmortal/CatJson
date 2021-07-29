@@ -6,9 +6,9 @@ using UnityEngine;
 
 namespace CatJson.Editor
 {
-    public static class ParseCodeGenConfig
+    public static class JsonCodeGenConfig
     {
-        public static string GenCodeDirPath = Application.dataPath + "/Scripts/CatJson/Runtime/GenParseCode";
+        public static string ParseJsonCodeDirPath = Application.dataPath + "/Scripts/CatJson/Runtime/GenParseJsonCode";
         public static string ParseClassCodeTemplateFilePath = Application.dataPath + "/Scripts/CatJson/Editor/ParseClassCodeTemplate.txt";
         public static string ParseStructCodeTemplateFilePath = Application.dataPath + "/Scripts/CatJson/Editor/ParseStructCodeTemplate.txt";
         public static string StaticCtorTemplateFilePath = Application.dataPath + "/Scripts/CatJson/Editor/StaticCtorTemplate.txt";

@@ -108,10 +108,12 @@ namespace CatJson
         /// </summary>
         private static void AppendJsonKeyValue(Type valueType, string name, object value, int depth)
         {
-            Util.Append("\"", depth);
-            Util.Append(name);
-            Util.Append("\"");
-            Util.Append(":");
+            //Util.Append("\"", depth);
+            //Util.Append(name);
+            //Util.Append("\"");
+            //Util.Append(":");
+
+            Util.AppendJsonKey(name, depth);
 
             AppendJsonValue(valueType, value, depth);
         }

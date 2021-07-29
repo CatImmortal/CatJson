@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace CatJson
 {
-    public static partial class ParseCode
+    public static partial class GenCodes
     {
         private static TestJson1_Item Parse_TestJson1_Item()
         {
