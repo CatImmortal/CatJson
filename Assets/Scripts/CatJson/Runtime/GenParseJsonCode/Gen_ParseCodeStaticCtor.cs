@@ -8,7 +8,7 @@ namespace CatJson
         static GenCodes()
         {
 			ParseJsonCodeFuncDict.Add(typeof(TestJson1_Root),Parse_TestJson1_Root);
-
+            ToJsonCodeFuncDict.Add(typeof(ToJson1_Data), ToJson_ToJson1_Data);
         }
     }
 }

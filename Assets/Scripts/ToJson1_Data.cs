@@ -12,4 +12,6 @@ public class ToJson1_Data
 
     public List<bool> boolList;
 
+    public ToJson1_Data d;
+
 }

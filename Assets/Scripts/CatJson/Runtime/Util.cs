@@ -38,13 +38,7 @@ namespace CatJson
         }
 
 
-        public static void AppendJsonKey(string key,int depth)
-        {
-            Append("\"", depth);
-            Append(key);
-            Append("\"");
-            Append(":");
-        }
+      
 
 
         /// <summary>

@@ -11,17 +11,33 @@ namespace CatJson
         /// <summary>
         /// 将指定类型的对象转换为Json文本
         /// </summary>
-        public static string ToJson<T>(T obj)
+        public static string ToJson<T>(T obj, bool reflection = true) where T : new()
         {
-            return ToJson(obj, typeof(T));
+            return ToJson(obj, typeof(T),reflection);
         }
 
         /// <summary>
         /// 将指定类型的对象转换为Json文本
         /// </summary>
-        public static string ToJson(object obj, Type type)
+        public static string ToJson(object obj, Type type, bool reflection = true)
         {
-            AppendJsonObject(obj, type, 1);
+            if (reflection)
+            {
+                //反射转换
+                AppendJsonObject(obj, type, 1);
+            }
+            else if (GenCodes.ToJsonCodeFuncDict.TryGetValue(type, out Action<object,int> action))
+            {
+                //使用预生成代码转换
+                action(obj, 1);
+            }
+
+
+            if (Util.CachedSB.Length == 0)
+            {
+                throw new Exception($"没有为{type}类型预生成的转换代码");
+            }
+
             string json = Util.CachedSB.ToString();
             Util.CachedSB.Clear();
             return json;
@@ -108,13 +124,7 @@ namespace CatJson
         /// </summary>
         private static void AppendJsonKeyValue(Type valueType, string name, object value, int depth)
         {
-            //Util.Append("\"", depth);
-            //Util.Append(name);
-            //Util.Append("\"");
-            //Util.Append(":");
-
-            Util.AppendJsonKey(name, depth);
-
+            AppendJsonKey(name, depth);
             AppendJsonValue(valueType, value, depth);
         }
 
@@ -263,6 +273,63 @@ namespace CatJson
             //自定义类对象
             AppendJsonObject(value, valueType, depth + 1);
         }
+
+
+
+        public static void AppendJsonKey(string key, int depth)
+        {
+            Util.Append("\"", depth);
+            Util.Append(key);
+            Util.Append("\"");
+            Util.Append(":");
+        }
+
+        public static void AppendJsonValue(bool b,int depth = 0)
+        {
+            if (b == true)
+            {
+                Util.Append("true",depth);
+            }
+            else
+            {
+                Util.Append("false",depth);
+            }
+            Util.AppendLine(",");
+        }
+
+        public static void AppendJsonValue(string s, int depth = 0)
+        {
+            Util.Append("\"",depth);
+            Util.Append(s.ToString());
+            Util.Append("\"");
+            Util.AppendLine(",");
+        }
+
+        public static void AppendJsonValue(int i, int depth = 0)
+        {
+            Util.Append(i.ToString(),depth);
+            Util.AppendLine(",");
+        }
+
+        public static void AppendJsonValue(long l, int depth = 0)
+        {
+            Util.Append(l.ToString(), depth);
+            Util.AppendLine(",");
+        }
+
+        public static void AppendJsonValue(float f, int depth = 0)
+        {
+            Util.Append(f.ToString(), depth);
+            Util.AppendLine(",");
+        }
+
+        public static void AppendJsonValue(double d, int depth = 0)
+        {
+            Util.Append(d.ToString(), depth);
+            Util.AppendLine(",");
+        }
+
+
     }
 
 }

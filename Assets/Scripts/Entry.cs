@@ -30,11 +30,31 @@ public class Entry : MonoBehaviour
 
         //result = JsonParser.ParseJson<TestJson1_Root>(testJson1Text);
 
-        //string json = JsonMapper.ToJson(result);
-        //StreamWriter sw = File.CreateText(Application.dataPath + "/ToJsonResult.txt");
-        //sw.Write(json);
-        //sw.Close();
+        ToJson1_Data data = new ToJson1_Data();
 
+        data.b = true;
+        data.n = 3.14f;
+        data.s = "tojson";
+
+        data.intDict = new Dictionary<string, int>() { { "key1",1},{ "key2",2} };
+        data.boolList = new List<bool>() { true, false, true };
+
+        ToJson1_Data d = new ToJson1_Data();
+        d.b = true;
+        d.n = 3.14f;
+        d.s = "tojson";
+
+        d.intDict = new Dictionary<string, int>() { { "key1", 1 }, { "key2", 2 } };
+        d.boolList = new List<bool>() { true, false, true };
+
+        data.d = d;
+
+        string json = JsonParser.ToJson(data);
+        StreamWriter sw = File.CreateText(Application.dataPath + "/ToJsonResult.txt");
+        sw.Write(json);
+        sw.Close();
+
+        Debug.Log(json);
 
     }
 

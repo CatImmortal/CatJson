@@ -1,0 +1,8 @@
+{
+	"b":true,
+	"n":3.14,
+	"s":tojson,
+	"intDict":{		"key1":,		"key2:,	},
+	"boolList":[
+		true,		false,		tre,	]
+}
