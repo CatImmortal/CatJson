@@ -178,6 +178,11 @@ namespace CatJson
                 return;
             }
 
+            if (valueType.IsEnum)
+            {
+                //枚举 todo:
+            }
+
             if (Util.IsArrayOrList(valueType))
             {
                 //数组 或 List<T>

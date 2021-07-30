@@ -1,0 +1,20 @@
+﻿#Using#
+
+namespace CatJson
+{
+    public static partial class ParseCode
+    {
+        private static void #MethodName#(object obj,int depth)
+        {
+            #ClassName# data = (#ClassName#)obj;
+
+            Util.AppendLine("{");
+
+#ToJsonCode#
+
+            Util.Append("}", depth - 1);
+         
+        }
+    }
+
+}

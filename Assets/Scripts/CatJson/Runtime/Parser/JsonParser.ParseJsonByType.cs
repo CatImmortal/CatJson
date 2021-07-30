@@ -98,6 +98,10 @@ namespace CatJson
                     {
                         return double.Parse(str);
                     }
+                    if (type.IsEnum)
+                    {
+                        //枚举 todo:
+                    }
                     break;
 
                 case TokenType.String:

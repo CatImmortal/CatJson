@@ -10,8 +10,6 @@ namespace CatJson
         {
             ToJson1_Data data = (ToJson1_Data)obj;
 
-            bool flag = false;
-
             Util.AppendLine("{");
 
             if (data.b != default)
@@ -39,13 +37,11 @@ namespace CatJson
                 Util.AppendLine("{");
                 foreach (var item in data.intDict)
                 {
-                    flag = true;
                     JsonParser.AppendJsonKey(item.Key, depth + 1);
                     JsonParser.AppendJsonValue(item.Value);
                 }
-                if (flag == true)
+                if (data.intDict.Count > 0)
                 {
-                    flag = false;
                     Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);
                 }
                 Util.AppendLine("},", depth);
@@ -57,12 +53,10 @@ namespace CatJson
                 Util.AppendLine("[");
                 foreach (var item in data.boolList)
                 {
-                    flag = true;
                     JsonParser.AppendJsonValue(item, depth);
                 }
-                if (flag == true)
+                if (data.boolList.Count > 0)
                 {
-                    flag = false;
                     Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);
                 }
                 Util.AppendLine("]", depth);
