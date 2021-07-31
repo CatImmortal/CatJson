@@ -29,7 +29,7 @@ namespace CatJson
                 //使用反射解析
                 result = ParseJsonObjectByType(type);
             }
-            else if (GenCodes.ParseJsonCodeFuncDict.TryGetValue(type, out Func<object> func))
+            else if (GenJsonCodes.ParseJsonCodeFuncDict.TryGetValue(type, out Func<object> func))
             {
                 //使用预生成代码解析
                 result = func();

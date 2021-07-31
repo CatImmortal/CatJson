@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using CatJson;
 
-[GenCodeRoot]
+//[GenJsonCodeRoot]
 public class TestJson1_Root
 {
     public bool b;

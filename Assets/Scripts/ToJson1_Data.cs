@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using CatJson;
+[GenJsonCodeRoot]
 public class ToJson1_Data
 {
     public bool b;
@@ -15,3 +17,4 @@ public class ToJson1_Data
     public ToJson1_Data d;
 
 }
+

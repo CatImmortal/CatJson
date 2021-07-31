@@ -9,7 +9,7 @@ namespace CatJson
     /// 依赖的其他类不用标记也会自动生成
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
-    public class GenCodeRootAttribute : Attribute
+    public class GenJsonCodeRootAttribute : Attribute
     {
 
     }

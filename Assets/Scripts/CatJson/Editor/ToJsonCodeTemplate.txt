@@ -2,15 +2,20 @@
 
 namespace CatJson
 {
-    public static partial class ParseCode
+    public static partial class GenJsonCodes
     {
         private static void #MethodName#(object obj,int depth)
         {
             #ClassName# data = (#ClassName#)obj;
-
+            bool flag = false;
             Util.AppendLine("{");
 
 #ToJsonCode#
+
+            if (flag)
+            {
+                Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);
+            }
 
             Util.Append("}", depth - 1);
          

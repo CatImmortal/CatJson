@@ -26,7 +26,7 @@ namespace CatJson
                 //反射转换
                 AppendJsonObject(obj, type, 1);
             }
-            else if (GenCodes.ToJsonCodeFuncDict.TryGetValue(type, out Action<object,int> action))
+            else if (GenJsonCodes.ToJsonCodeFuncDict.TryGetValue(type, out Action<object,int> action))
             {
                 //使用预生成代码转换
                 action(obj, 1);
@@ -299,7 +299,7 @@ namespace CatJson
             {
                 Util.Append("false",depth);
             }
-            Util.AppendLine(",");
+            
         }
 
         public static void AppendJsonValue(string s, int depth = 0)
@@ -307,31 +307,28 @@ namespace CatJson
             Util.Append("\"",depth);
             Util.Append(s.ToString());
             Util.Append("\"");
-            Util.AppendLine(",");
+
         }
 
         public static void AppendJsonValue(int i, int depth = 0)
         {
             Util.Append(i.ToString(),depth);
-            Util.AppendLine(",");
         }
 
         public static void AppendJsonValue(long l, int depth = 0)
         {
             Util.Append(l.ToString(), depth);
-            Util.AppendLine(",");
+
         }
 
         public static void AppendJsonValue(float f, int depth = 0)
         {
             Util.Append(f.ToString(), depth);
-            Util.AppendLine(",");
         }
 
         public static void AppendJsonValue(double d, int depth = 0)
         {
             Util.Append(d.ToString(), depth);
-            Util.AppendLine(",");
         }
 
 

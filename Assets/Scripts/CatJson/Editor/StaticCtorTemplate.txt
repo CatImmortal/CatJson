@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace CatJson
 {
-    public static partial class ParseCode
+    public static partial class GenJsonCodes
     {
-        static ParseCode()
+        static GenJsonCodes()
         {
-#AddParseCodeFunc#
+#AddJsonCodeFunc#
         }
     }
 }

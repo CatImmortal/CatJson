@@ -37,8 +37,13 @@ namespace CatJson
             CachedSB.AppendLine(str);
         }
 
-
-      
+        /// <summary>
+        /// 是否为内置基础类型 string bool 数字
+        /// </summary>
+        public static bool IsBaseType(Type type)
+        {
+            return type == typeof(string) || type == typeof(bool) || IsNumber(type);
+        }
 
 
         /// <summary>
@@ -63,6 +68,19 @@ namespace CatJson
         public static bool IsDictionary(Type type)
         {
             return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>);
+        }
+
+        /// <summary>
+        /// 获取数组和List的元素类型
+        /// </summary>
+        public static Type GetArrayElementType(Type type)
+        {
+            if (type.IsArray)
+            {
+                return type.GetElementType();
+            }
+
+            return type.GetGenericArguments()[0];
         }
 
         /// <summary>

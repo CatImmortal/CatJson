@@ -49,8 +49,8 @@ public class Entry : MonoBehaviour
 
         data.d = d;
 
-        string json = JsonParser.ToJson(data);
-        StreamWriter sw = File.CreateText(Application.dataPath + "/ToJsonResult.txt");
+        string json = JsonParser.ToJson(data,false);
+        StreamWriter sw = File.CreateText(Application.dataPath + "/ToJsonResultByCode.txt");
         sw.Write(json);
         sw.Close();
 

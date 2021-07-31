@@ -8,10 +8,13 @@ namespace CatJson.Editor
     public static partial class JsonCodeGenerator
     {
 
+
+
+
         /// <summary>
         /// 生成Json解析代码文件
         /// </summary>
-        private static void GenJsonParseCode(Type type)
+        private static void GenParseJsonCodeFile(Type type)
         {
             //读取模板文件
             StreamReader sr;
@@ -141,7 +144,7 @@ namespace CatJson.Editor
                 AppendLine($"List<{typeFullName}> list = new List<{typeFullName}>();");
 
                 //解析Json数组
-                AppendParseArrayCode(elementType);
+                AppendParseJsonArrayCode(elementType);
 
                 if (type.IsArray)
                 {
@@ -157,7 +160,7 @@ namespace CatJson.Editor
                 //字典
                 Type valueType = type.GetGenericArguments()[1];
                 AppendLine($"{typeFullName} dict = new {typeFullName}();");
-                AppendParseDictCode(valueType);
+                AppendParseJsonDictCode(valueType);
                 AppendLine($"temp.{name} = dict;");
             }
             else if (JsonCodeGenConfig.UseExtensionFuncTypes.Contains(type))
@@ -169,7 +172,7 @@ namespace CatJson.Editor
             else
             {
 
-                //其他类型 生成解析代码
+                //其他类型 使用生成的解析代码
                 AppendLine($"temp.{name} = {GetParseJsonCodeMethodName(type)}();");
 
                 if (!GenCodeTypes.Contains(type))
@@ -185,7 +188,7 @@ namespace CatJson.Editor
         /// <summary>
         /// 生成解析json数组的代码
         /// </summary>
-        private static void AppendParseArrayCode(Type elementType, string listName = "list", string userdata1Name = "userdata11", string userdata2Name = "userdata21", string nextTokenTypeName = "nextTokenType1", string dictName = "dict", string keyName = "key1")
+        private static void AppendParseJsonArrayCode(Type elementType, string listName = "list", string userdata1Name = "userdata11", string userdata2Name = "userdata21", string nextTokenTypeName = "nextTokenType1", string dictName = "dict", string keyName = "key1")
         {
             AppendLine($"JsonParser.ParseJsonArrayProcedure({listName}, null, ({userdata1Name}, {userdata2Name}, {nextTokenTypeName}) =>");
             AppendLine("{");
@@ -225,7 +228,7 @@ namespace CatJson.Editor
 
                 AppendLine($"List<{typeFullName}> {listName}1 = new List<{typeFullName}>();");
 
-                AppendParseArrayCode(newElementType, $"{listName}1", $"{userdata1Name}1", $"{userdata2Name}1", $"{nextTokenTypeName}1", $"{dictName}1", $"{keyName}1");
+                AppendParseJsonArrayCode(newElementType, $"{listName}1", $"{userdata1Name}1", $"{userdata2Name}1", $"{nextTokenTypeName}1", $"{dictName}1", $"{keyName}1");
 
 
 
@@ -244,7 +247,7 @@ namespace CatJson.Editor
                 Type valueType = elementType.GetGenericArguments()[1];
                 string typeFullName = GetTypeFullName(elementType);
                 AppendLine($"{typeFullName} {dictName} = new {typeFullName}();");
-                AppendParseDictCode(valueType, $"{dictName}", $"{userdata1Name}1", $"{userdata2Name}1", $"{keyName}1", $"{nextTokenTypeName}1");
+                AppendParseJsonDictCode(valueType, $"{dictName}", $"{userdata1Name}1", $"{userdata2Name}1", $"{keyName}1", $"{nextTokenTypeName}1");
                 AppendLine($"{listName}.Add({dictName});");
             }
             else if (JsonCodeGenConfig.UseExtensionFuncTypes.Contains(elementType))
@@ -270,7 +273,7 @@ namespace CatJson.Editor
         /// <summary>
         /// 生成解析字典的代码
         /// </summary>
-        private static void AppendParseDictCode(Type valueType, string dictName = "dict", string userdata1Name = "userdata11", string userdata2Name = "userdata21", string keyName = "key1", string nextTokenTypeName = "nextTokenType1", string listName = "list")
+        private static void AppendParseJsonDictCode(Type valueType, string dictName = "dict", string userdata1Name = "userdata11", string userdata2Name = "userdata21", string keyName = "key1", string nextTokenTypeName = "nextTokenType1", string listName = "list")
         {
             AppendLine($"JsonParser.ParseJsonObjectProcedure({dictName}, null, ({userdata1Name}, {userdata2Name},{keyName}, {nextTokenTypeName}) =>");
             AppendLine("{");
@@ -312,7 +315,7 @@ namespace CatJson.Editor
 
                 AppendLine($"List<{elementTypeFullName}> {listName}1 = new List<{elementTypeFullName}>();");
 
-                AppendParseArrayCode(elementType, $"{listName}1", $"{userdata1Name}1", $"{userdata2Name}1", $"{nextTokenTypeName}1", $"{dictName}1", $"{keyName}1");
+                AppendParseJsonArrayCode(elementType, $"{listName}1", $"{userdata1Name}1", $"{userdata2Name}1", $"{nextTokenTypeName}1", $"{dictName}1", $"{keyName}1");
 
 
                 if (valueType.IsArray)
@@ -329,7 +332,7 @@ namespace CatJson.Editor
                 //字典
                 Type newValueType = valueType.GetGenericArguments()[1];
                 AppendLine($"{valueTypeFullName} {dictName}1 = new {valueTypeFullName}();");
-                AppendParseDictCode(newValueType, $"{dictName}1", $"{userdata1Name}1", $"{userdata2Name}1", $"{keyName}1", $"{nextTokenTypeName}1");
+                AppendParseJsonDictCode(newValueType, $"{dictName}1", $"{userdata1Name}1", $"{userdata2Name}1", $"{keyName}1", $"{nextTokenTypeName}1");
                 AppendLine($"((Dictionary<string, {valueTypeFullName}>){userdata1Name}).Add({keyName}.ToString(),{dictName}1);");
             }
             else if (JsonCodeGenConfig.UseExtensionFuncTypes.Contains(valueType))
@@ -351,7 +354,34 @@ namespace CatJson.Editor
             AppendLine("});");
         }
 
-       
+        /// <summary>
+        /// 获取类型全名，特殊处理带泛型的字典与List<T>
+        /// </summary>
+        private static string GetTypeFullName(Type type)
+        {
+            if (!type.IsGenericType)
+            {
+                return type.FullName;
+            }
+
+            if (Util.IsDictionary(type))
+            {
+                Type valueType = type.GetGenericArguments()[1];
+                return $"Dictionary<string,{GetTypeFullName(valueType)}>";
+            }
+
+            Type elementType;
+            if (type.IsArray)
+            {
+                elementType = type.GetElementType();
+            }
+            else
+            {
+                elementType = type.GetGenericArguments()[0];
+            }
+
+            return $"List<{GetTypeFullName(elementType)}>";
+        }
     }
 }
 

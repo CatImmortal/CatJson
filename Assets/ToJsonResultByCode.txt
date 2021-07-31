@@ -1,0 +1,28 @@
+{
+	"b":true,
+	"n":3.14,
+	"s":"tojson",
+	"intDict":{
+		"key1":1,
+		"key2":2
+	},
+	"boolList":[
+		true,
+		false,
+		true
+	],
+	"d":{
+		"b":true,
+		"n":3.14,
+		"s":"tojson",
+		"intDict":{
+			"key1":1,
+			"key2":2
+		},
+		"boolList":[
+			true,
+			false,
+			true
+		]
+	}
+}
