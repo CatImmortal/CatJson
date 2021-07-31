@@ -10,7 +10,7 @@ namespace CatJson
         /// </summary>
         public static string ToJson(JsonObject jo)
         {
-            jo.ToJson(1);
+            jo.ToJson(0);
             string json = Util.CachedSB.ToString();
             Util.CachedSB.Clear();
             return json;

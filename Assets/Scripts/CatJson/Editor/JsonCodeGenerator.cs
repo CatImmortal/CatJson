@@ -55,6 +55,7 @@ namespace CatJson.Editor
                 if (!GenCodeTypes.Contains(type))
                 {
                     GenParseJsonCodeFile(type);
+                    GenToJsonCodeFile(type);
                     GenCodeTypes.Add(type);
                 }
             }
@@ -296,7 +297,7 @@ namespace CatJson.Editor
             else
             {
                 //其他类型 使用生成的转换代码
-                AppendLine($"{GetToJsonCodeMethodName(valueType)}({valueName},depth + 1);", 3);
+                AppendLine($"{GetToJsonCodeMethodName(valueType)}({valueName},{depthCode});", 3);
             }
         }
 

@@ -24,12 +24,12 @@ namespace CatJson
             if (reflection)
             {
                 //反射转换
-                AppendJsonObject(obj, type, 1);
+                AppendObjectJson(obj, type, 0);
             }
             else if (GenJsonCodes.ToJsonCodeFuncDict.TryGetValue(type, out Action<object,int> action))
             {
                 //使用预生成代码转换
-                action(obj, 1);
+                action(obj, 0);
             }
 
 
@@ -46,16 +46,15 @@ namespace CatJson
         /// <summary>
         /// 追加Json数据类对象文本
         /// </summary>
-        private static void AppendJsonObject(object obj, Type type, int depth)
+        private static void AppendObjectJson(object obj, Type type, int depth)
         {
-            Util.AppendLine("{");
-
-
             if (!propertyInfoDict.ContainsKey(type) && !fieldInfoDict.ContainsKey(type))
             {
                 //初始化反射信息
                 AddToReflectionMap(type);
             }
+
+            Util.AppendLine("{");
 
             bool flag = false;
 
@@ -73,13 +72,14 @@ namespace CatJson
                         //默认值跳过序列化
                         continue;
                     }
+
                     flag = true;
 
                    
 
-                    AppendJsonKeyValue(piType, piName, value, depth);
+                    AppendSingleKeyValueJsohn(piType, piName, value, depth + 1);
 
-                    Util.AppendLine(",");
+                    
                 }
             }
 
@@ -100,9 +100,7 @@ namespace CatJson
                     flag = true;
 
 
-                    AppendJsonKeyValue(fiType, fiName, value, depth);
-
-                    Util.AppendLine(",");
+                    AppendSingleKeyValueJsohn(fiType, fiName, value, depth + 1);
                 }
 
             }
@@ -115,30 +113,36 @@ namespace CatJson
 
 
 
-            Util.Append("}", depth - 1);
+            Util.Append("}", depth);
 
         }
 
         /// <summary>
-        /// 追加Json 键值对文本
+        /// 追加单个Json 键值对文本
         /// </summary>
-        private static void AppendJsonKeyValue(Type valueType, string name, object value, int depth)
+        private static void AppendSingleKeyValueJsohn(Type valueType, string name, object value, int depth)
         {
-            AppendJsonKey(name, depth);
-            AppendJsonValue(valueType, value, depth);
+            AppendKeyJson(name, depth);
+            AppendValueJson(valueType, value, depth);
+            Util.AppendLine(",");
+        }
+
+        /// <summary>
+        /// 追加json key文本
+        /// </summary>
+        public static void AppendKeyJson(string key, int depth)
+        {
+            Util.Append("\"", depth);
+            Util.Append(key);
+            Util.Append("\"");
+            Util.Append(":");
         }
 
         /// <summary>
         /// 追加Json 值文本
         /// </summary>
-        private static void AppendJsonValue(Type valueType, object value, int depth)
+        private static void AppendValueJson(Type valueType, object value, int depth)
         {
-            if (value == null)
-            {
-                Util.Append("null");
-                return;
-            }
-
             if (extensionToJsonFuncDict.TryGetValue(valueType, out Action<object> action))
             {
                 //自定义转换Json文本方法
@@ -185,57 +189,8 @@ namespace CatJson
 
             if (Util.IsArrayOrList(valueType))
             {
-                //数组 或 List<T>
-                Util.AppendLine("[");
-
-                bool flag = false;
-
-                if (valueType.IsArray)
-                {
-                    Array array = (Array)value;
-                    for (int i = 0; i < array.Length; i++)
-                    {
-                        object element = array.GetValue(i);
-                        if (element == null)
-                        {
-                            continue;
-                        }
-
-                        flag = true;
-
-                       
-                        Util.AppendTab(depth + 1);
-                        AppendJsonValue(element.GetType(), element, depth);
-                        Util.AppendLine(",");
-                    }
-                }
-                else
-                {
-                    IList list = (IList)value;
-                    for (int i = 0; i < list.Count; i++)
-                    {
-                        object element = list[i];
-                        if (element == null)
-                        {
-                            continue;
-                        }
-
-                        flag = true;
-                        Util.AppendTab(depth + 1);
-                        AppendJsonValue(element.GetType(), element, depth);
-                        Util.AppendLine(",");
-                    }
-                }
-
-                if (flag)
-                {
-                    //删掉最后的 , 字符
-                    Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);
-                  
-                }
-                Util.Append("]", depth);
-
-
+                //数组或List
+                AppendArrayJson(valueType,value,depth);
                 return;
             }
 
@@ -243,50 +198,108 @@ namespace CatJson
             if (Util.IsDictionary(valueType))
             {
                 //字典
-                IDictionary dict = (IDictionary)value;
-                IDictionaryEnumerator enumerator = dict.GetEnumerator();
-
-                Util.AppendLine("{");
-
-                bool flag = false;
-
-                while (enumerator.MoveNext())
-                {
-                    //null值跳过
-                    if (enumerator.Value == null)
-                    {
-                        continue;
-                    }
-
-                    flag = true;
-                    AppendJsonKeyValue(enumerator.Value.GetType(), enumerator.Key.ToString(), enumerator.Value, depth + 1);
-                    Util.AppendLine(",");
-                }
-
-                if (flag == true)
-                {
-                    //删掉最后的 , 字符
-                    Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);
-                }
-
-
-                Util.Append("}", depth);
-
+                AppendDictJson(value, depth);
                 return;
             }
 
             //自定义类对象
-            AppendJsonObject(value, valueType, depth + 1);
+            AppendObjectJson(value, valueType, depth);
         }
 
-
-
-        public static void AppendJsonKey(string key, int depth)
+        /// <summary>
+        /// 追加json数组文本
+        /// </summary>
+        private static void AppendArrayJson(Type valueType, object value, int depth)
         {
-            Util.Append("\"", depth);
-            Util.Append(key);
-            Util.Append("\"");
-            Util.Append(":");
+            Util.AppendLine("[");
+
+            bool flag = false;
+
+            if (valueType.IsArray)
+            {
+                Array array = (Array)value;
+                for (int i = 0; i < array.Length; i++)
+                {
+                    flag = true;
+                    object element = array.GetValue(i);
+                    Util.AppendTab(depth + 1);
+                    if (element == null)
+                    {
+                        Util.AppendLine("null");
+                    }
+                    else
+                    {
+                        AppendValueJson(element.GetType(), element, depth + 1);
+                    }
+                   
+
+                    Util.AppendLine(",");
+                }
+            }
+            else
+            {
+                IList list = (IList)value;
+                for (int i = 0; i < list.Count; i++)
+                {
+                    flag = true;
+                    object element = list[i];
+                    Util.AppendTab(depth + 1);
+                    if (element == null)
+                    {
+                        Util.AppendLine("null");
+                    }
+                    else
+                    {
+                        AppendValueJson(element.GetType(), element, depth + 1);
+                    }
+                    Util.AppendLine(",");
+                }
+            }
+
+            if (flag)
+            {
+                //删掉最后的 , 字符
+                Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);
+
+            }
+            Util.Append("]", depth);
+        }
+
+        /// <summary>
+        /// 追加json字典文本
+        /// </summary>
+        private static void AppendDictJson(object value, int depth)
+        {
+            //字典
+            IDictionary dict = (IDictionary)value;
+            IDictionaryEnumerator enumerator = dict.GetEnumerator();
+
+            Util.AppendLine("{");
+
+            while (enumerator.MoveNext())
+            {
+                if (enumerator.Value == null)
+                {
+                    AppendKeyJson(enumerator.Key.ToString(), depth + 1);
+                    Util.Append("null");
+                    Util.AppendLine(",");
+                }
+                else
+                {
+                    AppendSingleKeyValueJsohn(enumerator.Value.GetType(), enumerator.Key.ToString(), enumerator.Value, depth + 1);
+                }  
+                
+                
+            }
+
+            if (dict.Count > 0)
+            {
+                //删掉最后的 , 字符
+                Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);
+            }
+
+
+            Util.Append("}", depth);
         }
 
         public static void AppendJsonValue(bool b,int depth = 0)

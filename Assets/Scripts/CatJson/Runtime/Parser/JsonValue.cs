@@ -54,6 +54,7 @@ namespace CatJson
             switch (Type)
             {
                 case ValueType.Null:
+                    Util.Append("null");
                     break;
                 case ValueType.Boolean:
                     if (Boolean == true)
@@ -77,19 +78,17 @@ namespace CatJson
                     Util.AppendLine("[");
                     for (int i = 0; i < Array.Length; i++)
                     {
-                        Util.AppendTab(depth);
+                        Util.AppendTab(depth + 1);
                         JsonValue jv = Array[i];
                         jv.ToJson(depth + 1);
-                        if (i != Array.Length - 1)
-                        {
-                            Util.AppendLine(",");
-                        }
-                        else
-                        {
-                            Util.AppendLine(string.Empty);
-                        }
+                        Util.AppendLine(",");
                     }
-                    Util.Append("]",depth - 1);
+                    if (Array.Length > 0)
+                    {
+                        //删掉最后的 , 字符
+                        Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);
+                    }
+                    Util.Append("]",depth);
                     break;
                 case ValueType.Object:
                     Obj.ToJson(depth);

@@ -122,24 +122,24 @@ namespace CatJson
         {
             if (!type.IsValueType)
             {
-                return value == null;
+                return value == default;
             }
 
             if (value is int i)
             {
-                return (int)value == default;
+                return i == default;
             }
             if (value is long l)
             {
-                return (long)value == default;
+                return l == default;
             }
             if (value is float f)
             {
-                return (float)value == default;
+                return f == default;
             }
             if (value is double d)
             {
-                return (double)value == default;
+                return d == default;
             }
 
             if (value is bool b)

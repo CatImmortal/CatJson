@@ -56,33 +56,31 @@ namespace CatJson
         public void ToJson(int depth)
         {
             Util.AppendLine("{");
-            int count = 0;
-            foreach (KeyValuePair<string, JsonValue> item in valueDict)
+
+            if (valueDict != null)
             {
-                count++;
-                Util.Append("\"", depth);
-
-                Util.Append(item.Key);
-                Util.Append("\"");
-
-                //Util.Append(" ");
-                Util.Append(":");
-                //Util.Append(" ");
-
-                item.Value.ToJson(depth + 1);
-
-                if (count != valueDict.Count)
+                foreach (KeyValuePair<string, JsonValue> item in valueDict)
                 {
-                    //不是最后一个
+
+                    Util.Append("\"", depth + 1);
+                    Util.Append(item.Key);
+                    Util.Append("\"");
+
+                    Util.Append(":");
+
+                    item.Value.ToJson(depth + 1);
+
                     Util.AppendLine(",");
                 }
-                else
+
+                if (valueDict.Count > 0)
                 {
-                    Util.AppendLine(string.Empty);
+                    //删掉最后的 , 字符
+                    Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);
                 }
             }
-           
-            Util.Append("}", depth - 1);
+
+            Util.Append("}", depth);
         }
     }
 }

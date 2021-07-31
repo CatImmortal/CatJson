@@ -28,7 +28,7 @@ public class Entry : MonoBehaviour
 
         testJson1Text = Resources.Load<TextAsset>("TestJson1").text;
 
-        //result = JsonParser.ParseJson<TestJson1_Root>(testJson1Text);
+        result = JsonParser.ParseJson<TestJson1_Root>(testJson1Text);
 
         ToJson1_Data data = new ToJson1_Data();
 
@@ -36,7 +36,7 @@ public class Entry : MonoBehaviour
         data.n = 3.14f;
         data.s = "tojson";
 
-        data.intDict = new Dictionary<string, int>() { { "key1",1},{ "key2",2} };
+        data.intDict = new Dictionary<string, int>() { { "key1", 1 }, { "key2", 2 } };
         data.boolList = new List<bool>() { true, false, true };
 
         ToJson1_Data d = new ToJson1_Data();
@@ -49,12 +49,35 @@ public class Entry : MonoBehaviour
 
         data.d = d;
 
-        string json = JsonParser.ToJson(data,false);
-        StreamWriter sw = File.CreateText(Application.dataPath + "/ToJsonResultByCode.txt");
+        data.dictDcit = new Dictionary<string, Dictionary<string, ToJson1_Data>>()
+        {
+            {"key3",new Dictionary<string, ToJson1_Data>(){ { "key31", d },{ "key32", d } } },
+            {"key4",new Dictionary<string, ToJson1_Data>(){ { "key41", d },{ "key42", d } } },
+        };
+
+        data.listList = new List<List<int>>()
+        {
+            new List<int>(){1,2,3},
+            new List<int>(){4,5,6},
+        };
+
+        string json = JsonParser.ToJson(data);
+        StreamWriter sw = File.CreateText(Application.dataPath + "/ToJsonResultByReflection.txt");
         sw.Write(json);
         sw.Close();
 
-        Debug.Log(json);
+        JsonObject jo = JsonParser.ParseJson(json);
+        string json2 = JsonParser.ToJson(jo);
+        StreamWriter sw2 = File.CreateText(Application.dataPath + "/ToJsonResultByJsonTree.txt");
+        sw2.Write(json2);
+        sw2.Close();
+
+        //string json2 = JsonParser.ToJson(data,false);
+        //StreamWriter sw2 = File.CreateText(Application.dataPath + "/ToJsonResultByCode.txt");
+        //sw2.Write(json2);
+        //sw2.Close();
+
+
 
     }
 

@@ -16,5 +16,8 @@ public class ToJson1_Data
 
     public ToJson1_Data d;
 
+    public Dictionary<string, Dictionary<string, ToJson1_Data>> dictDcit;
+    public List<List<int>> listList;
+
 }
 

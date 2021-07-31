@@ -51,6 +51,34 @@ namespace CatJson
 				{
 				temp.d = ParseJson_ToJson1_Data();
 				}
+				else if (key.Equals(new RangeString("dictDcit")))
+				{
+				Dictionary<string,Dictionary<string,ToJson1_Data>> dict = new Dictionary<string,Dictionary<string,ToJson1_Data>>();
+				JsonParser.ParseJsonObjectProcedure(dict, null, (userdata11, userdata21,key1, nextTokenType1) =>
+				{
+				Dictionary<string,ToJson1_Data> dict1 = new Dictionary<string,ToJson1_Data>();
+				JsonParser.ParseJsonObjectProcedure(dict1, null, (userdata111, userdata211,key11, nextTokenType11) =>
+				{
+				((Dictionary<string, ToJson1_Data>)userdata111).Add(key11.ToString(),ParseJson_ToJson1_Data());
+				});
+				((Dictionary<string, Dictionary<string,ToJson1_Data>>)userdata11).Add(key1.ToString(),dict1);
+				});
+				temp.dictDcit = dict;
+				}
+				else if (key.Equals(new RangeString("listList")))
+				{
+				List<List<System.Int32>> list = new List<List<System.Int32>>();
+				JsonParser.ParseJsonArrayProcedure(list, null, (userdata11, userdata21, nextTokenType1) =>
+				{
+				List<System.Int32> list1 = new List<System.Int32>();
+				JsonParser.ParseJsonArrayProcedure(list1, null, (userdata111, userdata211, nextTokenType11) =>
+				{
+				((List<System.Int32>)userdata111).Add(System.Int32.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString()));
+				});
+				list.Add(list1);
+				});
+				temp.listList = list;
+				}
 
                 else{
                     JsonParser.ParseJsonValue(nextTokenType);
