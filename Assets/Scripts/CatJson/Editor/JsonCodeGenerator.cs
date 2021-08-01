@@ -59,7 +59,7 @@ namespace CatJson.Editor
             }
 
             //生成静态构造器文件
-            GenStaticCtorCode(types);
+            GenStaticCtorCodeFile(types);
 
             AssetDatabase.Refresh();
         }
@@ -116,7 +116,7 @@ namespace CatJson.Editor
         /// <summary>
         /// 生成静态构造器文件
         /// </summary>
-        private static void GenStaticCtorCode(List<Type> types)
+        private static void GenStaticCtorCodeFile(List<Type> types)
         {
             //读取模板文件
             StreamReader sr = new StreamReader(JsonCodeGenConfig.StaticCtorTemplateFilePath);
