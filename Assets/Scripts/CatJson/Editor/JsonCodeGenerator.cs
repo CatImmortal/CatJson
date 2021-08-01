@@ -24,7 +24,18 @@ namespace CatJson.Editor
         /// </summary>
         private static Queue<Type> needGenTypes = new Queue<Type>();
 
+        [MenuItem("CatJson/清理已生成的Json解析-转换代码")]
+        private static void ClearJsonCode()
+        {
+            ClearGenCodeDir();
+            Directory.Delete(JsonCodeGenConfig.ParseJsonCodeDirPath);
+            Directory.Delete(JsonCodeGenConfig.ToJsonCodeDirPath);
 
+
+            AssetDatabase.Refresh();
+
+            EditorUtility.DisplayDialog("提示", "已清理", "确认");
+        }
 
         [MenuItem("CatJson/预生成Json解析-转换代码")]
         private static void GenJsonCode()
@@ -62,6 +73,8 @@ namespace CatJson.Editor
             GenStaticCtorCodeFile(types);
 
             AssetDatabase.Refresh();
+
+            EditorUtility.DisplayDialog("提示", "已生成完毕", "确认");
         }
 
         /// <summary>

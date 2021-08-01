@@ -21,6 +21,7 @@ namespace CatJson
                 RangeString rs = Lexer.GetNextTokenByType(TokenType.String);
                 return DateTime.Parse(rs.ToString());
             });
+
             //加速Vector3的解析运行
             extensionParseFuncDict.Add(typeof(Vector3), () =>
              {
@@ -38,7 +39,7 @@ namespace CatJson
                      Lexer.GetNextTokenByType(TokenType.Colon);
 
                      //主要手写这段if else
-                     //识别需要反序列化的字段值 
+                     //识别需要解析的字段值 
                      if (key.Equals(new RangeString("x")))
                      {
                          string token = Lexer.GetNextToken(out _).ToString();

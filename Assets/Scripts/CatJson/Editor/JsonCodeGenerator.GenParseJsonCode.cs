@@ -188,6 +188,17 @@ namespace CatJson.Editor
             AppendLine($"JsonParser.ParseJsonArrayProcedure({listName}, null, ({userdata1Name}, {userdata2Name}, {nextTokenTypeName}) =>");
             AppendLine("{");
 
+            if (!elementType.IsValueType)
+            {
+                //元素是引用类型 可能为null
+                AppendLine("if (nextTokenType1 == TokenType.Null)");
+                AppendLine("{");
+                AppendLine(" JsonParser.Lexer.GetNextToken(out _);");
+                AppendLine($"((List<{GetTypeFullName(elementType)}>){userdata1Name}).Add(null);");
+                AppendLine("return;");
+                AppendLine("}");
+            }
+
             //基础类型
             if (elementType == typeof(string))
             {
@@ -274,6 +285,17 @@ namespace CatJson.Editor
             AppendLine("{");
 
             string valueTypeFullName = GetTypeFullName(valueType);
+
+            if (!valueType.IsValueType)
+            {
+                //元素是引用类型 可能为null
+                AppendLine("if (nextTokenType1 == TokenType.Null)");
+                AppendLine("{");
+                AppendLine(" JsonParser.Lexer.GetNextToken(out _);");
+                AppendLine($"((Dictionary<string, {valueTypeFullName}>){userdata1Name}).Add({keyName}.ToString(),null);");
+                AppendLine("return;");
+                AppendLine("}");
+            }
 
             //基础类型
             if (valueType == typeof(string))

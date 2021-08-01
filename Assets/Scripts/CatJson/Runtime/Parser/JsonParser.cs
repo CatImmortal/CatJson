@@ -40,6 +40,23 @@ namespace CatJson
         /// </summary>
         public static void ParseJsonObjectProcedure(object userdata1,object userdata2,Action<object,object,RangeString, TokenType> action)
         {
+            //if (Lexer.LookNextTokenType() == TokenType.Null)
+            //{
+            //    //处理null对象
+            //    action(userdata1, userdata2, default, TokenType.Null);
+            //    //有逗号就跳过逗号
+            //    if (Lexer.LookNextTokenType() == TokenType.Comma)
+            //    {
+            //        Lexer.GetNextTokenByType(TokenType.Comma);
+
+            //        if (Lexer.LookNextTokenType() == TokenType.RightBracket)
+            //        {
+            //            throw new Exception("Json对象不能以逗号结尾");
+            //        }
+            //    }
+            //    return;
+            //}
+
             //跳过 {
             Lexer.GetNextTokenByType(TokenType.LeftBrace);
 
