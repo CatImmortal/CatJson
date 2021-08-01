@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
@@ -7,10 +6,6 @@ namespace CatJson.Editor
 {
     public static partial class JsonCodeGenerator
     {
-
-
-
-
         /// <summary>
         /// 生成Json解析代码文件
         /// </summary>

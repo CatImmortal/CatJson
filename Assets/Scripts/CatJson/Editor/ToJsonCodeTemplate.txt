@@ -17,7 +17,7 @@ namespace CatJson
                 Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);
             }
 
-            Util.Append("}", depth - 1);
+            Util.Append("}", depth);
          
         }
     }
