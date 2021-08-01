@@ -21,6 +21,12 @@ namespace CatJson
         /// </summary>
         public static string ToJson(object obj, Type type, bool reflection = true)
         {
+            if (obj is IJsonParserCallbackReceiver receiver)
+            {
+                //触发转换开始回调
+                receiver.OnToJsonStart();
+            }
+
             if (reflection)
             {
                 //反射转换
