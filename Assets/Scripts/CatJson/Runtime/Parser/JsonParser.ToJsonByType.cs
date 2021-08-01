@@ -231,7 +231,7 @@ namespace CatJson
                     Util.AppendTab(depth + 1);
                     if (element == null)
                     {
-                        Util.AppendLine("null");
+                        Util.Append("null");
                     }
                     else
                     {
@@ -252,7 +252,7 @@ namespace CatJson
                     Util.AppendTab(depth + 1);
                     if (element == null)
                     {
-                        Util.AppendLine("null");
+                        Util.Append("null");
                     }
                     else
                     {

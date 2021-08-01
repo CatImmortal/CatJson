@@ -29,6 +29,18 @@ public class Entry : MonoBehaviour
         testJson1Text = Resources.Load<TextAsset>("TestJson1").text;
 
         testJson1Object = JsonParser.ParseJson<TestJson1_Root>(testJson1Text);
+
+        ToJson_Data data = new ToJson_Data();
+        data.dataListList = new List<List<ToJson_Data>>();
+        data.dataListList.Add(null);
+        data.dataListList.Add(new List<ToJson_Data>() { null });
+
+        data.dataDictDict = new Dictionary<string, Dictionary<string, ToJson_Data>>();
+        data.dataDictDict.Add("key1", null);
+        data.dataDictDict.Add("key2", new Dictionary<string, ToJson_Data>() { { "key21", null } });
+
+        Debug.Log(JsonParser.ToJson(data));
+        Debug.Log(JsonParser.ToJson(data,false));
     }
 
 

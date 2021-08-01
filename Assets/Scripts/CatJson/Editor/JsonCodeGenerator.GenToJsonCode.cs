@@ -127,7 +127,21 @@ namespace CatJson.Editor
             AppendLine($"foreach (var {itemName} in {arrayName})", 3);
             AppendLine("{", 3);
             AppendLine($"Util.AppendTab({depthCode}+1);", 3);
-            AppendToJsonValueCode(elementType, itemName, itemName + "1", depthCode + "+1");
+            if (!elementType.IsValueType)
+            {
+                AppendLine($"if ({itemName} == null)",3);
+                AppendLine("{",3);
+                AppendLine("Util.Append(\"null\");", 3);
+                AppendLine("}",3);
+                AppendLine("else", 3);
+                AppendLine("{", 3);
+                AppendToJsonValueCode(elementType, itemName, itemName + "1", depthCode + "+1");
+                AppendLine("}", 3);
+            }
+            else
+            {
+                AppendToJsonValueCode(elementType, itemName, itemName + "1", depthCode + "+1");
+            }
             AppendLine("Util.AppendLine(\",\");", 3);
             AppendLine("}", 3);
 
@@ -156,7 +170,23 @@ namespace CatJson.Editor
             AppendLine($"foreach (var {itemName} in {dictName})", 3);
             AppendLine("{", 3);
             AppendLine($"JsonParser.AppendJsonKey({itemName}.Key, {depthCode}+1);", 3);
-            AppendToJsonValueCode(valueType, itemName + ".Value", itemName + "1", depthCode + "+1");
+
+            if (!valueType.IsValueType)
+            {
+                AppendLine($"if ({itemName}.Value == null)", 3);
+                AppendLine("{", 3);
+                AppendLine("Util.Append(\"null\");", 3);
+                AppendLine("}", 3);
+                AppendLine("else", 3);
+                AppendLine("{", 3);
+                AppendToJsonValueCode(valueType, itemName + ".Value", itemName + "1", depthCode + "+1");
+                AppendLine("}", 3);
+            }
+            else
+            {
+                AppendToJsonValueCode(valueType, itemName + ".Value", itemName + "1", depthCode + "+1");
+            }
+
             AppendLine("Util.AppendLine(\",\");", 3);
             AppendLine("}", 3);
 
