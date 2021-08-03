@@ -1,12 +1,14 @@
-﻿#Using#
+using System;
+using System.Collections.Generic;
+
 
 namespace CatJson
 {
     public static partial class GenJsonCodes
     {
-        private static #ClassName# #MethodName#()
+        private static UnityEngine.Quaternion ParseJson_UnityEngine_Quaternion()
         {
-            #ClassName# temp = new #ClassName#();
+            UnityEngine.Quaternion temp = new UnityEngine.Quaternion();
             TokenType tokenType;
 
             JsonParser.Lexer.GetNextTokenByType(TokenType.LeftBrace);
@@ -19,7 +21,27 @@ namespace CatJson
 
                 JsonParser.Lexer.GetNextTokenByType(TokenType.Colon);
 
-#IfElseParse#
+				if (key.Equals(new RangeString("eulerAngles")))
+				{
+				temp.eulerAngles = ParseJson_UnityEngine_Vector3();
+				}
+				else if (key.Equals(new RangeString("x")))
+				{
+				temp.x = System.Single.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
+				}
+				else if (key.Equals(new RangeString("y")))
+				{
+				temp.y = System.Single.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
+				}
+				else if (key.Equals(new RangeString("z")))
+				{
+				temp.z = System.Single.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
+				}
+				else if (key.Equals(new RangeString("w")))
+				{
+				temp.w = System.Single.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
+				}
+
                 else{
                     JsonParser.ParseJsonValue(JsonParser.Lexer.LookNextTokenType());
                 }

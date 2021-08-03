@@ -1,12 +1,14 @@
-﻿#Using#
+using System;
+using System.Collections.Generic;
+
 
 namespace CatJson
 {
     public static partial class GenJsonCodes
     {
-        private static #ClassName# #MethodName#()
+        private static UnityEngine.Bounds ParseJson_UnityEngine_Bounds()
         {
-            #ClassName# temp = new #ClassName#();
+            UnityEngine.Bounds temp = new UnityEngine.Bounds();
             TokenType tokenType;
 
             JsonParser.Lexer.GetNextTokenByType(TokenType.LeftBrace);
@@ -19,7 +21,27 @@ namespace CatJson
 
                 JsonParser.Lexer.GetNextTokenByType(TokenType.Colon);
 
-#IfElseParse#
+				if (key.Equals(new RangeString("center")))
+				{
+				temp.center = ParseJson_UnityEngine_Vector3();
+				}
+				else if (key.Equals(new RangeString("size")))
+				{
+				temp.size = ParseJson_UnityEngine_Vector3();
+				}
+				else if (key.Equals(new RangeString("extents")))
+				{
+				temp.extents = ParseJson_UnityEngine_Vector3();
+				}
+				else if (key.Equals(new RangeString("min")))
+				{
+				temp.min = ParseJson_UnityEngine_Vector3();
+				}
+				else if (key.Equals(new RangeString("max")))
+				{
+				temp.max = ParseJson_UnityEngine_Vector3();
+				}
+
                 else{
                     JsonParser.ParseJsonValue(JsonParser.Lexer.LookNextTokenType());
                 }

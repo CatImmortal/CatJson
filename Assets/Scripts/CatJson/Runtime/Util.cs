@@ -116,7 +116,7 @@ namespace CatJson
         }
     
         /// <summary>
-        /// value是否为该类型的默认值
+        /// value是否为内置基础类型的默认值(null 0 false)
         /// </summary>
         public static bool IsDefaultValue(Type type,object value)
         {

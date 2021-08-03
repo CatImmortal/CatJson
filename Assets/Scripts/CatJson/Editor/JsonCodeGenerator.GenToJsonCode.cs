@@ -71,13 +71,47 @@ namespace CatJson.Editor
         /// </summary>
         private static void AppendToJsonCodeBySingle(Type type, string name)
         {
-            AppendLine($"if (data.{name} != default)", 3);
-            AppendLine("{", 3);
-            AppendLine("flag = true;", 3);
-            AppendLine($"JsonParser.AppendJsonKey(\"{name}\", depth + 1);", 3);
-            AppendToJsonValueCode(type, $"data.{name}");
-            AppendLine("Util.AppendLine(\",\");", 3);
-            AppendLine("}", 3);
+            //是否有 != 运算符可以调用
+            bool hasOpInequality = false;
+            if (!type.IsValueType)
+            {
+                hasOpInequality = true;
+            }
+            else
+            {
+                //值类型要检查所有静态方法
+                MethodInfo[] mis = type.GetMethods(BindingFlags.Public | BindingFlags.Static);
+                foreach (MethodInfo mi in mis)
+                {
+                    if (mi.Name == "op_Inequality")
+                    {
+                        hasOpInequality = true;
+                        break;
+                    }
+                }
+            }
+
+          
+
+            if (hasOpInequality)
+            {
+                AppendLine($"if (data.{name} != default)", 3);
+                AppendLine("{", 3);
+                AppendLine("flag = true;", 3);
+                AppendLine($"JsonParser.AppendJsonKey(\"{name}\", depth + 1);", 3);
+                AppendToJsonValueCode(type, $"data.{name}");
+                AppendLine("Util.AppendLine(\",\");", 3);
+                AppendLine("}", 3);
+            }
+            else
+            {
+                AppendLine("flag = true;", 3);
+                AppendLine($"JsonParser.AppendJsonKey(\"{name}\", depth + 1);", 3);
+                AppendToJsonValueCode(type, $"data.{name}");
+                AppendLine("Util.AppendLine(\",\");", 3);
+            }
+
+            AppendLine(string.Empty);
         }
 
         /// <summary>

@@ -30,6 +30,26 @@ public class Entry : MonoBehaviour
         testJson1Text = Resources.Load<TextAsset>("TestJson1").text;
 
         testJson1Object = JsonParser.ParseJson<TestJson1_Root>(testJson1Text);
+
+        UnityJson_Data data = new UnityJson_Data();
+        data.v2 = new Vector2(1, 2);
+        data.v3 = new Vector3(1, 2, 3);
+        data.v4 = new Vector4(1, 2, 3, 4);
+        data.rotate = new Quaternion(1, 2, 3, 4);
+        data.color = new Color(1, 2, 3, 4);
+        data.bounds = new Bounds(new Vector3(1, 2, 3), new Vector3(1, 2, 3));
+        data.rect = new Rect(1, 2, 3, 4);
+        data.keyframe = new Keyframe(1, 2, 3, 4);
+        data.ac = new AnimationCurve(new Keyframe(1, 2, 3, 4), new Keyframe(5, 6, 7, 8));
+
+        //string json = JsonParser.ToJson(data);
+        //Debug.Log(json);
+        string json = JsonParser.ToJson(data,false);
+        Debug.Log(json);
+
+        UnityJson_Data data2 = JsonParser.ParseJson<UnityJson_Data>(json,false);
+        Debug.Log(data2);
+
     }
 
 

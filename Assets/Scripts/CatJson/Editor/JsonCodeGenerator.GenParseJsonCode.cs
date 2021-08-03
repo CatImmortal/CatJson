@@ -69,7 +69,6 @@ namespace CatJson.Editor
             }
 
             //处理字段
-            isElseIf = false;
             foreach (FieldInfo fi in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
             {
                 AppendIfElseCode(fi.FieldType, fi.Name, isElseIf);

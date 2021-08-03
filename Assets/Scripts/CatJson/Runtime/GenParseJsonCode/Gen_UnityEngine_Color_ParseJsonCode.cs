@@ -1,12 +1,14 @@
-﻿#Using#
+using System;
+using System.Collections.Generic;
+
 
 namespace CatJson
 {
     public static partial class GenJsonCodes
     {
-        private static #ClassName# #MethodName#()
+        private static UnityEngine.Color ParseJson_UnityEngine_Color()
         {
-            #ClassName# temp = new #ClassName#();
+            UnityEngine.Color temp = new UnityEngine.Color();
             TokenType tokenType;
 
             JsonParser.Lexer.GetNextTokenByType(TokenType.LeftBrace);
@@ -19,7 +21,23 @@ namespace CatJson
 
                 JsonParser.Lexer.GetNextTokenByType(TokenType.Colon);
 
-#IfElseParse#
+				if (key.Equals(new RangeString("r")))
+				{
+				temp.r = System.Single.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
+				}
+				else if (key.Equals(new RangeString("g")))
+				{
+				temp.g = System.Single.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
+				}
+				else if (key.Equals(new RangeString("b")))
+				{
+				temp.b = System.Single.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
+				}
+				else if (key.Equals(new RangeString("a")))
+				{
+				temp.a = System.Single.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
+				}
+
                 else{
                     JsonParser.ParseJsonValue(JsonParser.Lexer.LookNextTokenType());
                 }
