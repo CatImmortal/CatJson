@@ -11,7 +11,6 @@ public class TestJson1_Root
     public string str;
     public List<int> intList;
     public Dictionary<string, int> intDict;
-
     public TestJson1_Item item;
     public List<TestJson1_Item> itemList;
     public Dictionary<string, TestJson1_Item> itemDict;

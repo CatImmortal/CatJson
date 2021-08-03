@@ -104,7 +104,9 @@ namespace CatJson
                     }
                     if (type.IsEnum)
                     {
-                        //枚举 todo:
+                        //枚举
+                        int enumInt = int.Parse(str);
+                        return Enum.ToObject(type, enumInt);
                     }
                     break;
 
@@ -205,7 +207,7 @@ namespace CatJson
             ParseJsonObjectProcedure(dict, valueType, (userdata1, userdata2, key, nextTokenType) => {
                 Type t = (Type)userdata2;
                 object value = ParseJsonValueByType(nextTokenType, t);
-                dict.Add(key.ToString(), value);
+                ((IDictionary)userdata1).Add(key.ToString(), value);
             });
 
             return dict;
@@ -232,8 +234,7 @@ namespace CatJson
             ParseJsonArrayProcedure(list, elementType, (userdata1, userdata2, nextTokenType) =>
             {
                 object value = ParseJsonValueByType(nextTokenType, (Type)userdata2);
-                IList valueList = (IList)userdata1;
-                valueList.Add(value);
+                ((IList)userdata1).Add(value);
             });
 
             //返回List<T>

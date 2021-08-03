@@ -120,7 +120,8 @@ namespace CatJson.Editor
             }
             else if (type.IsEnum)
             {
-                //枚举 todo:
+                //枚举
+                AppendLine($"temp.{name} = ({type.FullName})int.Parse(JsonParser.Lexer.GetNextToken(out _).ToString());");
             }
             else if (Util.IsArrayOrList(type))
             {
@@ -215,7 +216,8 @@ namespace CatJson.Editor
             }
             else if (elementType.IsEnum)
             {
-                //枚举 todo:
+                //枚举
+                AppendLine($"((List<{elementType.FullName}>){userdata1Name}).Add(({elementType.FullName})int.Parse(JsonParser.Lexer.GetNextToken(out _).ToString()));");
             }
             else if (Util.IsArrayOrList(elementType))
             {
@@ -313,7 +315,8 @@ namespace CatJson.Editor
             }
             else if (valueType.IsEnum)
             {
-                //枚举 todo:
+                //枚举
+                AppendLine($"((Dictionary<string, {valueType.FullName}>){userdata1Name}).Add({keyName}.ToString(),({valueType.FullName})int.Parse(JsonParser.Lexer.GetNextToken(out _).ToString()));");
             }
             else if (Util.IsArrayOrList(valueType))
             {

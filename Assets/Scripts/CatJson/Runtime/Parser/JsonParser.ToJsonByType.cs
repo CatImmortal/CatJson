@@ -190,7 +190,10 @@ namespace CatJson
 
             if (valueType.IsEnum)
             {
-                //枚举 todo:
+                //枚举
+                int enumInt = (int)value;
+                Util.Append(enumInt.ToString());
+                return;
             }
 
             if (Util.IsArrayOrList(valueType))

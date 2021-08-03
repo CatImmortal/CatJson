@@ -92,7 +92,8 @@ namespace CatJson.Editor
             }
             else if (valueType.IsEnum)
             {
-                //枚举 todo:
+                //枚举
+                AppendLine($"JsonParser.AppendJsonValue((int){valueName});", 3);
             }
             else if (Util.IsArrayOrList(valueType))
             {
