@@ -87,7 +87,7 @@ namespace CatJson.Editor
         {
             if (Util.IsBaseType(valueType))
             {
-                //基础类型 string bool 数字
+                //内置基础类型
                 AppendLine($"JsonParser.AppendJsonValue({valueName});", 3);
             }
             else if (valueType.IsEnum)

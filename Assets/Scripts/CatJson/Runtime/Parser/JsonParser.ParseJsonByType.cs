@@ -82,6 +82,10 @@ namespace CatJson
                 case TokenType.Number:
                     RangeString token = Lexer.GetNextToken(out _);
                     string str = token.ToString();
+                    if (type == typeof(byte))
+                    {
+                        return byte.Parse(str);
+                    }
                     if (type == typeof(int))
                     {
                         return int.Parse(str);
@@ -109,6 +113,10 @@ namespace CatJson
                     if (type == typeof(string))
                     {
                         return token.ToString();
+                    }
+                    if (type == typeof(char))
+                    {
+                        return char.Parse(token.ToString());
                     }
                     break;
 

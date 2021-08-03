@@ -114,7 +114,7 @@ namespace CatJson.Editor
                 AppendLine("JsonParser.Lexer.GetNextToken(out tokenType);");
                 AppendLine($"temp.{name} = tokenType == TokenType.True;");
             }
-            else if (Util.IsNumber(type))
+            else if (Util.IsNumber(type) || type == typeof(char))
             {
                 AppendLine($"temp.{name} = {type.FullName}.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());");
             }
@@ -209,7 +209,7 @@ namespace CatJson.Editor
                 AppendLine("JsonParser.Lexer.GetNextToken(out tokenType);");
                 AppendLine($"((List<{elementType.FullName}>){userdata1Name}).Add(tokenType == TokenType.True);");
             }
-            else if (Util.IsNumber(elementType))
+            else if (Util.IsNumber(elementType) || elementType == typeof(char))
             {
                 AppendLine($"((List<{elementType.FullName}>){userdata1Name}).Add({elementType.FullName}.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString()));");
             }
@@ -307,7 +307,7 @@ namespace CatJson.Editor
                 AppendLine("JsonParser.Lexer.GetNextToken(out tokenType);");
                 AppendLine($"((Dictionary<string, {valueType.FullName}>){userdata1Name}).Add({keyName}.ToString(),tokenType == TokenType.True);");
             }
-            else if (Util.IsNumber(valueType))
+            else if (Util.IsNumber(valueType) || valueType == typeof(char))
             {
                 AppendLine($"((Dictionary<string, {valueType.FullName}>){userdata1Name}).Add({keyName}.ToString(), {valueType.FullName}.Parse(JsonParser.Lexer.GetNextToken(out _).ToString()));");
             }

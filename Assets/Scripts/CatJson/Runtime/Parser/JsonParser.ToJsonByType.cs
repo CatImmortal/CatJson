@@ -164,7 +164,7 @@ namespace CatJson
                 return;
             }
 
-            if (valueType == typeof(string))
+            if (valueType == typeof(string) || valueType == typeof(char))
             {
                 //字符串
                 Util.Append("\"");
@@ -308,25 +308,39 @@ namespace CatJson
             Util.Append("}", depth);
         }
 
-        public static void AppendJsonValue(bool b,int depth = 0)
+        //------------------------为内置基础类型提供append方法，以供生成的代码调用------------------------------------
+        public static void AppendJsonValue(bool b, int depth = 0)
         {
             if (b == true)
             {
-                Util.Append("true",depth);
+                Util.Append("true", depth);
             }
             else
             {
-                Util.Append("false",depth);
+                Util.Append("false", depth);
             }
-            
+
         }
 
         public static void AppendJsonValue(string s, int depth = 0)
         {
             Util.Append("\"",depth);
-            Util.Append(s.ToString());
+            Util.Append(s);
             Util.Append("\"");
 
+        }
+
+        public static void AppendJsonValue(char c, int depth = 0)
+        {
+            Util.Append("\"", depth);
+            Util.Append(c.ToString());
+            Util.Append("\"");
+
+        }
+
+        public static void AppendJsonValue(byte b,int depth = 0)
+        {
+            Util.Append(b.ToString(), depth);
         }
 
         public static void AppendJsonValue(int i, int depth = 0)
@@ -350,7 +364,7 @@ namespace CatJson
             Util.Append(d.ToString(), depth);
         }
 
-
+       
     }
 
 }

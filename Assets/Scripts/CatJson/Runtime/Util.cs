@@ -38,20 +38,20 @@ namespace CatJson
         }
 
         /// <summary>
-        /// 是否为内置基础类型 string bool 数字
+        /// 是否为内置基础类型 (string char bool 数字)
         /// </summary>
         public static bool IsBaseType(Type type)
         {
-            return type == typeof(string) || type == typeof(bool) || IsNumber(type);
+            return type == typeof(string) || type == typeof(char) || type == typeof(bool) || IsNumber(type);
         }
 
 
         /// <summary>
-        /// type是否为数字类型（int float double)
+        /// type是否为数字类型（byte int long float double)
         /// </summary>
         public static bool IsNumber(Type type)
         {
-            return type == typeof(int) || type == typeof(long) || type == typeof(float) || type == typeof(double);
+            return type == typeof(byte) || type == typeof(int) || type == typeof(long) || type == typeof(float) || type == typeof(double);
         }
 
         /// <summary>
@@ -125,6 +125,11 @@ namespace CatJson
                 return value == default;
             }
 
+            if (value is byte b)
+            {
+                return b == default;
+            }
+
             if (value is int i)
             {
                 return i == default;
@@ -142,9 +147,9 @@ namespace CatJson
                 return d == default;
             }
 
-            if (value is bool b)
+            if (value is bool boolean)
             {
-                return b == default;
+                return boolean == default;
             }
 
 
