@@ -53,7 +53,7 @@ namespace CatJson.Editor
 
             GetGenRootTypes();
 
-            //生成解析/转换代码
+            //生成root的解析/转换代码
             foreach (Type root in GenRootTypes)
             {
                 GenParseJsonCodeFile(root);
