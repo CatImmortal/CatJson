@@ -12,9 +12,9 @@ namespace CatJson
 
             //添加自定义扩展解析方法
             //作用主要有2个
-            //1.json值不能直接用反射属性/字段的形式解析，比如"2016/5/9 13:09:55"可能需要被解析为DateTime而不是string
-            //2.不使用反射，通过手写解析代码来加速解析运行
-            
+            //1.json值不能直接解析为默认的对应类型，比如"2016/5/9 13:09:55"可能需要被解析为DateTime而不是string，同时可以辅助生成的代码
+            //2.不使用反射，通过手写解析代码来加速解析运行，比较鸡肋，不如直接生成代码
+
             //解析DateTime
             extensionParseFuncDict.Add(typeof(DateTime), () =>
             {
@@ -22,7 +22,7 @@ namespace CatJson
                 return DateTime.Parse(rs.ToString());
             });
 
-            //加速Vector3的解析运行
+            //加速Vector3的反射解析运
             extensionParseFuncDict.Add(typeof(Vector3), () =>
              {
                  Vector3 v3 = new Vector3();

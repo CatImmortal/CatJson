@@ -130,6 +130,13 @@ namespace CatJson
                 for (int i = 0; i < pis.Length; i++)
                 {
                     PropertyInfo pi = pis[i];
+
+                    if (pi.GetCustomAttribute<JsonIgnoreAttribute>() != null)
+                    {
+                        //需要忽略
+                        continue;
+                    }
+
                     if (pi.SetMethod != null && pi.GetMethod != null && pi.Name != "Item")
                     {
                         //属性必须同时具有get set 并且不能是索引器item
@@ -149,13 +156,17 @@ namespace CatJson
                 for (int i = 0; i < fis.Length; i++)
                 {
                     FieldInfo fi = fis[i];
+                    if (fi.GetCustomAttribute<JsonIgnoreAttribute>() != null)
+                    {
+                        //需要忽略
+                        continue;
+                    }
                     dict2.Add(new RangeString(fi.Name), fi);
                 }
 
             }
             fieldInfoDict.Add(type, dict2);
         }
-
 
 
     }
