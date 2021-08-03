@@ -6,7 +6,7 @@ namespace CatJson
 {
     public static partial class GenJsonCodes
     {
-        private static void ToJson_UnityEngine_Color(object obj,int depth)
+        private static void ToJson_UnityEngine_Color(UnityEngine.Color obj,int depth)
         {
             UnityEngine.Color data = (UnityEngine.Color)obj;
             bool flag = false;

@@ -6,7 +6,7 @@ namespace CatJson
 {
     public static partial class GenJsonCodes
     {
-        private static void ToJson_UnityEngine_Rect(object obj,int depth)
+        private static void ToJson_UnityEngine_Rect(UnityEngine.Rect obj,int depth)
         {
             UnityEngine.Rect data = (UnityEngine.Rect)obj;
             bool flag = false;

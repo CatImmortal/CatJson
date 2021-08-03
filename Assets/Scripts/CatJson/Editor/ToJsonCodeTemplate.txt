@@ -4,7 +4,7 @@ namespace CatJson
 {
     public static partial class GenJsonCodes
     {
-        private static void #MethodName#(object obj,int depth)
+        private static void #MethodName#(#Type# obj,int depth)
         {
             #ClassName# data = (#ClassName#)obj;
             bool flag = false;

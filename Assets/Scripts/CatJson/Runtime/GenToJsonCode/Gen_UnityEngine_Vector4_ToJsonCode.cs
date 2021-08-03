@@ -6,7 +6,7 @@ namespace CatJson
 {
     public static partial class GenJsonCodes
     {
-        private static void ToJson_UnityEngine_Vector4(object obj,int depth)
+        private static void ToJson_UnityEngine_Vector4(UnityEngine.Vector4 obj,int depth)
         {
             UnityEngine.Vector4 data = (UnityEngine.Vector4)obj;
             bool flag = false;

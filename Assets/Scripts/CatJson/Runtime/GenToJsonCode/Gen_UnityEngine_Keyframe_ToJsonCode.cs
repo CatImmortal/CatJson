@@ -6,7 +6,7 @@ namespace CatJson
 {
     public static partial class GenJsonCodes
     {
-        private static void ToJson_UnityEngine_Keyframe(object obj,int depth)
+        private static void ToJson_UnityEngine_Keyframe(UnityEngine.Keyframe obj,int depth)
         {
             UnityEngine.Keyframe data = (UnityEngine.Keyframe)obj;
             bool flag = false;

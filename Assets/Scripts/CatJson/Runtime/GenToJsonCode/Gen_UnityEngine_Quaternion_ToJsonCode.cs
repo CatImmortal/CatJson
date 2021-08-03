@@ -6,7 +6,7 @@ namespace CatJson
 {
     public static partial class GenJsonCodes
     {
-        private static void ToJson_UnityEngine_Quaternion(object obj,int depth)
+        private static void ToJson_UnityEngine_Quaternion(UnityEngine.Quaternion obj,int depth)
         {
             UnityEngine.Quaternion data = (UnityEngine.Quaternion)obj;
             bool flag = false;

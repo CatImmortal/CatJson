@@ -27,6 +27,16 @@ namespace CatJson.Editor
             //写入转换方法名
             template = template.Replace("#MethodName#", GetToJsonCodeMethodName(type));
 
+            if (!GenRootTypes.Contains(type) && type.IsValueType)
+            {
+                //不是root并且是值类型 obj的参数类型直接使用原本的类型名 防止装箱
+                template = template.Replace("#Type#", type.FullName);
+            }
+            else
+            {
+                template = template.Replace("#Type#", "object");
+            }
+
             //生成转换代码
             template = template.Replace("#ToJsonCode#", AppendToJsonCode(type));
 

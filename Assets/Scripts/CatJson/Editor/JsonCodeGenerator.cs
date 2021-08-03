@@ -15,6 +15,11 @@ namespace CatJson.Editor
         private static StringBuilder sb = new StringBuilder();
 
         /// <summary>
+        /// 需要生成代码并注册到JsonParser的Type
+        /// </summary>
+        private static HashSet<Type> GenRootTypes = new HashSet<Type>();
+
+        /// <summary>
         /// 存放已生成过代码的Type
         /// </summary>
         private static HashSet<Type> GenCodeTypes = new HashSet<Type>();
@@ -46,18 +51,16 @@ namespace CatJson.Editor
             GenCodeTypes.Clear();
             needGenTypes.Clear();
 
-            //生成Root的解析/转换代码
-            List<Type> types = GetGenCodeTypes();
-            for (int i = 0; i < types.Count; i++)
+            GetGenRootTypes();
+
+            //生成解析/转换代码
+            foreach (Type root in GenRootTypes)
             {
-                Type type = types[i];
-
-                GenParseJsonCodeFile(type);
-                GenToJsonCodeFile(type);
-                GenCodeTypes.Add(type);
+                GenParseJsonCodeFile(root);
+                GenToJsonCodeFile(root);
+                GenCodeTypes.Add(root);
             }
-
-            //生成被Root依赖的Type的解析/转换代码
+            //生成被依赖的Type的解析/转换代码
             while (needGenTypes.Count > 0)
             {
                 Type type = needGenTypes.Dequeue();
@@ -70,7 +73,7 @@ namespace CatJson.Editor
             }
 
             //生成静态构造器文件
-            GenStaticCtorCodeFile(types);
+            GenStaticCtorCodeFile();
 
             AssetDatabase.Refresh();
 
@@ -129,14 +132,14 @@ namespace CatJson.Editor
         /// <summary>
         /// 生成静态构造器文件
         /// </summary>
-        private static void GenStaticCtorCodeFile(List<Type> types)
+        private static void GenStaticCtorCodeFile()
         {
             //读取模板文件
             StreamReader sr = new StreamReader(JsonCodeGenConfig.StaticCtorTemplateFilePath);
             string template = sr.ReadToEnd();
             sr.Close();
 
-            foreach (Type type in types)
+            foreach (Type type in GenRootTypes)
             {
                 AppendLine($"ParseJsonCodeFuncDict.Add(typeof({type.FullName}),{GetParseJsonCodeMethodName(type)});", 3);
                 AppendLine($"ToJsonCodeFuncDict.Add(typeof({type.FullName}), {GetToJsonCodeMethodName(type)});", 3);
@@ -167,9 +170,8 @@ namespace CatJson.Editor
         /// <summary>
         /// 获取需要生成代码的json数据类
         /// </summary>
-        private static List<Type> GetGenCodeTypes()
+        private static void GetGenRootTypes()
         {
-            List<Type> types = new List<Type>();
             foreach (string item in JsonCodeGenConfig.Assemblies)
             {
                 Assembly assembly = Assembly.Load(item);
@@ -177,12 +179,10 @@ namespace CatJson.Editor
                 {
                     if (type.GetCustomAttribute<GenJsonCodeRootAttribute>() != null)
                     {
-                        types.Add(type);
+                        GenRootTypes.Add(type);
                     }
                 }
             }
-
-            return types;
         }
       
 
