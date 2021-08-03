@@ -37,22 +37,6 @@ namespace CatJson
 				{
 				temp.outTangent = System.Single.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
 				}
-				else if (key.Equals(new RangeString("inWeight")))
-				{
-				temp.inWeight = System.Single.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
-				}
-				else if (key.Equals(new RangeString("outWeight")))
-				{
-				temp.outWeight = System.Single.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
-				}
-				else if (key.Equals(new RangeString("weightedMode")))
-				{
-				temp.weightedMode = (UnityEngine.WeightedMode)int.Parse(JsonParser.Lexer.GetNextToken(out _).ToString());
-				}
-				else if (key.Equals(new RangeString("tangentMode")))
-				{
-				temp.tangentMode = System.Int32.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
-				}
 
                 else{
                     JsonParser.ParseJsonValue(JsonParser.Lexer.LookNextTokenType());

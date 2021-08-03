@@ -12,14 +12,6 @@ namespace CatJson
             bool flag = false;
             Util.AppendLine("{");
 
-			if (data.eulerAngles != default)
-			{
-			flag = true;
-			JsonParser.AppendJsonKey("eulerAngles", depth + 1);
-			ToJson_UnityEngine_Vector3(data.eulerAngles,depth+1);
-			Util.AppendLine(",");
-			}
-				
 			if (data.x != default)
 			{
 			flag = true;

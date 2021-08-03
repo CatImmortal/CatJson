@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
@@ -39,9 +40,23 @@ namespace CatJson.Editor
         /// </summary>
         private static string AppendToJsonCode(Type type)
         {
+            JsonParser.IgnoreSet.TryGetValue(type, out HashSet<string> set);
+
             //处理属性
             foreach (PropertyInfo pi in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
+                if (pi.GetCustomAttribute<JsonIgnoreAttribute>() != null)
+                {
+                    //忽略
+                    continue;
+                }
+
+                if (set != null && set.Contains(pi.Name))
+                {
+                    //忽略
+                    continue;
+                }
+
                 //属性必须同时具有get set 并且不能是索引器item
                 if (pi.SetMethod != null && pi.GetMethod != null && pi.Name != "Item")
                 {
@@ -55,6 +70,17 @@ namespace CatJson.Editor
             //处理字段
             foreach (FieldInfo fi in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
             {
+                if (fi.GetCustomAttribute<JsonIgnoreAttribute>() != null)
+                {
+                    //忽略
+                    continue;
+                }
+
+                if (set != null && set.Contains(fi.Name))
+                {
+                    //忽略
+                    continue;
+                }
 
                 AppendToJsonCodeBySingle(fi.FieldType, fi.Name);
 

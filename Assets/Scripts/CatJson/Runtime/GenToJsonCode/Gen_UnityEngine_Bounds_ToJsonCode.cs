@@ -28,30 +28,6 @@ namespace CatJson
 			Util.AppendLine(",");
 			}
 				
-			if (data.extents != default)
-			{
-			flag = true;
-			JsonParser.AppendJsonKey("extents", depth + 1);
-			ToJson_UnityEngine_Vector3(data.extents,depth+1);
-			Util.AppendLine(",");
-			}
-				
-			if (data.min != default)
-			{
-			flag = true;
-			JsonParser.AppendJsonKey("min", depth + 1);
-			ToJson_UnityEngine_Vector3(data.min,depth+1);
-			Util.AppendLine(",");
-			}
-				
-			if (data.max != default)
-			{
-			flag = true;
-			JsonParser.AppendJsonKey("max", depth + 1);
-			ToJson_UnityEngine_Vector3(data.max,depth+1);
-			Util.AppendLine(",");
-			}
-				
 
 
             if (flag)

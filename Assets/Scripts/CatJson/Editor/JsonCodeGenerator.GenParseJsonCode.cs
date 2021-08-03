@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
@@ -50,6 +51,8 @@ namespace CatJson.Editor
         /// </summary>
         private static string AppendIfElseParseCode(Type type)
         {
+            JsonParser.IgnoreSet.TryGetValue(type, out HashSet<string> set);
+
             //处理属性
             bool isElseIf = false;
             foreach (PropertyInfo pi in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
@@ -57,6 +60,18 @@ namespace CatJson.Editor
                 //属性必须同时具有get set 并且不能是索引器item
                 if (pi.SetMethod != null && pi.GetMethod != null && pi.Name != "Item")
                 {
+                    if (pi.GetCustomAttribute<JsonIgnoreAttribute>() != null)
+                    {
+                        //忽略
+                        continue;
+                    }
+
+                    if (set != null && set.Contains(pi.Name))
+                    {
+                        //忽略
+                        continue;
+                    }
+
                     AppendIfElseCode(pi.PropertyType, pi.Name, isElseIf);
 
                     if (!isElseIf)
@@ -71,6 +86,18 @@ namespace CatJson.Editor
             //处理字段
             foreach (FieldInfo fi in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
             {
+                if (fi.GetCustomAttribute<JsonIgnoreAttribute>() != null)
+                {
+                    //忽略
+                    continue;
+                }
+
+                if (set != null && set.Contains(fi.Name))
+                {
+                    //忽略
+                    continue;
+                }
+
                 AppendIfElseCode(fi.FieldType, fi.Name, isElseIf);
 
                 if (!isElseIf)

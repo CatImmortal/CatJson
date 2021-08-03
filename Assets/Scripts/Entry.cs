@@ -42,13 +42,15 @@ public class Entry : MonoBehaviour
         data.keyframe = new Keyframe(1, 2, 3, 4);
         data.ac = new AnimationCurve(new Keyframe(1, 2, 3, 4), new Keyframe(5, 6, 7, 8));
 
-        //string json = JsonParser.ToJson(data);
-        //Debug.Log(json);
-        string json = JsonParser.ToJson(data,false);
+        string json = JsonParser.ToJson(data);
+        Debug.Log(json);
+        json = JsonParser.ToJson(data, false);
         Debug.Log(json);
 
-        UnityJson_Data data2 = JsonParser.ParseJson<UnityJson_Data>(json,false);
+        UnityJson_Data data2 = JsonParser.ParseJson<UnityJson_Data>(json, false);
         Debug.Log(data2);
+
+
 
     }
 

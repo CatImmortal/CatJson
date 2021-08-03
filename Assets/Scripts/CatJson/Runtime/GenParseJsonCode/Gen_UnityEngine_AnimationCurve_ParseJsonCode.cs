@@ -30,14 +30,6 @@ namespace CatJson
 				});
 				temp.keys = list.ToArray();
 				}
-				else if (key.Equals(new RangeString("preWrapMode")))
-				{
-				temp.preWrapMode = (UnityEngine.WrapMode)int.Parse(JsonParser.Lexer.GetNextToken(out _).ToString());
-				}
-				else if (key.Equals(new RangeString("postWrapMode")))
-				{
-				temp.postWrapMode = (UnityEngine.WrapMode)int.Parse(JsonParser.Lexer.GetNextToken(out _).ToString());
-				}
 
                 else{
                     JsonParser.ParseJsonValue(nextTokenType);

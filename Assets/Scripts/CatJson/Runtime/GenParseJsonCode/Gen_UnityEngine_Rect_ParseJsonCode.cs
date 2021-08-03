@@ -29,22 +29,6 @@ namespace CatJson
 				{
 				temp.y = System.Single.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
 				}
-				else if (key.Equals(new RangeString("position")))
-				{
-				temp.position = ParseJson_UnityEngine_Vector2();
-				}
-				else if (key.Equals(new RangeString("center")))
-				{
-				temp.center = ParseJson_UnityEngine_Vector2();
-				}
-				else if (key.Equals(new RangeString("min")))
-				{
-				temp.min = ParseJson_UnityEngine_Vector2();
-				}
-				else if (key.Equals(new RangeString("max")))
-				{
-				temp.max = ParseJson_UnityEngine_Vector2();
-				}
 				else if (key.Equals(new RangeString("width")))
 				{
 				temp.width = System.Single.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
@@ -52,26 +36,6 @@ namespace CatJson
 				else if (key.Equals(new RangeString("height")))
 				{
 				temp.height = System.Single.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
-				}
-				else if (key.Equals(new RangeString("size")))
-				{
-				temp.size = ParseJson_UnityEngine_Vector2();
-				}
-				else if (key.Equals(new RangeString("xMin")))
-				{
-				temp.xMin = System.Single.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
-				}
-				else if (key.Equals(new RangeString("yMin")))
-				{
-				temp.yMin = System.Single.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
-				}
-				else if (key.Equals(new RangeString("xMax")))
-				{
-				temp.xMax = System.Single.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
-				}
-				else if (key.Equals(new RangeString("yMax")))
-				{
-				temp.yMax = System.Single.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
 				}
 
                 else{

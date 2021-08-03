@@ -21,11 +21,7 @@ namespace CatJson
 
                 JsonParser.Lexer.GetNextTokenByType(TokenType.Colon);
 
-				if (key.Equals(new RangeString("eulerAngles")))
-				{
-				temp.eulerAngles = ParseJson_UnityEngine_Vector3();
-				}
-				else if (key.Equals(new RangeString("x")))
+				if (key.Equals(new RangeString("x")))
 				{
 				temp.x = System.Single.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
 				}

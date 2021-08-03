@@ -31,16 +31,6 @@ namespace CatJson
 			Util.AppendLine(",");
 			}
 				
-			flag = true;
-			JsonParser.AppendJsonKey("preWrapMode", depth + 1);
-			JsonParser.AppendJsonValue((int)data.preWrapMode);
-			Util.AppendLine(",");
-				
-			flag = true;
-			JsonParser.AppendJsonKey("postWrapMode", depth + 1);
-			JsonParser.AppendJsonValue((int)data.postWrapMode);
-			Util.AppendLine(",");
-				
 
 
             if (flag)

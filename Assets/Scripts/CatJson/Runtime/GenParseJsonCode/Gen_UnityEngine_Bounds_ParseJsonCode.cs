@@ -29,18 +29,6 @@ namespace CatJson
 				{
 				temp.size = ParseJson_UnityEngine_Vector3();
 				}
-				else if (key.Equals(new RangeString("extents")))
-				{
-				temp.extents = ParseJson_UnityEngine_Vector3();
-				}
-				else if (key.Equals(new RangeString("min")))
-				{
-				temp.min = ParseJson_UnityEngine_Vector3();
-				}
-				else if (key.Equals(new RangeString("max")))
-				{
-				temp.max = ParseJson_UnityEngine_Vector3();
-				}
 
                 else{
                     JsonParser.ParseJsonValue(JsonParser.Lexer.LookNextTokenType());

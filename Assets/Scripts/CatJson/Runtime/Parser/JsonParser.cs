@@ -35,6 +35,8 @@ namespace CatJson
         /// </summary>
         private static Dictionary<Type, Action<object>> extensionToJsonFuncDict = new Dictionary<Type, Action<object>>();
 
+        public static Dictionary<Type, HashSet<string>> IgnoreSet = new Dictionary<Type, HashSet<string>>();
+
         /// <summary>
         /// 解析Json对象的通用流程
         /// </summary>
@@ -122,6 +124,8 @@ namespace CatJson
         /// </summary>
         private static void AddToReflectionMap(Type type)
         {
+            IgnoreSet.TryGetValue(type, out HashSet<string> set);
+
             PropertyInfo[] pis = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
             Dictionary<RangeString, PropertyInfo> dict1 = null;
             if (pis.Length > 0)
@@ -132,6 +136,12 @@ namespace CatJson
                     PropertyInfo pi = pis[i];
 
                     if (pi.GetCustomAttribute<JsonIgnoreAttribute>() != null)
+                    {
+                        //需要忽略
+                        continue;
+                    }
+
+                    if (set != null && set.Contains(pi.Name))
                     {
                         //需要忽略
                         continue;
@@ -161,6 +171,13 @@ namespace CatJson
                         //需要忽略
                         continue;
                     }
+
+                    if (set != null && set.Contains(fi.Name))
+                    {
+                        //需要忽略
+                        continue;
+                    }
+
                     dict2.Add(new RangeString(fi.Name), fi);
                 }
 
