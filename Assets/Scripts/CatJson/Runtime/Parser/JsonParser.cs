@@ -1,8 +1,17 @@
-﻿using System;
+﻿
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-
+#if FUCK_LUA
+using ILRuntime.CLR.Method;
+using ILRuntime.CLR.TypeSystem;
+using ILRuntime.CLR.Utils;
+using ILRuntime.Reflection;
+using ILRuntime.Runtime.Enviorment;
+using ILRuntime.Runtime.Intepreter;
+using ILRuntime.Runtime.Stack;
+#endif
 namespace CatJson
 {
     /// <summary>
@@ -28,13 +37,16 @@ namespace CatJson
         /// <summary>
         /// 扩展类型与其对应的解析方法
         /// </summary>
-        private static Dictionary<Type, Func<object>> extensionParseFuncDict = new Dictionary<Type, Func<object>>();
+        public static Dictionary<Type, Func<object>> ExtensionParseFuncDict = new Dictionary<Type, Func<object>>();
 
         /// <summary>
         /// 扩展类型与其对应的转换Json文本方法
         /// </summary>
-        private static Dictionary<Type, Action<object>> extensionToJsonFuncDict = new Dictionary<Type, Action<object>>();
+        public static Dictionary<Type, Action<object>> ExtensionToJsonFuncDict = new Dictionary<Type, Action<object>>();
 
+        /// <summary>
+        /// 需要忽略的类型字段/属性名称
+        /// </summary>
         public static Dictionary<Type, HashSet<string>> IgnoreSet = new Dictionary<Type, HashSet<string>>();
 
         /// <summary>
@@ -135,7 +147,7 @@ namespace CatJson
                 {
                     PropertyInfo pi = pis[i];
 
-                    if (pi.GetCustomAttribute<JsonIgnoreAttribute>() != null)
+                    if (Attribute.IsDefined(pi, typeof(JsonIgnoreAttribute)))
                     {
                         //需要忽略
                         continue;
@@ -166,7 +178,8 @@ namespace CatJson
                 for (int i = 0; i < fis.Length; i++)
                 {
                     FieldInfo fi = fis[i];
-                    if (fi.GetCustomAttribute<JsonIgnoreAttribute>() != null)
+
+                    if (Attribute.IsDefined(fi,typeof(JsonIgnoreAttribute)))
                     {
                         //需要忽略
                         continue;
@@ -184,6 +197,113 @@ namespace CatJson
             }
             fieldInfoDict.Add(type, dict2);
         }
+
+        /// <summary>
+        /// 检查Type,，如果是热更层的需要进行转换
+        /// </summary>
+        private static Type CheckType(Type type)
+        {
+#if FUCK_LUA
+            if (type is ILRuntimeWrapperType wt)
+            {
+                return wt.RealType;
+            }
+#endif
+            return type;
+        }
+
+        /// <summary>
+        /// 获取obj的Type
+        /// </summary>
+        private static Type GetType(object obj)
+        {
+#if FUCK_LUA
+            if (obj is ILTypeInstance ins)
+            {
+               return ins.Type.ReflectionType;
+            }
+            if (obj is CrossBindingAdaptorType cross)
+            {
+                return cross.ILInstance.Type.ReflectionType;
+            }
+#endif
+            return obj.GetType();
+        }
+
+        /// <summary>
+        /// 创建type的实例
+        /// </summary>
+        private static object CreateInstance(Type type)
+        {
+#if FUCK_LUA
+            if (type is ILRuntimeType ilrtType)
+            {
+                return ilrtType.ILType.Instantiate();
+            }
+#endif
+
+
+            return Activator.CreateInstance(type);
+        }
+#if FUCK_LUA
+ public unsafe static void RegisterILRuntimeCLRRedirection(ILRuntime.Runtime.Enviorment.AppDomain appdomain)
+        {
+            foreach (MethodInfo mi in typeof(JsonParser).GetMethods())
+            {
+                if (mi.Name == "ParseJson" && mi.IsGenericMethodDefinition)
+                {
+                    appdomain.RegisterCLRMethodRedirection(mi, RedirectionParseJson);
+                }
+                else if (mi.Name == "ToJson" && mi.IsGenericMethodDefinition)
+                {
+                    appdomain.RegisterCLRMethodRedirection(mi, RedirectionToJson);
+                }
+            }
+        }
+
+        public unsafe static StackObject* RedirectionParseJson(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(esp, 2);
+
+            ptr_of_this_method = ILIntepreter.Minus(esp, 1);
+            bool reflection = ptr_of_this_method->Value == 1;
+
+            ptr_of_this_method = ILIntepreter.Minus(esp, 2);
+            string json = (string)typeof(string).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, mStack));
+
+            intp.Free(ptr_of_this_method);
+
+            Type type = method.GenericArguments[0].ReflectionType;
+
+            object result_of_this_method = ParseJson(json, type);
+
+            return ILIntepreter.PushObject(__ret, mStack, result_of_this_method);
+        }
+
+        public unsafe static StackObject* RedirectionToJson(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
+        {
+            ILRuntime.Runtime.Enviorment.AppDomain __domain = intp.AppDomain;
+            StackObject* ptr_of_this_method;
+            StackObject* __ret = ILIntepreter.Minus(esp, 2);
+
+            ptr_of_this_method = ILIntepreter.Minus(esp, 1);
+            bool reflection = ptr_of_this_method->Value == 1;
+
+            ptr_of_this_method = ILIntepreter.Minus(esp, 2);
+            ILTypeInstance obj = (ILTypeInstance)typeof(ILTypeInstance).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, mStack), 0);
+
+            intp.Free(ptr_of_this_method);
+
+            Type type = method.GenericArguments[0].ReflectionType;
+
+            string result_of_this_method = ToJson(obj,type, reflection);
+
+            return ILIntepreter.PushObject(__ret, mStack, result_of_this_method);
+        }
+#endif
+
 
 
     }

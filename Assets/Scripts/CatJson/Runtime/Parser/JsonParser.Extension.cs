@@ -17,7 +17,7 @@ namespace CatJson
 
 
             //解析DateTime
-            extensionParseFuncDict.Add(typeof(DateTime), () =>
+            ExtensionParseFuncDict.Add(typeof(DateTime), () =>
             {
                 RangeString rs = Lexer.GetNextTokenByType(TokenType.String);
                 return DateTime.Parse(rs.ToString());
@@ -25,15 +25,15 @@ namespace CatJson
 
 
             //添加自定义扩展转换Json文本方法
-            extensionToJsonFuncDict.Add(typeof(DateTime), (value) =>
+            ExtensionToJsonFuncDict.Add(typeof(DateTime), (value) =>
             {
                 Util.Append("\"");
                 Util.Append(value.ToString());
                 Util.Append("\"");
             });
 
-            //添加需要忽略的非自定义类的字段/属性
 
+            //添加需要忽略的非自定义类的字段/属性
             IgnoreSet.Add(typeof(Quaternion), new HashSet<string>()
             {
                 nameof(Quaternion.eulerAngles),
