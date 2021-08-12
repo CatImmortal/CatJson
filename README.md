@@ -1,2 +1,3 @@
 # CatJson
 为Unity开发者量身打造的功能强大的高性能Json库，内置ILRuntime支持
+文档有空再写
