@@ -1,9 +1,15 @@
-# CatJson
-为Unity开发者量身打造的功能强大的高性能Json库，在内存分配，CPU耗时，功能扩展上都做到了一个较好的水平，并且内置ILRuntime支持
+# 简介
+为Unity开发者量身打造的功能强大的高性能Json库，内置ILRuntime支持
 
+<br/>
 
+在内存分配，CPU耗时，功能扩展上都做到了一个较好的水平
 
-## 性能对比
+<br/>
+
+源码十分精简，在支持大量功能的同时Runtime部分源码只有2k行，仅为LitJson的一半
+
+# 性能对比
 
 反序列化Json文本为自定义数据类型：
 
@@ -15,7 +21,7 @@
 
 
 
-## 功能介绍
+# 功能介绍
 
 - **支持Json文本与通用Json对象间的转换**
 
@@ -24,7 +30,7 @@
   string jsonText = JsonParser.ToJson(jo);
   ```
 
-  
+  <br/>
 
 - **支持Json文本与自定义数据类型间的转换**
 
@@ -33,29 +39,29 @@
   string jsonText = JsonParser.ToJson(data);
   ```
 
-  
+  <br/>
 
 - **序列化为Json文本时自带格式化**
 
-  
+  <br/>
 
 - **基础数据类型支持byte,char,bool,string,int,long,float,double**
 
-  
+  <br/>
 
 - **支持自定义枚举类型，会作为int进行转换**
 
-  
+  <br/>
 
 - **容器方面支持字典、数组、List，其中字典key的类型除了string外还支持int类型**
 
   *注意：支持三者的互相嵌套，但对于数组套数组的情况只支持锯齿数组不支持多维数组*
 
-  
+  <br/>
 
 - **支持各种Unity特有数据类型，如Vector2/3/4，Quaternion,Color,Bounds,Rect,Keyframe,AnimationCurve等**
 
-  
+  <br/>
 
 - **支持预生成序列化/反序列化代码以大幅度提高性能**
 
@@ -65,7 +71,7 @@
 
   *注意：标记根类型即可，其所依赖的类型会自动生成对应代码*
 
-  
+  <br/>
 
 - **支持使用者主动指定某个类型的转换方式**
 
@@ -90,7 +96,7 @@
               });
   ```
 
-  
+  <br/>
 
 - **支持使用JsonIgnore特性标记想要忽略的字段/属性**
 
@@ -103,19 +109,17 @@
               }
   ```
 
-  
+  <br/>
 
 - **定义了IJsonParserCallbackReceiver接口，为使用者提供序列化前的回调OnToJsonStart和反序列化后的回调OnParseJsonEnd，以处理其他特殊情况**
 
-  
+  <br/>
 
 - **支持与ILRuntime下对于热更层类型的序列化/反序列化，使用FUCK_LUA宏即可一键开启**
 
   *注意：对于ILRuntime热更层的类型只能通过反射运行，不支持生成代码*
 
-
-
-## 注意事项
+# 注意事项
 
 - 只会对公有的实例字段/属性进行序列化/反序列化，且属性必须同时具有get/set
 - 对于字段/属性而言，如果其值为null,false或0，那么为了性能考虑将不会进行序列化/反序列化
