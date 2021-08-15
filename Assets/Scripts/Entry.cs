@@ -43,6 +43,12 @@ public class Entry : MonoBehaviour
             TestParseJsonNodeTree();
         }
 
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            //序列化 节点树
+            TestToJsonNodeTree();
+        }
+
         if (Input.GetKeyDown(KeyCode.A))
         {
             //反序列化 Json数据类对象
@@ -117,6 +123,71 @@ public class Entry : MonoBehaviour
     }
 
     /// <summary>
+    /// 测试序列化Json节点树为Json文本
+    /// </summary>
+    private void TestToJsonNodeTree()
+    {
+        JsonObject result2_1 = JsonParser.ParseJson(testJson1Text);
+
+        Profiler.BeginSample("Cat Json");
+        for (int i = 0; i < TestCount; i++)
+        {
+            string json = JsonParser.ToJson(result2_1);
+        }
+        Profiler.EndSample();
+
+        JsonData result2_2 = JsonMapper.ToObject(testJson1Text);
+        Profiler.BeginSample("Lit Json");
+        for (int i = 0; i < TestCount; i++)
+        {
+            string json = JsonMapper.ToJson(result2_2);
+        }
+        Profiler.EndSample();
+
+        object result2_3 = JsonConvert.DeserializeObject(testJson1Text);
+        Profiler.BeginSample("Newtonsoft Json");
+        for (int i = 0; i < TestCount; i++)
+        {
+            string json = JsonConvert.SerializeObject(result2_3);
+        }
+        Profiler.EndSample();
+
+
+        Dictionary<string, object> result2_4 = (Dictionary<string, object>)NetJSON.NetJSON.DeserializeObject(testJson1Text);
+        Profiler.BeginSample("Net Json");
+        for (int i = 0; i < TestCount; i++)
+        {
+            string json = NetJSON.NetJSON.Serialize(result2_4);
+        }
+        Profiler.EndSample();
+
+        Dictionary<string, object> result2_5 = MiniJSON.Json.Deserialize(testJson1Text) as Dictionary<string, object>;
+
+        Profiler.BeginSample("Mini Json");
+        for (int i = 0; i < TestCount; i++)
+        {
+            string json = MiniJSON.Json.Serialize(result2_5);
+        }
+        Profiler.EndSample();
+
+        //JSONNode result2_6 = JSON.Parse(testJson1Text);
+        //Profiler.BeginSample("Simple Json");
+        //for (int i = 0; i < TestCount; i++)
+        //{
+
+        //}
+        //Profiler.EndSample();
+
+        //MojoJson.JsonValue result2_7 = MojoJson.Json.Parse(testJson1Text);
+        //Profiler.BeginSample("Mojo Json");
+        //for (int i = 0; i < TestCount; i++)
+        //{
+         
+        //}
+        //Profiler.EndSample();
+    }
+
+    /// <summary>
     /// 测试反序列化json数据对象
     /// </summary>
     private void TestParseJsonObject()
@@ -160,13 +231,7 @@ public class Entry : MonoBehaviour
 
     }
 
-    /// <summary>
-    /// 测试序列化Json节点树为Json文本
-    /// </summary>
-    private void TestToJsonNodeTree()
-    {
 
-    }
 
     /// <summary>
     /// 测试指定类型对象序列化为Json文本
