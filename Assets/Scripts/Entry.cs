@@ -31,19 +31,6 @@ public class Entry : MonoBehaviour
 
         testJson1Object = JsonParser.ParseJson<TestJson1_Root>(testJson1Text);
 
-        IntKeyJson_Data data = new IntKeyJson_Data();
-        data.dict = new Dictionary<int, string>();
-        data.dict.Add(1, "value1");
-        data.dict.Add(2, "value2");
-
-        string json = JsonParser.ToJson(data,false);
-        Debug.Log(json);
-
-        IntKeyJson_Data result = JsonParser.ParseJson<IntKeyJson_Data>(json,false);
-        foreach (var item in result.dict)
-        {
-            Debug.Log(item);
-        }
     }
 
 

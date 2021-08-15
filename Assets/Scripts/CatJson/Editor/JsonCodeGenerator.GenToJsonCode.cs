@@ -165,12 +165,12 @@ namespace CatJson.Editor
                 //枚举
                 AppendLine($"JsonParser.AppendJsonValue((int){valueName});", 3);
             }
-            else if (Util.IsArrayOrList(valueType))
+            else if (Util.IsArrayOrListType(valueType))
             {
                 //数组或List
                 AppendToJsonArrayCode(valueType, Util.GetArrayElementType(valueType), valueName, itemName, depthCode);
             }
-            else if (Util.IsDictionary(valueType))
+            else if (Util.IsDictionaryType(valueType))
             {
                 //字典
                 AppendToJsonDictCode(valueType.GetGenericArguments()[0],valueType.GetGenericArguments()[1], valueName, itemName, depthCode);

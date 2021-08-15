@@ -140,7 +140,7 @@ namespace CatJson.Editor
                 AppendLine("JsonParser.Lexer.GetNextToken(out tokenType);");
                 AppendLine($"temp.{name} = tokenType == TokenType.True;");
             }
-            else if (Util.IsNumber(type) || type == typeof(char))
+            else if (Util.IsNumberType(type) || type == typeof(char))
             {
                 AppendLine($"temp.{name} = {type.FullName}.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());");
             }
@@ -149,7 +149,7 @@ namespace CatJson.Editor
                 //枚举
                 AppendLine($"temp.{name} = ({type.FullName})int.Parse(JsonParser.Lexer.GetNextToken(out _).ToString());");
             }
-            else if (Util.IsArrayOrList(type))
+            else if (Util.IsArrayOrListType(type))
             {
                 //数组和List<T>
                 Type elementType;
@@ -177,7 +177,7 @@ namespace CatJson.Editor
                     AppendLine($"temp.{name} = list;");
                 }
             }
-            else if (Util.IsDictionary(type))
+            else if (Util.IsDictionaryType(type))
             {
                 //字典
                 Type keyType = type.GetGenericArguments()[0];
@@ -237,7 +237,7 @@ namespace CatJson.Editor
                 AppendLine("JsonParser.Lexer.GetNextToken(out tokenType);");
                 AppendLine($"((List<{elementType.FullName}>){userdata1Name}).Add(tokenType == TokenType.True);");
             }
-            else if (Util.IsNumber(elementType) || elementType == typeof(char))
+            else if (Util.IsNumberType(elementType) || elementType == typeof(char))
             {
                 AppendLine($"((List<{elementType.FullName}>){userdata1Name}).Add({elementType.FullName}.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString()));");
             }
@@ -246,7 +246,7 @@ namespace CatJson.Editor
                 //枚举
                 AppendLine($"((List<{elementType.FullName}>){userdata1Name}).Add(({elementType.FullName})int.Parse(JsonParser.Lexer.GetNextToken(out _).ToString()));");
             }
-            else if (Util.IsArrayOrList(elementType))
+            else if (Util.IsArrayOrListType(elementType))
             {
                 //数组 List<T>
                 Type newElementType;
@@ -276,7 +276,7 @@ namespace CatJson.Editor
                     AppendLine($"{listName}.Add({listName}1);");
                 }
             }
-            else if (Util.IsDictionary(elementType))
+            else if (Util.IsDictionaryType(elementType))
             {
                 //字典
                 Type keyType = elementType.GetGenericArguments()[0];
@@ -342,7 +342,7 @@ namespace CatJson.Editor
                 AppendLine("JsonParser.Lexer.GetNextToken(out tokenType);");
                 AppendLine($"((Dictionary<{keyType.FullName}, {valueType.FullName}>){userdata1Name}).Add({addKeyCode},tokenType == TokenType.True);");
             }
-            else if (Util.IsNumber(valueType) || valueType == typeof(char))
+            else if (Util.IsNumberType(valueType) || valueType == typeof(char))
             {
                 AppendLine($"((Dictionary<{keyType.FullName}, {valueType.FullName}>){userdata1Name}).Add({addKeyCode}, {valueType.FullName}.Parse(JsonParser.Lexer.GetNextToken(out _).ToString()));");
             }
@@ -351,7 +351,7 @@ namespace CatJson.Editor
                 //枚举
                 AppendLine($"((Dictionary<{keyType.FullName}, {valueType.FullName}>){userdata1Name}).Add({addKeyCode},({valueType.FullName})int.Parse(JsonParser.Lexer.GetNextToken(out _).ToString()));");
             }
-            else if (Util.IsArrayOrList(valueType))
+            else if (Util.IsArrayOrListType(valueType))
             {
                 //数组和List<T>
                 Type elementType;
@@ -380,7 +380,7 @@ namespace CatJson.Editor
                     AppendLine($"((Dictionary<{keyType.FullName}, {valueTypeFullName}>){userdata1Name}).Add({addKeyCode}, {listName}1);");
                 }
             }
-            else if (Util.IsDictionary(valueType))
+            else if (Util.IsDictionaryType(valueType))
             {
                 //字典
                 Type newKeyType = valueType.GetGenericArguments()[0];
@@ -418,7 +418,7 @@ namespace CatJson.Editor
                 return type.FullName;
             }
 
-            if (Util.IsDictionary(type))
+            if (Util.IsDictionaryType(type))
             {
                 Type keyType = type.GetGenericArguments()[0];
                 Type valueType = type.GetGenericArguments()[1];

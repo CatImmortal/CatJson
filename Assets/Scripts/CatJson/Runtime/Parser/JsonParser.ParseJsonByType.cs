@@ -140,7 +140,7 @@ namespace CatJson
 
                 case TokenType.LeftBracket:
 
-                    if (Util.IsArrayOrList(type))
+                    if (Util.IsArrayOrListType(type))
                     {
                         Type elementType;
 
@@ -181,7 +181,7 @@ namespace CatJson
 
                 case TokenType.LeftBrace:
 
-                    if (Util.IsDictionary(type))
+                    if (Util.IsDictionaryType(type))
                     {
                         //字典
 
