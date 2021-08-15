@@ -75,7 +75,7 @@
 
 - **支持使用者主动指定某个类型的转换方式**
 
-  以**DateTime**为例，在**JsonParser.Extension.cs**文件中的静态构造方法中写入下述代码，即可将**DateTime**以字符串的形式被序列化/反序列化：
+  以**DateTime**为例，在**JsonParser.Extension.cs**文件中的静态构造方法中写入下述代码，即可将**DateTime**以字符串的形式序列化/反序列化：
 
   ```C#
               //反序列化DateTime
