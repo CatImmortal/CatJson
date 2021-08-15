@@ -103,7 +103,7 @@
   对于无法进行修改源码标记的字段，以**Quaternion**的**eulerAngles**为例，可在**JsonParser.Extension.cs**文件中的静态构造方法中写入下述代码进行忽略：
 
   ```c#
-  IgnoreSet.Add(typeof(Quaternion), new HashSet<string>()
+              IgnoreSet.Add(typeof(Quaternion), new HashSet<string>()
               {
                   nameof(Quaternion.eulerAngles),
               }
