@@ -78,7 +78,7 @@
   以**DateTime**为例，在**JsonParser.Extension.cs**文件中的静态构造方法中写入下述代码，即可将**DateTime**以字符串的形式被序列化/反序列化：
 
   ```C#
-   			//反序列化DateTime
+   			      //反序列化DateTime
               ExtensionParseFuncDict.Add(typeof(DateTime), () =>
               {
                   //这里使用了Lexer.GetNextTokenByType(TokenType.String)从Json文本中提取了DateTime类型的字段/属性所对应的字符串值，然后使用DateTime.Parse解析该值，并将结果返回
