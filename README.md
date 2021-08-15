@@ -7,11 +7,11 @@
 
 反序列化Json文本为自定义数据类型：
 
-![](https://github.com/CatImmortal/CatJson/raw/master/ImageRes/ParseJsonByType.png)
+![](https://github.com/CatImmortal/CatJson/raw/main/ImageRes/ParseJsonByType.png)
 
 将自定义数据类型序列化为Json文本：
 
-![](https://github.com/CatImmortal/CatJson/raw/master/ImageRes/ToJsonByType.png.png)
+![](https://github.com/CatImmortal/CatJson/raw/main/ImageRes/ToJsonByType.png.png)
 
 
 
