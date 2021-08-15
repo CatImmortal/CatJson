@@ -180,9 +180,10 @@ namespace CatJson.Editor
             else if (Util.IsDictionary(type))
             {
                 //字典
+                Type keyType = type.GetGenericArguments()[0];
                 Type valueType = type.GetGenericArguments()[1];
                 AppendLine($"{typeFullName} dict = new {typeFullName}();");
-                AppendParseJsonDictCode(valueType);
+                AppendParseJsonDictCode(keyType,valueType);
                 AppendLine($"temp.{name} = dict;");
             }
             else if (JsonCodeGenConfig.UseExtensionFuncTypes.Contains(type))
@@ -278,10 +279,11 @@ namespace CatJson.Editor
             else if (Util.IsDictionary(elementType))
             {
                 //字典
+                Type keyType = elementType.GetGenericArguments()[0];
                 Type valueType = elementType.GetGenericArguments()[1];
                 string typeFullName = GetTypeFullName(elementType);
                 AppendLine($"{typeFullName} {dictName} = new {typeFullName}();");
-                AppendParseJsonDictCode(valueType, $"{dictName}", $"{userdata1Name}1", $"{userdata2Name}1", $"{keyName}1", $"{nextTokenTypeName}1");
+                AppendParseJsonDictCode(keyType,valueType, $"{dictName}", $"{userdata1Name}1", $"{userdata2Name}1", $"{keyName}1", $"{nextTokenTypeName}1");
                 AppendLine($"{listName}.Add({dictName});");
             }
             else if (JsonCodeGenConfig.UseExtensionFuncTypes.Contains(elementType))
@@ -307,12 +309,17 @@ namespace CatJson.Editor
         /// <summary>
         /// 生成解析字典的代码
         /// </summary>
-        private static void AppendParseJsonDictCode(Type valueType, string dictName = "dict", string userdata1Name = "userdata11", string userdata2Name = "userdata21", string keyName = "key1", string nextTokenTypeName = "nextTokenType1", string listName = "list")
+        private static void AppendParseJsonDictCode(Type keyType,Type valueType, string dictName = "dict", string userdata1Name = "userdata11", string userdata2Name = "userdata21",string isIntKeyName = "isIntKey1", string keyName = "key1", string nextTokenTypeName = "nextTokenType1", string listName = "list")
         {
-            AppendLine($"JsonParser.ParseJsonObjectProcedure({dictName}, null, ({userdata1Name}, {userdata2Name},{keyName}, {nextTokenTypeName}) =>");
+            AppendLine($"JsonParser.ParseJsonObjectProcedure({dictName}, null,false, ({userdata1Name}, {userdata2Name},{isIntKeyName},{keyName}, {nextTokenTypeName}) =>");
             AppendLine("{");
 
             string valueTypeFullName = GetTypeFullName(valueType);
+            string addKeyCode = $"{keyName}.ToString()";
+            if (keyType == typeof(int))
+            {
+                addKeyCode = $"int.Parse({keyName}.ToString())";
+            }
 
             if (!valueType.IsValueType)
             {
@@ -320,7 +327,7 @@ namespace CatJson.Editor
                 AppendLine("if (nextTokenType1 == TokenType.Null)");
                 AppendLine("{");
                 AppendLine(" JsonParser.Lexer.GetNextToken(out _);");
-                AppendLine($"((Dictionary<string, {valueTypeFullName}>){userdata1Name}).Add({keyName}.ToString(),null);");
+                AppendLine($"((Dictionary<{keyType.FullName}, {valueTypeFullName}>){userdata1Name}).Add({addKeyCode},null);");
                 AppendLine("return;");
                 AppendLine("}");
             }
@@ -328,21 +335,21 @@ namespace CatJson.Editor
             //基础类型
             if (valueType == typeof(string))
             {
-                AppendLine($"((Dictionary<string, {valueType.FullName}>){userdata1Name}).Add({keyName}.ToString(),JsonParser.Lexer.GetNextToken(out _).ToString());");
+                AppendLine($"((Dictionary<{keyType.FullName}, {valueType.FullName}>){userdata1Name}).Add({addKeyCode},JsonParser.Lexer.GetNextToken(out _).ToString());");
             }
             else if (valueType == typeof(bool))
             {
                 AppendLine("JsonParser.Lexer.GetNextToken(out tokenType);");
-                AppendLine($"((Dictionary<string, {valueType.FullName}>){userdata1Name}).Add({keyName}.ToString(),tokenType == TokenType.True);");
+                AppendLine($"((Dictionary<{keyType.FullName}, {valueType.FullName}>){userdata1Name}).Add({addKeyCode},tokenType == TokenType.True);");
             }
             else if (Util.IsNumber(valueType) || valueType == typeof(char))
             {
-                AppendLine($"((Dictionary<string, {valueType.FullName}>){userdata1Name}).Add({keyName}.ToString(), {valueType.FullName}.Parse(JsonParser.Lexer.GetNextToken(out _).ToString()));");
+                AppendLine($"((Dictionary<{keyType.FullName}, {valueType.FullName}>){userdata1Name}).Add({addKeyCode}, {valueType.FullName}.Parse(JsonParser.Lexer.GetNextToken(out _).ToString()));");
             }
             else if (valueType.IsEnum)
             {
                 //枚举
-                AppendLine($"((Dictionary<string, {valueType.FullName}>){userdata1Name}).Add({keyName}.ToString(),({valueType.FullName})int.Parse(JsonParser.Lexer.GetNextToken(out _).ToString()));");
+                AppendLine($"((Dictionary<{keyType.FullName}, {valueType.FullName}>){userdata1Name}).Add({addKeyCode},({valueType.FullName})int.Parse(JsonParser.Lexer.GetNextToken(out _).ToString()));");
             }
             else if (Util.IsArrayOrList(valueType))
             {
@@ -366,30 +373,31 @@ namespace CatJson.Editor
 
                 if (valueType.IsArray)
                 {
-                    AppendLine($"((Dictionary<string, {valueTypeFullName}>){userdata1Name}).Add({keyName}.ToString(), {listName}1.ToArray());");
+                    AppendLine($"((Dictionary<{keyType.FullName}, {valueTypeFullName}>){userdata1Name}).Add({addKeyCode}, {listName}1.ToArray());");
                 }
                 else
                 {
-                    AppendLine($"((Dictionary<string, {valueTypeFullName}>){userdata1Name}).Add({keyName}.ToString(), {listName}1);");
+                    AppendLine($"((Dictionary<{keyType.FullName}, {valueTypeFullName}>){userdata1Name}).Add({addKeyCode}, {listName}1);");
                 }
             }
             else if (Util.IsDictionary(valueType))
             {
                 //字典
+                Type newKeyType = valueType.GetGenericArguments()[0];
                 Type newValueType = valueType.GetGenericArguments()[1];
                 AppendLine($"{valueTypeFullName} {dictName}1 = new {valueTypeFullName}();");
-                AppendParseJsonDictCode(newValueType, $"{dictName}1", $"{userdata1Name}1", $"{userdata2Name}1", $"{keyName}1", $"{nextTokenTypeName}1");
-                AppendLine($"((Dictionary<string, {valueTypeFullName}>){userdata1Name}).Add({keyName}.ToString(),{dictName}1);");
+                AppendParseJsonDictCode(newKeyType,newValueType, $"{dictName}1", $"{userdata1Name}1", $"{userdata2Name}1",$"{isIntKeyName}1", $"{keyName}1", $"{nextTokenTypeName}1");
+                AppendLine($"((Dictionary<{newKeyType}, {valueTypeFullName}>){userdata1Name}).Add({addKeyCode},{dictName}1);");
             }
             else if (JsonCodeGenConfig.UseExtensionFuncTypes.Contains(valueType))
             {
                 //其他类型 使用JsonParser.Extension里的扩展
-                AppendLine($"((Dictionary<string, {valueTypeFullName}>){userdata1Name}).Add({keyName}.ToString(),({valueType.FullName})JsonParser.ParseJsonValueByType(nextTokenType,typeof({valueTypeFullName})));");
+                AppendLine($"((Dictionary<{keyType.FullName}, {valueTypeFullName}>){userdata1Name}).Add({addKeyCode},({valueType.FullName})JsonParser.ParseJsonValueByType(nextTokenType,typeof({valueTypeFullName})));");
             }
             else
             {
                 //自定义类型 使用生成的解析代码
-                AppendLine($"((Dictionary<string, {valueTypeFullName}>){userdata1Name}).Add({keyName}.ToString(),{GetParseJsonCodeMethodName(valueType)}());");
+                AppendLine($"((Dictionary<{keyType.FullName}, {valueTypeFullName}>){userdata1Name}).Add({addKeyCode},{GetParseJsonCodeMethodName(valueType)}());");
 
                 if (!GenCodeTypes.Contains(valueType))
                 {
@@ -412,8 +420,13 @@ namespace CatJson.Editor
 
             if (Util.IsDictionary(type))
             {
+                Type keyType = type.GetGenericArguments()[0];
                 Type valueType = type.GetGenericArguments()[1];
-                return $"Dictionary<string,{GetTypeFullName(valueType)}>";
+                if (keyType != typeof(int))
+                {
+                    return $"Dictionary<{keyType},{GetTypeFullName(valueType)}>";
+                }
+                return $"Dictionary<int,{GetTypeFullName(valueType)}>";
             }
 
             Type elementType;

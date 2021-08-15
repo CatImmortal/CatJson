@@ -14,7 +14,7 @@ namespace CatJson
 
             #ClassName# obj = new #ClassName#();
 
-            JsonParser.ParseJsonObjectProcedure(obj, null, (userdata1, userdata2, key, nextTokenType) =>
+            JsonParser.ParseJsonObjectProcedure(obj, null,false, (userdata1, userdata2,isIntKey, key, nextTokenType) =>
             {
                 #ClassName# temp = (#ClassName#)userdata1;
                 TokenType tokenType;

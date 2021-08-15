@@ -221,7 +221,7 @@ namespace CatJson
                 AddToReflectionMap(type);
             }
 
-            ParseJsonObjectProcedure(obj, type, (userdata1, userdata2, key, nextTokenType) => {
+            ParseJsonObjectProcedure(obj, type,false, (userdata1, userdata2,isIntKey, key, nextTokenType) => {
 
                 Type t = (Type)userdata2;
 
@@ -302,11 +302,21 @@ namespace CatJson
         private static object ParseJsonObjectByDict(Type dictType, Type valueType)
         {
             IDictionary dict = (IDictionary)Activator.CreateInstance(dictType);
-
-            ParseJsonObjectProcedure(dict, valueType, (userdata1, userdata2, key, nextTokenType) => {
+            Type keyType = dictType.GetGenericArguments()[0];
+            ParseJsonObjectProcedure(dict, valueType,keyType == typeof(int), (userdata1, userdata2,isIntKey, key, nextTokenType) => {
                 Type t = (Type)userdata2;
                 object value = ParseJsonValueByType(nextTokenType, t);
-                ((IDictionary)userdata1).Add(key.ToString(), value);
+                if (!isIntKey)
+                {
+                    
+                    ((IDictionary)userdata1).Add(key.ToString(), value);
+                }
+                else
+                {
+                    //处理字典key为int的情况
+                    ((IDictionary)userdata1).Add(int.Parse(key.ToString()), value);
+                }
+               
             });
 
             return dict;

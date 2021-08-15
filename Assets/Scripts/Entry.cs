@@ -31,27 +31,19 @@ public class Entry : MonoBehaviour
 
         testJson1Object = JsonParser.ParseJson<TestJson1_Root>(testJson1Text);
 
-        UnityJson_Data data = new UnityJson_Data();
-        data.v2 = new Vector2(1, 2);
-        data.v3 = new Vector3(1, 2, 3);
-        data.v4 = new Vector4(1, 2, 3, 4);
-        data.rotate = new Quaternion(1, 2, 3, 4);
-        data.color = new Color(1, 2, 3, 4);
-        data.bounds = new Bounds(new Vector3(1, 2, 3), new Vector3(1, 2, 3));
-        data.rect = new Rect(1, 2, 3, 4);
-        data.keyframe = new Keyframe(1, 2, 3, 4);
-        data.ac = new AnimationCurve(new Keyframe(1, 2, 3, 4), new Keyframe(5, 6, 7, 8));
+        IntKeyJson_Data data = new IntKeyJson_Data();
+        data.dict = new Dictionary<int, string>();
+        data.dict.Add(1, "value1");
+        data.dict.Add(2, "value2");
 
-        string json = JsonParser.ToJson(data);
-        Debug.Log(json);
-        json = JsonParser.ToJson(data, false);
+        string json = JsonParser.ToJson(data,false);
         Debug.Log(json);
 
-        UnityJson_Data data2 = JsonParser.ParseJson<UnityJson_Data>(json, false);
-        Debug.Log(data2);
-
-
-
+        IntKeyJson_Data result = JsonParser.ParseJson<IntKeyJson_Data>(json,false);
+        foreach (var item in result.dict)
+        {
+            Debug.Log(item);
+        }
     }
 
 

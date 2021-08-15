@@ -52,7 +52,7 @@ namespace CatJson
         /// <summary>
         /// 解析Json对象的通用流程
         /// </summary>
-        public static void ParseJsonObjectProcedure(object userdata1,object userdata2,Action<object,object,RangeString, TokenType> action)
+        public static void ParseJsonObjectProcedure(object userdata1,object userdata2,bool isIntKey,Action<object,object,bool,RangeString, TokenType> action)
         {
 
             //跳过 {
@@ -70,7 +70,7 @@ namespace CatJson
                 //array和json obj需要完整的[]和{}，所以只能look
                 TokenType nextTokenType = Lexer.LookNextTokenType();
 
-                action(userdata1,userdata2,key, nextTokenType);
+                action(userdata1,userdata2,isIntKey,key, nextTokenType);
 
                 //有逗号就跳过逗号
                 if (Lexer.LookNextTokenType() == TokenType.Comma)

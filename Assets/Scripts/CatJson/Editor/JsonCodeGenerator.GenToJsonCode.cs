@@ -173,7 +173,7 @@ namespace CatJson.Editor
             else if (Util.IsDictionary(valueType))
             {
                 //字典
-                AppendToJsonDictCode(valueType.GetGenericArguments()[1], valueName, itemName, depthCode);
+                AppendToJsonDictCode(valueType.GetGenericArguments()[0],valueType.GetGenericArguments()[1], valueName, itemName, depthCode);
             }
             else if (JsonCodeGenConfig.UseExtensionFuncTypes.Contains(valueType))
             {
@@ -234,16 +234,26 @@ namespace CatJson.Editor
         /// <summary>
         /// 生成转换Json字典的代码
         /// </summary>
-        private static void AppendToJsonDictCode(Type valueType, string dictName, string itemName, string depthCode)
+        private static void AppendToJsonDictCode(Type keyType,Type valueType, string dictName, string itemName, string depthCode)
         {
             AppendLine("Util.AppendLine(\"{\");", 3);
 
             AppendLine($"foreach (var {itemName} in {dictName})", 3);
             AppendLine("{", 3);
-            AppendLine($"JsonParser.AppendJsonKey({itemName}.Key, {depthCode}+1);", 3);
+            if (keyType != typeof(int))
+            {
+                AppendLine($"JsonParser.AppendJsonKey({itemName}.Key, {depthCode}+1);", 3);
+            }
+            else
+            {
+                //处理key为int的情况
+                AppendLine($"JsonParser.AppendJsonKey({itemName}.Key.ToString(), {depthCode}+1);", 3);
+            }
+           
 
             if (!valueType.IsValueType)
             {
+                //对引用类型添加null检查
                 AppendLine($"if ({itemName}.Value == null)", 3);
                 AppendLine("{", 3);
                 AppendLine("Util.Append(\"null\");", 3);
