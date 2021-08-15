@@ -100,7 +100,7 @@
 
 - **支持使用JsonIgnore特性标记想要忽略的字段/属性**
 
-  对于无法进行修改源码标记的字段，以**Quaternion**的**eulerAngles**为例，可在**JsonParser.Extension.cs**文件中的静态构造方法中写入下述代码进行忽略：
+  对于无法通过修改源码进行标记的字段/属性，以**Quaternion**的**eulerAngles**为例，可在**JsonParser.Extension.cs**文件中的静态构造方法中写入下述代码进行忽略：
 
   ```c#
               IgnoreSet.Add(typeof(Quaternion), new HashSet<string>()
