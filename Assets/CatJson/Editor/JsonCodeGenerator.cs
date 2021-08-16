@@ -73,7 +73,7 @@ namespace CatJson.Editor
             }
 
             //生成静态构造器文件
-            GenStaticCtorCodeFile();
+            GenStaticInitCodeFile();
 
             AssetDatabase.Refresh();
 
@@ -130,25 +130,25 @@ namespace CatJson.Editor
         }
 
         /// <summary>
-        /// 生成静态构造器文件
+        /// 生成静态初始化文件
         /// </summary>
-        private static void GenStaticCtorCodeFile()
+        private static void GenStaticInitCodeFile()
         {
             //读取模板文件
-            StreamReader sr = new StreamReader(JsonCodeGenConfig.StaticCtorTemplateFilePath);
+            StreamReader sr = new StreamReader(JsonCodeGenConfig.StaticInitTemplateFilePath);
             string template = sr.ReadToEnd();
             sr.Close();
 
             foreach (Type type in GenRootTypes)
             {
-                AppendLine($"ParseJsonCodeFuncDict.Add(typeof({type.FullName}),{GetParseJsonCodeMethodName(type)});", 3);
-                AppendLine($"ToJsonCodeFuncDict.Add(typeof({type.FullName}), {GetToJsonCodeMethodName(type)});", 3);
+                AppendLine($"GenJsonCodes.ParseJsonCodeFuncDict.Add(typeof({type.FullName}),{GetParseJsonCodeMethodName(type)});", 3);
+                AppendLine($"GenJsonCodes.ToJsonCodeFuncDict.Add(typeof({type.FullName}), {GetToJsonCodeMethodName(type)});", 3);
             }
 
             template = template.Replace("#AddJsonCodeFunc#", sb.ToString());
             sb.Clear();
 
-            StreamWriter sw = new StreamWriter($"{JsonCodeGenConfig.ParseJsonCodeDirPath}/Gen_GenJsonCodesStaticCtor.cs");
+            StreamWriter sw = new StreamWriter($"{JsonCodeGenConfig.ParseJsonCodeDirPath}/Gen_StaticInit.cs");
             sw.Write(template);
             sw.Close();
         }

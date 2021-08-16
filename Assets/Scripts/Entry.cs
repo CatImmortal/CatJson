@@ -31,6 +31,7 @@ public class Entry : MonoBehaviour
 
         testJson1Object = JsonParser.ParseJson<TestJson1_Root>(testJson1Text);
 
+        GenJsonCodesHelper.Init();
     }
 
 

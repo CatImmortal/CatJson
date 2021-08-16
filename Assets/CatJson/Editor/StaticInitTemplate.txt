@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace CatJson
 {
-    public static partial class GenJsonCodes
+    public static partial class GenJsonCodesHelper
     {
-        static GenJsonCodes()
+        public static void Init()
         {
 #AddJsonCodeFunc#
         }

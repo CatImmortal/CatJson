@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace CatJson
 {
-    public static partial class GenJsonCodes
+    public static partial class GenJsonCodesHelper
     {
         private static void ToJson_TestJson1_Item(object obj,int depth)
         {

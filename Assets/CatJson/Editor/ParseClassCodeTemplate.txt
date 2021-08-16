@@ -2,7 +2,7 @@
 
 namespace CatJson
 {
-    public static partial class GenJsonCodes
+    public static partial class GenJsonCodesHelper
     {
         private static #ClassName# #MethodName#()
         {
