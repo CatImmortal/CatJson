@@ -35,23 +35,26 @@ namespace CatJson
                 //使用反射解析
                 result = ParseJsonObjectByType(type);
             }
-            else if (GenJsonCodes.ParseJsonCodeFuncDict.TryGetValue(type, out Func<object> func))
+            else
             {
-                //使用预生成代码解析
-                result = func();
-            }
-
-            if (result != null)
-            {
-                if (result is IJsonParserCallbackReceiver receiver)
+                if (GenJsonCodes.ParseJsonCodeFuncDict.TryGetValue(type, out Func<object> func))
                 {
-                    //触发解析结束回调
-                    receiver.OnParseJsonEnd();
+                    //使用预生成代码解析
+                    result = func();
                 }
-                return result;
+                else
+                {
+                    throw new Exception($"没有为{type}类型预生成的解析代码");
+                }  
             }
 
-            throw new Exception($"没有为{type}类型预生成的解析代码");
+            if (result != null && result is IJsonParserCallbackReceiver receiver)
+            {
+                //触发解析结束回调
+                receiver.OnParseJsonEnd();
+            }
+
+            return result;
         }
 
 

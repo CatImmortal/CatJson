@@ -35,16 +35,17 @@ namespace CatJson
                 //反射转换
                 AppendJsonObject(obj, type, 0);
             }
-            else if (GenJsonCodes.ToJsonCodeFuncDict.TryGetValue(type, out Action<object,int> action))
+            else 
             {
-                //使用预生成代码转换
-                action(obj, 0);
-            }
-
-
-            if (Util.CachedSB.Length == 0)
-            {
-                throw new Exception($"没有为{type}类型预生成的转换代码");
+                if (GenJsonCodes.ToJsonCodeFuncDict.TryGetValue(type, out Action<object, int> action))
+                {
+                    //使用预生成代码转换
+                    action(obj, 0);
+                }
+                else
+                {
+                    throw new Exception($"没有为{type}类型预生成的转换代码");
+                }
             }
 
             string json = Util.CachedSB.ToString();
