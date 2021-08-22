@@ -36,7 +36,7 @@
 
   ```c#
   CustomData data = JsonParser.ParseJson<CustomData>(jsonText);
-  string jsonText = JsonParser.ToJson(data);
+  string jsonText = JsonParser.ToJson<CustomData>(data);
   ```
 
   <br/>
