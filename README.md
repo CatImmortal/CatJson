@@ -121,7 +121,7 @@
 
   *注意：对于ILRuntime热更层的类型只能通过反射运行，不支持生成代码*
   
-  *注意：如果要在热更层调用ToJson或ParseJson的泛型版本，需要在ILRuntime初始化时调用JsonParse.RegisterILRuntimeCLRRedirection注册CatJson的CLR重定向*
+  *注意：如果要在热更层调用ToJson或ParseJson的泛型版本，需要在ILRuntime初始化时调用JsonParser.RegisterILRuntimeCLRRedirection注册CatJson的CLR重定向*
 
 # 注意事项
 
