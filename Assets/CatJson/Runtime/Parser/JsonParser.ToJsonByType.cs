@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ namespace CatJson
         /// </summary>
         public static string ToJson<T>(T obj, bool reflection = true)
         {
-            return ToJson(obj, typeof(T),reflection);
+            return ToJson(obj, GetType(obj), reflection);
         }
 
         /// <summary>
@@ -117,7 +117,11 @@ namespace CatJson
             if (flag == true)
             {
                 //删掉最后的 , 字符
+                #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
                 Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);
+#else
+                Util.CachedSB.Remove(Util.CachedSB.Length - 2, 1);
+#endif
             }
 
 
@@ -274,8 +278,11 @@ namespace CatJson
             if (flag)
             {
                 //删掉最后的 , 字符
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
                 Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);
-
+#else
+                Util.CachedSB.Remove(Util.CachedSB.Length - 2, 1);
+#endif
             }
             Util.Append("]", depth);
         }
@@ -310,7 +317,11 @@ namespace CatJson
             if (dict.Count > 0)
             {
                 //删掉最后的 , 字符
+                #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
                 Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);
+#else
+                Util.CachedSB.Remove(Util.CachedSB.Length - 2, 1);
+#endif
             }
 
 
