@@ -225,7 +225,11 @@ namespace CatJson.Editor
                 AppendLine($"if ({arrayName}.Count > 0)", 3);
             }
             AppendLine("{", 3);
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             AppendLine(" Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);", 3);
+#else
+            AppendLine(" Util.CachedSB.Remove(Util.CachedSB.Length - 2, 1);", 3);
+#endif
             AppendLine("}", 3);
 
             AppendLine($"Util.Append(\"]\",{depthCode});", 3);
@@ -273,7 +277,11 @@ namespace CatJson.Editor
 
             AppendLine($"if ({dictName}.Count > 0)", 3);
             AppendLine("{", 3);
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             AppendLine(" Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);", 3);
+#else
+            AppendLine(" Util.CachedSB.Remove(Util.CachedSB.Length - 2, 1);", 3);
+#endif
             AppendLine("}", 3);
 
             AppendLine($"Util.Append(\"}}\",{depthCode});", 3);

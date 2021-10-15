@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -292,20 +292,18 @@ namespace CatJson
             bool reflection = ptr_of_this_method->Value == 1;
 
             ptr_of_this_method = ILIntepreter.Minus(esp, 2);
-            ILTypeInstance obj = (ILTypeInstance)typeof(ILTypeInstance).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, mStack), 0);
+            ILTypeInstance obj =
+                (ILTypeInstance)typeof(ILTypeInstance).CheckCLRTypes(
+                    StackObject.ToObject(ptr_of_this_method, __domain, mStack), 0);
 
             intp.Free(ptr_of_this_method);
 
             Type type = method.GenericArguments[0].ReflectionType;
 
-            string result_of_this_method = ToJson(obj,type, reflection);
+            string result_of_this_method = ToJson(obj, type, reflection);
 
             return ILIntepreter.PushObject(__ret, mStack, result_of_this_method);
         }
 #endif
-
-
-
     }
-
 }
