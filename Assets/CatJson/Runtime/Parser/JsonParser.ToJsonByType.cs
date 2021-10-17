@@ -1,16 +1,15 @@
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 #if FUCK_LUA
 using ILRuntime.Reflection;
 #endif
+
 namespace CatJson
 {
     public static partial class JsonParser
     {
-
         /// <summary>
         /// 将指定类型的对象转换为Json文本
         /// </summary>
@@ -35,7 +34,7 @@ namespace CatJson
                 //反射转换
                 AppendJsonObject(obj, type, 0);
             }
-            else 
+            else
             {
                 if (GenJsonCodes.ToJsonCodeFuncDict.TryGetValue(type, out Action<object, int> action))
                 {
@@ -65,12 +64,10 @@ namespace CatJson
             }
 
             Util.AppendLine("{");
-
-            bool flag = false;
-
             propertyInfoDict.TryGetValue(type, out Dictionary<RangeString, PropertyInfo> piDict);
             if (piDict != null)
             {
+                int index = 0;
                 foreach (KeyValuePair<RangeString, PropertyInfo> item in piDict)
                 {
                     object value = item.Value.GetValue(obj);
@@ -83,19 +80,21 @@ namespace CatJson
                         continue;
                     }
 
-                    flag = true;
+                    AppendJsonKey(piName, depth+1);
+                    AppendJsonValue(piType, value, depth+1);
+                    if (index < piDict.Count-1)
+                    {
+                        Util.AppendLine(",");
+                    }
 
-                   
-
-                    AppendJsonKeyValue(piType, piName, value, depth + 1);
-
-                    
+                    index++;
                 }
             }
 
             fieldInfoDict.TryGetValue(type, out Dictionary<RangeString, FieldInfo> fiDict);
             if (fiDict != null)
             {
+                int index = 0;
                 foreach (KeyValuePair<RangeString, FieldInfo> item in fiDict)
                 {
                     object value = item.Value.GetValue(obj);
@@ -106,39 +105,28 @@ namespace CatJson
                         //默认值跳过序列化
                         continue;
                     }
-                    flag = true;
-
-
-                    AppendJsonKeyValue(fiType, fiName, value, depth + 1);
+                    AppendJsonKey(fiName, depth+1);
+                    AppendJsonValue(fiType, value, depth+1);
+                    if (index < fiDict.Count-1)
+                    {
+                        Util.AppendLine(",");
+                    }
+                    index++;
                 }
-
             }
-
-            if (flag == true)
-            {
-                //删掉最后的 , 字符
-                #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-                Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);
-#else
-                Util.CachedSB.Remove(Util.CachedSB.Length - 2, 1);
-#endif
-            }
-
-
-
-            Util.Append("}", depth);
-
+            Util.AppendLine(string.Empty);
+            Util.Append("}",depth);
         }
 
-        /// <summary>
-        /// 追加单个Json 键值对文本
-        /// </summary>
-        private static void AppendJsonKeyValue(Type valueType, string name, object value, int depth)
-        {
-            AppendJsonKey(name, depth);
-            AppendJsonValue(valueType, value, depth);
-            Util.AppendLine(",");
-        }
+        // /// <summary>
+        // /// 追加单个Json 键值对文本
+        // /// </summary>
+        // private static void AppendJsonKeyValue(Type valueType, string name, object value, int depth)
+        // {
+        //     AppendJsonKey(name, depth);
+        //     AppendJsonValue(valueType, value, depth);
+        //     Util.AppendLine(",");
+        // }
 
         /// <summary>
         /// 追加json key文本
@@ -156,7 +144,6 @@ namespace CatJson
         /// </summary>
         private static void AppendJsonValue(Type valueType, object value, int depth)
         {
-
             valueType = CheckType(valueType);
 
             if (ExtensionToJsonFuncDict.TryGetValue(valueType, out Action<object> action))
@@ -195,6 +182,7 @@ namespace CatJson
                 {
                     Util.Append("false");
                 }
+
                 return;
             }
 
@@ -209,7 +197,7 @@ namespace CatJson
             if (Util.IsArrayOrList(value))
             {
                 //数组或List
-                AppendJsonArray(valueType,value,depth);
+                AppendJsonArray(valueType, value, depth);
                 return;
             }
 
@@ -231,15 +219,12 @@ namespace CatJson
         private static void AppendJsonArray(Type valueType, object value, int depth)
         {
             Util.AppendLine("[");
-
-            bool flag = false;
-
+            
             if (valueType.IsArray)
             {
                 Array array = (Array)value;
                 for (int i = 0; i < array.Length; i++)
                 {
-                    flag = true;
                     object element = array.GetValue(i);
                     Util.AppendTab(depth + 1);
                     if (element == null)
@@ -248,11 +233,13 @@ namespace CatJson
                     }
                     else
                     {
-                        AppendJsonValue(GetType(element), element, depth + 1);
+                        AppendJsonValue(GetType(element), element, depth+1);
                     }
-                   
-
-                    Util.AppendLine(",");
+                    if (i< array.Length-1)
+                    {
+                        Util.AppendLine(",");
+                    }
+                 
                 }
             }
             else
@@ -260,7 +247,6 @@ namespace CatJson
                 IList list = (IList)value;
                 for (int i = 0; i < list.Count; i++)
                 {
-                    flag = true;
                     object element = list[i];
                     Util.AppendTab(depth + 1);
                     if (element == null)
@@ -271,19 +257,14 @@ namespace CatJson
                     {
                         AppendJsonValue(GetType(element), element, depth + 1);
                     }
-                    Util.AppendLine(",");
+
+                    if (i< list.Count-1)
+                    {
+                        Util.AppendLine(",");
+                    }
                 }
             }
-
-            if (flag)
-            {
-                //删掉最后的 , 字符
-#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-                Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);
-#else
-                Util.CachedSB.Remove(Util.CachedSB.Length - 2, 1);
-#endif
-            }
+            Util.AppendLine(string.Empty);
             Util.Append("]", depth);
         }
 
@@ -297,7 +278,7 @@ namespace CatJson
             IDictionaryEnumerator enumerator = dict.GetEnumerator();
 
             Util.AppendLine("{");
-
+            int index = 0;
             while (enumerator.MoveNext())
             {
                 if (enumerator.Value == null)
@@ -308,23 +289,18 @@ namespace CatJson
                 }
                 else
                 {
-                    AppendJsonKeyValue(GetType(enumerator.Value), enumerator.Key.ToString(), enumerator.Value, depth + 1);
-                }  
-                
-                
+                    AppendJsonKey(enumerator.Key.ToString(), depth+1);
+                    AppendJsonValue(GetType(enumerator.Value), enumerator.Value, depth+1);
+                    if (index < dict.Count-1)
+                    {
+                        Util.AppendLine(",");
+                    }
+                }
+
+                index++;
             }
 
-            if (dict.Count > 0)
-            {
-                //删掉最后的 , 字符
-                #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-                Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);
-#else
-                Util.CachedSB.Remove(Util.CachedSB.Length - 2, 1);
-#endif
-            }
-
-
+            Util.AppendLine(string.Empty);
             Util.Append("}", depth);
         }
 
@@ -339,15 +315,13 @@ namespace CatJson
             {
                 Util.Append("false", depth);
             }
-
         }
 
         public static void AppendJsonValue(string s, int depth = 0)
         {
-            Util.Append("\"",depth);
+            Util.Append("\"", depth);
             Util.Append(s);
             Util.Append("\"");
-
         }
 
         public static void AppendJsonValue(char c, int depth = 0)
@@ -355,23 +329,21 @@ namespace CatJson
             Util.Append("\"", depth);
             Util.Append(c.ToString());
             Util.Append("\"");
-
         }
 
-        public static void AppendJsonValue(byte b,int depth = 0)
+        public static void AppendJsonValue(byte b, int depth = 0)
         {
             Util.Append(b.ToString(), depth);
         }
 
         public static void AppendJsonValue(int i, int depth = 0)
         {
-            Util.Append(i.ToString(),depth);
+            Util.Append(i.ToString(), depth);
         }
 
         public static void AppendJsonValue(long l, int depth = 0)
         {
             Util.Append(l.ToString(), depth);
-
         }
 
         public static void AppendJsonValue(float f, int depth = 0)
@@ -383,8 +355,5 @@ namespace CatJson
         {
             Util.Append(d.ToString(), depth);
         }
-
-       
     }
-
 }

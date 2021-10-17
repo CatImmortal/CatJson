@@ -81,17 +81,12 @@ namespace CatJson
                         Util.AppendTab(depth + 1);
                         JsonValue jv = Array[i];
                         jv.ToJson(depth + 1);
-                        Util.AppendLine(",");
+                        if (i<Array.Length-1)
+                        {
+                            Util.AppendLine(",");
+                        }
                     }
-                    if (Array.Length > 0)
-                    {
-                        //删掉最后的 , 字符
-                        #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-                Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);
-#else
-                Util.CachedSB.Remove(Util.CachedSB.Length - 2, 1);
-#endif
-                    }
+                    Util.AppendLine(string.Empty);
                     Util.Append("]",depth);
                     break;
                 case ValueType.Object:
