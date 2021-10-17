@@ -59,6 +59,7 @@ namespace CatJson
 
             if (valueDict != null)
             {
+                int index = 0;
                 foreach (KeyValuePair<string, JsonValue> item in valueDict)
                 {
 
@@ -70,17 +71,11 @@ namespace CatJson
 
                     item.Value.ToJson(depth + 1);
 
-                    Util.AppendLine(",");
-                }
-
-                if (valueDict.Count > 0)
-                {
-                    //删掉最后的 , 字符
-                    #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-                Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);
-#else
-                Util.CachedSB.Remove(Util.CachedSB.Length - 2, 1);
-#endif
+                    if (index<valueDict.Count-1)
+                    {
+                        Util.AppendLine(",");
+                    }
+                    index++;
                 }
             }
 

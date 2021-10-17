@@ -133,17 +133,15 @@ namespace CatJson.Editor
             {
                 AppendLine($"if (data.{name} != default)", 3);
                 AppendLine("{", 3);
-                AppendLine("flag = true;", 3);
-                AppendLine($"JsonParser.AppendJsonKey(\"{name}\", depth + 1);", 3);
-                AppendToJsonValueCode(type, $"data.{name}");
-                AppendLine("Util.AppendLine(\",\");", 3);
+                AppendLine($"JsonParser.AppendJsonKey(\"{name}\", depth + 1);", 4);
+                AppendToJsonValueCode(type, $"data.{name}",depth:4);
+                AppendLine("Util.AppendLine(\",\");", 4);
                 AppendLine("}", 3);
             }
             else
             {
-                AppendLine("flag = true;", 3);
                 AppendLine($"JsonParser.AppendJsonKey(\"{name}\", depth + 1);", 3);
-                AppendToJsonValueCode(type, $"data.{name}");
+                AppendToJsonValueCode(type, $"data.{name}",depth:3);
                 AppendLine("Util.AppendLine(\",\");", 3);
             }
 
@@ -153,37 +151,37 @@ namespace CatJson.Editor
         /// <summary>
         /// 生成转换Json值的代码
         /// </summary>
-        private static void AppendToJsonValueCode(Type valueType, string valueName, string itemName = "item", string depthCode = "depth+1")
+        private static void AppendToJsonValueCode(Type valueType, string valueName, string itemName = "item", string depthCode = "depth+1",int depth = 0)
         {
             if (Util.IsBaseType(valueType))
             {
                 //内置基础类型
-                AppendLine($"JsonParser.AppendJsonValue({valueName});", 3);
+                AppendLine($"JsonParser.AppendJsonValue({valueName});", depth);
             }
             else if (valueType.IsEnum)
             {
                 //枚举
-                AppendLine($"JsonParser.AppendJsonValue((int){valueName});", 3);
+                AppendLine($"JsonParser.AppendJsonValue((int){valueName});", depth);
             }
             else if (Util.IsArrayOrListType(valueType))
             {
                 //数组或List
-                AppendToJsonArrayCode(valueType, Util.GetArrayElementType(valueType), valueName, itemName, depthCode);
+                AppendToJsonArrayCode(valueType, Util.GetArrayElementType(valueType), valueName, itemName, depthCode,depth);
             }
             else if (Util.IsDictionaryType(valueType))
             {
                 //字典
-                AppendToJsonDictCode(valueType.GetGenericArguments()[0],valueType.GetGenericArguments()[1], valueName, itemName, depthCode);
+                AppendToJsonDictCode(valueType.GetGenericArguments()[0],valueType.GetGenericArguments()[1], valueName, itemName, depthCode,depth);
             }
             else if (JsonCodeGenConfig.UseExtensionFuncTypes.Contains(valueType))
             {
                 //其他类型 使用JsonParser.Extension里的扩展
-                AppendLine($"JsonParser.AppendJsonValue(typeof({valueType.FullName}),{valueName})", 3);
+                AppendLine($"JsonParser.AppendJsonValue(typeof({valueType.FullName}),{valueName})", depth);
             }
             else
             {
                 //其他类型 使用生成的转换代码
-                AppendLine($"{GetToJsonCodeMethodName(valueType)}({valueName},{depthCode});", 3);
+                AppendLine($"{GetToJsonCodeMethodName(valueType)}({valueName},{depthCode});", depth);
             }
         }
 
@@ -191,100 +189,84 @@ namespace CatJson.Editor
         /// 生成转换Json数组的代码 
         /// depthCode表示该数组作为value时，对应key的depth表达式代码
         /// </summary>
-        private static void AppendToJsonArrayCode(Type arrayType, Type elementType, string arrayName, string itemName, string depthCode)
+        private static void AppendToJsonArrayCode(Type arrayType, Type elementType, string arrayName, string itemName, string depthCode,int depth)
         {
-            AppendLine("Util.AppendLine(\"[\");", 3);
-
-            AppendLine($"foreach (var {itemName} in {arrayName})", 3);
-            AppendLine("{", 3);
-            AppendLine($"Util.AppendTab({depthCode}+1);", 3);
+            AppendLine("Util.AppendLine(\"[\");", depth);
+            AppendLine("int index = 0;", depth);
+            AppendLine($"foreach (var {itemName} in {arrayName})", depth);
+            AppendLine("{", depth);
+            AppendLine($"Util.AppendTab({depthCode}+1);", depth+1);
             if (!elementType.IsValueType)
             {
-                AppendLine($"if ({itemName} == null)",3);
-                AppendLine("{",3);
-                AppendLine("Util.Append(\"null\");", 3);
-                AppendLine("}",3);
-                AppendLine("else", 3);
-                AppendLine("{", 3);
-                AppendToJsonValueCode(elementType, itemName, itemName + "1", depthCode + "+1");
-                AppendLine("}", 3);
+                AppendLine($"if ({itemName} == null)",depth+1);
+                AppendLine("{",depth+1);
+                AppendLine("Util.Append(\"null\");", depth+2);
+                AppendLine("}",depth+1);
+                AppendLine("else", depth+1);
+                AppendLine("{", depth+1);
+                AppendToJsonValueCode(elementType, itemName, itemName + "1", depthCode + "+1",depth+2);
+                AppendLine("}", depth+1);
             }
             else
             {
-                AppendToJsonValueCode(elementType, itemName, itemName + "1", depthCode + "+1");
+                AppendToJsonValueCode(elementType, itemName, itemName + "1", depthCode + "+1",depth+1);
             }
-            AppendLine("Util.AppendLine(\",\");", 3);
-            AppendLine("}", 3);
 
-            if (arrayType.IsArray)
-            {
-                AppendLine($"if ({arrayName}.Length > 0)", 3);
-            }
-            else
-            {
-                AppendLine($"if ({arrayName}.Count > 0)", 3);
-            }
-            AppendLine("{", 3);
-#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-            AppendLine(" Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);", 3);
-#else
-            AppendLine(" Util.CachedSB.Remove(Util.CachedSB.Length - 2, 1);", 3);
-#endif
-            AppendLine("}", 3);
-
-            AppendLine($"Util.Append(\"]\",{depthCode});", 3);
+            AppendLine($"if (index < {arrayName}.Count-1)", depth+1);
+            AppendLine("{", depth+1);
+            AppendLine("Util.AppendLine(\",\");", depth+2);
+            AppendLine("}", depth+1);
+            AppendLine("index++;", depth+1);
+            AppendLine("}", depth);
+            AppendLine("Util.AppendLine(string.Empty);", depth);
+            AppendLine($"Util.Append(\"]\",{depthCode});", depth);
         }
 
         /// <summary>
         /// 生成转换Json字典的代码
         /// </summary>
-        private static void AppendToJsonDictCode(Type keyType,Type valueType, string dictName, string itemName, string depthCode)
+        private static void AppendToJsonDictCode(Type keyType,Type valueType, string dictName, string itemName, string depthCode,int depth)
         {
-            AppendLine("Util.AppendLine(\"{\");", 3);
-
-            AppendLine($"foreach (var {itemName} in {dictName})", 3);
-            AppendLine("{", 3);
+            AppendLine("Util.AppendLine(\"{\");", depth);
+            AppendLine("int index = 0;", depth);
+            AppendLine($"foreach (var {itemName} in {dictName})", depth);
+            AppendLine("{", depth);
             if (keyType != typeof(int))
             {
-                AppendLine($"JsonParser.AppendJsonKey({itemName}.Key, {depthCode}+1);", 3);
+                AppendLine($"JsonParser.AppendJsonKey({itemName}.Key, {depthCode}+1);", depth+1);
             }
             else
             {
                 //处理key为int的情况
-                AppendLine($"JsonParser.AppendJsonKey({itemName}.Key.ToString(), {depthCode}+1);", 3);
+                AppendLine($"JsonParser.AppendJsonKey({itemName}.Key.ToString(), {depthCode}+1);", depth+1);
             }
            
 
             if (!valueType.IsValueType)
             {
                 //对引用类型添加null检查
-                AppendLine($"if ({itemName}.Value == null)", 3);
-                AppendLine("{", 3);
-                AppendLine("Util.Append(\"null\");", 3);
-                AppendLine("}", 3);
-                AppendLine("else", 3);
-                AppendLine("{", 3);
-                AppendToJsonValueCode(valueType, itemName + ".Value", itemName + "1", depthCode + "+1");
-                AppendLine("}", 3);
+                AppendLine($"if ({itemName}.Value == null)", depth+1);
+                AppendLine("{", depth+1);
+                AppendLine("Util.Append(\"null\");", depth+2);
+                AppendLine("}", depth+1);
+                AppendLine("else", depth+1);
+                AppendLine("{", depth+1);
+                AppendToJsonValueCode(valueType, itemName + ".Value", itemName + "1", depthCode + "+1",depth+2);
+                AppendLine("}", depth+1);
             }
             else
             {
-                AppendToJsonValueCode(valueType, itemName + ".Value", itemName + "1", depthCode + "+1");
+                AppendToJsonValueCode(valueType, itemName + ".Value", itemName + "1", depthCode + "+1",depth+1);
             }
 
-            AppendLine("Util.AppendLine(\",\");", 3);
-            AppendLine("}", 3);
-
-            AppendLine($"if ({dictName}.Count > 0)", 3);
-            AppendLine("{", 3);
-#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-            AppendLine(" Util.CachedSB.Remove(Util.CachedSB.Length - 3, 1);", 3);
-#else
-            AppendLine(" Util.CachedSB.Remove(Util.CachedSB.Length - 2, 1);", 3);
-#endif
-            AppendLine("}", 3);
-
-            AppendLine($"Util.Append(\"}}\",{depthCode});", 3);
+            AppendLine($"if (index < {dictName}.Count-1)", depth+1);
+            AppendLine("{", depth+1);
+            AppendLine("Util.AppendLine(\",\");", depth+2);
+            AppendLine("}", depth+1);
+            AppendLine("index++;", depth+1);
+            AppendLine("}", depth);
+            AppendLine("Util.AppendLine(string.Empty);", depth);
+            AppendLine($"Util.Append(\"}}\",{depthCode});", depth);
         }
     }
 

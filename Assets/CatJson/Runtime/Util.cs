@@ -8,9 +8,19 @@ namespace CatJson
     public static class Util
     {
         public static StringBuilder CachedSB = new StringBuilder();
+        public static bool IsFormat { get; set; }
+
+        static Util()
+        {
+            IsFormat = true;
+        }
 
         public static void AppendTab(int tabNum)
         {
+            if (!IsFormat)
+            {
+                return;
+            }
             for (int i = 0; i < tabNum; i++)
             {
                 CachedSB.Append("\t");
@@ -19,7 +29,7 @@ namespace CatJson
 
         public static void Append(string str,int tabNum = 0)
         {
-            if (tabNum > 0)
+            if (tabNum > 0 && IsFormat)
             {
                 AppendTab(tabNum);
             }
@@ -29,12 +39,19 @@ namespace CatJson
 
         public static void AppendLine(string str, int tabNum = 0)
         {
-            if (tabNum > 0)
+            if (tabNum > 0 && IsFormat)
             {
                 AppendTab(tabNum);
             }
 
-            CachedSB.AppendLine(str);
+            if (IsFormat)
+            {
+                CachedSB.AppendLine(str);
+            }
+            else
+            {
+                CachedSB.Append(str);
+            }
         }
 
         /// <summary>
