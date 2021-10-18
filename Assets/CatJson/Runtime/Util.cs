@@ -67,7 +67,9 @@ namespace CatJson
         /// </summary>
         public static bool IsNumberType(Type type)
         {
-            return type == typeof(byte) || type == typeof(int) || type == typeof(long) || type == typeof(float) || type == typeof(double);
+            return type == typeof(byte) || type == typeof(int) || type == typeof(long) || type == typeof(float) || type == typeof(double)
+            ||type == typeof(uint)||type == typeof(ulong)||type == typeof(ushort)||type == typeof(short) ||type == typeof(decimal)
+            ||type == typeof(sbyte);
         }
 
         /// <summary>
@@ -75,7 +77,9 @@ namespace CatJson
         /// </summary>
         public static bool IsNumber(object obj)
         {
-            return obj is byte || obj is int || obj is long || obj is float || obj is double;
+            return obj is byte || obj is int || obj is long || obj is float || obj is double
+                   ||obj is uint||obj is ulong ||obj is ushort ||obj is short ||obj is decimal 
+                   ||obj is sbyte ;
         }
 
         /// <summary>
@@ -148,16 +152,41 @@ namespace CatJson
             }
             if (value is float f)
             {
-                return f == default;
+                return Math.Abs(f - default(float)) < 1e-6f;
             }
             if (value is double d)
             {
-                return d == default;
+                return Math.Abs(d - default(double)) < 1e-15;
             }
 
             if (value is bool boolean)
             {
                 return boolean == default;
+            }
+            
+            if (value is sbyte sb)
+            {
+                return sb == default;
+            }
+            if (value is short s)
+            {
+                return s == default;
+            }
+            if (value is uint ui)
+            {
+                return ui == default;
+            }
+            if (value is ulong ul)
+            {
+                return ul == default;
+            }
+            if (value is ushort us)
+            {
+                return us == default;
+            }
+            if (value is decimal de)
+            {
+                return de == default;
             }
 
 

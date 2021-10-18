@@ -143,7 +143,7 @@ namespace CatJson
         /// <summary>
         /// 追加Json 值文本
         /// </summary>
-        private static void AppendJsonValue(Type valueType, object value, int depth)
+        public static void AppendJsonValue(Type valueType, object value, int depth)
         {
             valueType = CheckType(valueType);
 
@@ -353,6 +353,36 @@ namespace CatJson
         }
 
         public static void AppendJsonValue(double d, int depth = 0)
+        {
+            Util.Append(d.ToString(CultureInfo.InvariantCulture), depth);
+        }
+
+        public static void AppendJsonValue(sbyte s, int depth = 0)
+        {
+            Util.Append(s.ToString(), depth);
+        }
+
+        public static void AppendJsonValue(short s, int depth = 0)
+        {
+            Util.Append(s.ToString(), depth);
+        }
+
+        public static void AppendJsonValue(uint ui, int depth = 0)
+        {
+            Util.Append(ui.ToString(), depth);
+        }
+
+        public static void AppendJsonValue(ulong ul, int depth = 0)
+        {
+            Util.Append(ul.ToString(), depth);
+        }
+
+        public static void AppendJsonValue(ushort us, int depth = 0)
+        {
+            Util.Append(us.ToString(), depth);
+        }
+
+        public static void AppendJsonValue(decimal d, int depth = 0)
         {
             Util.Append(d.ToString(CultureInfo.InvariantCulture), depth);
         }

@@ -113,6 +113,32 @@ namespace CatJson
                     {
                         return double.Parse(str);
                     }
+                    
+                    if (realType == typeof(sbyte))
+                    {
+                        return sbyte.Parse(str);
+                    }
+                    if (realType == typeof(short))
+                    {
+                        return short.Parse(str);
+                    }
+                    if (realType == typeof(uint))
+                    {
+                        return uint.Parse(str);
+                    }
+                    if (realType == typeof(ulong))
+                    {
+                        return ulong.Parse(str);
+                    }
+                    if (realType == typeof(ushort))
+                    {
+                        return ushort.Parse(str);
+                    }
+                    if (realType == typeof(decimal))
+                    {
+                        return decimal.Parse(str);
+                    }
+                    
 #if FUCK_LUA
                     if (type is ILRuntimeType ilrtType && ilrtType.ILType.IsEnum)
                     {
@@ -311,7 +337,6 @@ namespace CatJson
                 object value = ParseJsonValueByType(nextTokenType, t);
                 if (!isIntKey)
                 {
-                    
                     ((IDictionary)userdata1).Add(key.ToString(), value);
                 }
                 else

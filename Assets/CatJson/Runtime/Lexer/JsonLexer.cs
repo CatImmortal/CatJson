@@ -247,7 +247,26 @@ namespace CatJson
                
                 Next();
             }
+            // 字符串中有转义\" 的需要继续
+            bool isNeedBack = false;
+            if (json[curIndex-1] == '\\')
+            {
+                int index = 2;
+                while (curIndex-index!=0 && json[curIndex-index]=='\\' )
+                {
+                    index++;
+                }
+                if (index%2==0)
+                {
+                    ScanString();
+                    isNeedBack = true;
+                }
+            }
 
+            if (isNeedBack)
+            {
+                Next(-1);
+            }
             int endIndex = curIndex - 1;
 
             if (curIndex >= json.Length)
