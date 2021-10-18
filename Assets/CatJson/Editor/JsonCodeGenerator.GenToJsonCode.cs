@@ -53,8 +53,10 @@ namespace CatJson.Editor
             JsonParser.IgnoreSet.TryGetValue(type, out HashSet<string> set);
 
             //处理属性
-            foreach (PropertyInfo pi in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            PropertyInfo[] propertyInfos = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            for (var i = 0; i < propertyInfos.Length; i++)
             {
+                PropertyInfo pi = propertyInfos[i];
                 if (pi.GetCustomAttribute<JsonIgnoreAttribute>() != null)
                 {
                     //忽略
@@ -70,16 +72,24 @@ namespace CatJson.Editor
                 //属性必须同时具有get set 并且不能是索引器item
                 if (pi.SetMethod != null && pi.GetMethod != null && pi.Name != "Item")
                 {
-
                     AppendToJsonCodeBySingle(pi.PropertyType, pi.Name);
-
                 }
-
             }
 
-            //处理字段
-            foreach (FieldInfo fi in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
+            if (propertyInfos.Length > 0)
             {
+                int commaIndex = sb.ToString().LastIndexOf("Util.AppendLine(\",\");", StringComparison.Ordinal);
+                if (commaIndex!=-1)
+                {
+                    sb.Remove(commaIndex, 21);
+                }
+            }
+           
+            //处理字段
+            FieldInfo[] fieldInfos = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
+            for (var i = 0; i < fieldInfos.Length; i++)
+            {
+                FieldInfo fi = fieldInfos[i];
                 if (fi.GetCustomAttribute<JsonIgnoreAttribute>() != null)
                 {
                     //忽略
@@ -93,9 +103,15 @@ namespace CatJson.Editor
                 }
 
                 AppendToJsonCodeBySingle(fi.FieldType, fi.Name);
-
             }
-
+            if (fieldInfos.Length > 0)
+            {
+                int commaIndex = sb.ToString().LastIndexOf("Util.AppendLine(\",\");", StringComparison.Ordinal);
+                if (commaIndex!=-1)
+                {
+                    sb.Remove(commaIndex, 21);
+                }
+            }
             string result = sb.ToString();
             sb.Clear();
 
@@ -187,7 +203,7 @@ namespace CatJson.Editor
             else if (JsonCodeGenConfig.UseExtensionFuncTypes.Contains(valueType))
             {
                 //其他类型 使用JsonParser.Extension里的扩展
-                AppendLine($"JsonParser.AppendJsonValue(typeof({valueType.FullName}),{valueName})", depth);
+                AppendLine($"JsonParser.AppendJsonValue(typeof({valueType.FullName}),{valueName},depth + 1);", depth);
             }
             else
             {
@@ -223,7 +239,14 @@ namespace CatJson.Editor
                 AppendToJsonValueCode(elementType, itemName, itemName + "1", depthCode + "+1",depth+1);
             }
 
-            AppendLine($"if (index < {arrayName}.Count-1)", depth+1);
+            if (arrayType.IsGenericType && arrayType.GetGenericTypeDefinition() == typeof(List<>))
+            {
+                AppendLine($"if (index < {arrayName}.Count-1)", depth+1);
+            }
+            else
+            {
+                AppendLine($"if (index < {arrayName}.Length-1)", depth+1);
+            }
             AppendLine("{", depth+1);
             AppendLine("Util.AppendLine(\",\");", depth+2);
             AppendLine("}", depth+1);
