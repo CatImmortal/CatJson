@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 #if FUCK_LUA
 using ILRuntime.Reflection;
@@ -348,12 +349,12 @@ namespace CatJson
 
         public static void AppendJsonValue(float f, int depth = 0)
         {
-            Util.Append(f.ToString(), depth);
+            Util.Append(f.ToString(CultureInfo.InvariantCulture), depth);
         }
 
         public static void AppendJsonValue(double d, int depth = 0)
         {
-            Util.Append(d.ToString(), depth);
+            Util.Append(d.ToString(CultureInfo.InvariantCulture), depth);
         }
     }
 }

@@ -109,13 +109,13 @@ namespace CatJson.Editor
         {
             //是否有 != 运算符可以调用
             bool hasOpInequality = false;
-            if (!type.IsValueType)
+            if (!type.IsValueType || type.IsPrimitive)
             {
                 hasOpInequality = true;
             }
             else
             {
-                //值类型要检查所有静态方法
+                //自定义值类型要检查所有静态方法
                 MethodInfo[] mis = type.GetMethods(BindingFlags.Public | BindingFlags.Static);
                 foreach (MethodInfo mi in mis)
                 {
@@ -131,7 +131,18 @@ namespace CatJson.Editor
 
             if (hasOpInequality)
             {
-                AppendLine($"if (data.{name} != default)", 3);
+                if (type == typeof(float))
+                {
+                    AppendLine($"if (Math.Abs(data.{name} - default(float)) > 1E-6f)", 3);
+                }
+                else if (type == typeof(double))
+                {
+                    AppendLine($"if (Math.Abs(data.{name} - default(double)) > 1E-15)", 3);
+                }
+                else
+                {
+                    AppendLine($"if (data.{name} != default)", 3);
+                }
                 AppendLine("{", 3);
                 AppendLine($"JsonParser.AppendJsonKey(\"{name}\", depth + 1);", 4);
                 AppendToJsonValueCode(type, $"data.{name}",depth:4);

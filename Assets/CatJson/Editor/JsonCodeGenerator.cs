@@ -141,7 +141,14 @@ namespace CatJson.Editor
 
             foreach (Type type in GenRootTypes)
             {
-                AppendLine($"GenJsonCodes.ParseJsonCodeFuncDict.Add(typeof({type.FullName}),{GetParseJsonCodeMethodName(type)});", 3);
+                if (type.IsValueType && !type.IsPrimitive)
+                {
+                    AppendLine($"GenJsonCodes.ParseJsonCodeFuncDict.Add(typeof({type.FullName}),()=>{GetParseJsonCodeMethodName(type)}());", 3);
+                }
+                else
+                {
+                    AppendLine($"GenJsonCodes.ParseJsonCodeFuncDict.Add(typeof({type.FullName}),{GetParseJsonCodeMethodName(type)});", 3);
+                }
                 AppendLine($"GenJsonCodes.ToJsonCodeFuncDict.Add(typeof({type.FullName}), {GetToJsonCodeMethodName(type)});", 3);
             }
 
