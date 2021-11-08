@@ -33,7 +33,22 @@ namespace CatJson
             if (reflection)
             {
                 //反射转换
-                AppendJsonObject(obj, type, 0);
+
+                if (Util.IsArrayOrList(obj))
+                {
+                    //数组或list
+                    AppendJsonArray(type, obj, 0);
+                }
+                else if (Util.IsDictionary(obj))
+                {
+                    //字典
+                    AppendJsonDict(obj, 0);
+                }
+                else
+                {
+                    //自定义类
+                    AppendJsonObject(obj, type, 0);
+                }
             }
             else
             {
@@ -118,16 +133,6 @@ namespace CatJson
             Util.AppendLine(string.Empty);
             Util.Append("}",depth);
         }
-
-        // /// <summary>
-        // /// 追加单个Json 键值对文本
-        // /// </summary>
-        // private static void AppendJsonKeyValue(Type valueType, string name, object value, int depth)
-        // {
-        //     AppendJsonKey(name, depth);
-        //     AppendJsonValue(valueType, value, depth);
-        //     Util.AppendLine(",");
-        // }
 
         /// <summary>
         /// 追加json key文本

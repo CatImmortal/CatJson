@@ -33,7 +33,19 @@ namespace CatJson
             if (reflection)
             {
                 //使用反射解析
-                result = ParseJsonObjectByType(type);
+
+                if (Util.IsArrayOrListType(type) || Util.IsDictionaryType(type))
+                {
+                    //数组或list或字典
+                    TokenType nextTokenType = Lexer.LookNextTokenType();
+                    result = ParseJsonValueByType(nextTokenType, type);
+
+                }
+                else
+                {
+                    //数据类
+                    result = ParseJsonObjectByType(type);
+                }
             }
             else
             {
@@ -238,7 +250,7 @@ namespace CatJson
         }
 
         /// <summary>
-        /// 解析json对象为指定类型的对象实例
+        /// 解析json对象为指定类型的数据类实例
         /// </summary>
         public static object ParseJsonObjectByType(Type type)
         {
@@ -298,6 +310,7 @@ namespace CatJson
                 //List<T>
                 list = (IList)Activator.CreateInstance(arrayType);
             }
+
             ParseJsonArrayProcedure(list, elementType, (userdata1, userdata2, nextTokenType) =>
             {
                 object value = ParseJsonValueByType(nextTokenType, (Type)userdata2);
@@ -326,7 +339,7 @@ namespace CatJson
         }
 
         /// <summary>
-        /// 解析json对象为字典，key为string类型
+        /// 解析json对象为字典，key为string或int类型
         /// </summary>
         private static object ParseJsonObjectByDict(Type dictType, Type valueType)
         {

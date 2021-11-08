@@ -199,7 +199,7 @@ namespace CatJson
         }
 
         /// <summary>
-        /// 检查Type,，如果是热更层的需要进行转换
+        /// 检查Type,如果是热更层的需要进行转换
         /// </summary>
         private static Type CheckType(Type type)
         {
