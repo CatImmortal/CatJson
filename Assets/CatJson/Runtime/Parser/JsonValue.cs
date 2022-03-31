@@ -92,8 +92,6 @@ namespace CatJson
                 case ValueType.Object:
                     Obj.ToJson(depth);
                     break;
-                default:
-                    break;
             }
         }
     }

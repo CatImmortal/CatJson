@@ -50,6 +50,11 @@ namespace CatJson
         public static Dictionary<Type, HashSet<string>> IgnoreSet = new Dictionary<Type, HashSet<string>>();
 
         /// <summary>
+        /// 序列化时是否开启格式化
+        /// </summary>
+        public static bool IsFormat { get; set; } = true;
+        
+        /// <summary>
         /// 解析Json对象的通用流程
         /// </summary>
         public static void ParseJsonObjectProcedure(object userdata1,object userdata2,bool isIntKey,Action<object,object,bool,RangeString, TokenType> action)

@@ -79,11 +79,13 @@ namespace CatJson
                 AddToReflectionMap(type);
             }
 
+            //是否需要删除最后一个逗号
+            bool needRemoveLastComma = false;
+            
             Util.AppendLine("{");
             propertyInfoDict.TryGetValue(type, out Dictionary<RangeString, PropertyInfo> piDict);
             if (piDict != null)
             {
-                int index = 0;
                 foreach (KeyValuePair<RangeString, PropertyInfo> item in piDict)
                 {
                     object value = item.Value.GetValue(obj);
@@ -98,19 +100,14 @@ namespace CatJson
 
                     AppendJsonKey(piName, depth+1);
                     AppendJsonValue(piType, value, depth+1);
-                    if (index < piDict.Count-1)
-                    {
-                        Util.AppendLine(",");
-                    }
-
-                    index++;
+                    Util.AppendLine(",");
+                    needRemoveLastComma = true;
                 }
             }
 
             fieldInfoDict.TryGetValue(type, out Dictionary<RangeString, FieldInfo> fiDict);
             if (fiDict != null)
             {
-                int index = 0;
                 foreach (KeyValuePair<RangeString, FieldInfo> item in fiDict)
                 {
                     object value = item.Value.GetValue(obj);
@@ -123,13 +120,28 @@ namespace CatJson
                     }
                     AppendJsonKey(fiName, depth+1);
                     AppendJsonValue(fiType, value, depth+1);
-                    if (index < fiDict.Count-1)
-                    {
-                        Util.AppendLine(",");
-                    }
-                    index++;
+                    Util.AppendLine(",");
+                    needRemoveLastComma = true;
                 }
             }
+
+            if (needRemoveLastComma)
+            {
+
+                //需要删除的字符长度
+                int needRemoveLength = 1;
+                if (IsFormat)
+                {
+                    //开启了格式化序列化，需要额外删除一个换行符
+                    needRemoveLength += Util.NewLineLength;
+                }
+
+                //最后一个逗号的位置
+                int lastCommaIndex = Util.CachedSB.Length - needRemoveLength;
+                
+                Util.CachedSB.Remove(lastCommaIndex, needRemoveLength);
+            }
+            
             Util.AppendLine(string.Empty);
             Util.Append("}",depth);
         }

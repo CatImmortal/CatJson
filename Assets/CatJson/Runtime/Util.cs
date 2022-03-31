@@ -8,16 +8,16 @@ namespace CatJson
     public static class Util
     {
         public static StringBuilder CachedSB = new StringBuilder();
-        public static bool IsFormat { get; set; }
 
-        static Util()
-        {
-            IsFormat = true;
-        }
+        /// <summary>
+        /// 当前平台的换行符长度
+        /// </summary>
+        public static int NewLineLength => Environment.NewLine.Length;
+
 
         public static void AppendTab(int tabNum)
         {
-            if (!IsFormat)
+            if (!JsonParser.IsFormat)
             {
                 return;
             }
@@ -29,7 +29,7 @@ namespace CatJson
 
         public static void Append(string str,int tabNum = 0)
         {
-            if (tabNum > 0 && IsFormat)
+            if (tabNum > 0 && JsonParser.IsFormat)
             {
                 AppendTab(tabNum);
             }
@@ -39,12 +39,12 @@ namespace CatJson
 
         public static void AppendLine(string str, int tabNum = 0)
         {
-            if (tabNum > 0 && IsFormat)
+            if (tabNum > 0 && JsonParser.IsFormat)
             {
                 AppendTab(tabNum);
             }
 
-            if (IsFormat)
+            if (JsonParser.IsFormat)
             {
                 CachedSB.AppendLine(str);
             }
@@ -63,7 +63,7 @@ namespace CatJson
         }
 
         /// <summary>
-        /// type是否为数字类型(byte int long float double)
+        /// type是否为数字类型
         /// </summary>
         public static bool IsNumberType(Type type)
         {
@@ -73,7 +73,7 @@ namespace CatJson
         }
 
         /// <summary>
-        /// obj是否为数字（byte int long float double)
+        /// obj是否为数字
         /// </summary>
         public static bool IsNumber(object obj)
         {
@@ -91,7 +91,7 @@ namespace CatJson
         }
 
         /// <summary>
-        /// type是否为array或list的type
+        /// type是否为数组或List类型
         /// </summary>
         public static bool IsArrayOrListType(Type type)
         {
@@ -107,7 +107,7 @@ namespace CatJson
         }
 
         /// <summary>
-        /// type是否为字典的type
+        /// type是否为字典类型
         /// </summary>
         public static bool IsDictionaryType(Type type)
         {
@@ -188,11 +188,8 @@ namespace CatJson
             {
                 return de == default;
             }
-
-
-
+            
             return false;
-
         }
 
         /// <summary>
