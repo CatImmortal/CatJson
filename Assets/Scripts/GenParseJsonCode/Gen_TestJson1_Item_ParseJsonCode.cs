@@ -23,16 +23,16 @@ namespace CatJson
                 
 				if (key.Equals(new RangeString("b")))
 				{
-				JsonParser.Lexer.GetNextToken(out tokenType);
-				temp.b = tokenType == TokenType.True;
+					JsonParser.Lexer.GetNextToken(out tokenType);
+					temp.b = tokenType == TokenType.True;
 				}
 				else if (key.Equals(new RangeString("num")))
 				{
-				temp.num = System.Single.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
+					temp.num = System.Single.Parse(JsonParser.Lexer.GetNextToken(out tokenType).ToString());
 				}
 				else if (key.Equals(new RangeString("str")))
 				{
-				temp.str = JsonParser.Lexer.GetNextToken(out tokenType).ToString();
+					temp.str = JsonParser.Lexer.GetNextToken(out tokenType).ToString();
 				}
 
                 else{
