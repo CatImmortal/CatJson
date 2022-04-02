@@ -53,7 +53,10 @@ namespace CatJson
         /// 序列化时是否开启格式化
         /// </summary>
         public static bool IsFormat { get; set; } = true;
-        
+
+#if FUCK_LUA
+        private static ILRuntime.Runtime.Enviorment.AppDomain s_AppDomain;
+#endif
         /// <summary>
         /// 解析Json对象的通用流程
         /// </summary>
@@ -251,8 +254,9 @@ namespace CatJson
             return Activator.CreateInstance(type);
         }
 #if FUCK_LUA
- public unsafe static void RegisterILRuntimeCLRRedirection(ILRuntime.Runtime.Enviorment.AppDomain appdomain)
-        {
+         public unsafe static void RegisterILRuntimeCLRRedirection(ILRuntime.Runtime.Enviorment.AppDomain appdomain)
+         {
+             s_AppDomain = appdomain;
             foreach (MethodInfo mi in typeof(JsonParser).GetMethods())
             {
                 if (mi.Name == "ParseJson" && mi.IsGenericMethodDefinition)

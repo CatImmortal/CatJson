@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 #if FUCK_LUA
+using ILRuntime.CLR.TypeSystem;
 using ILRuntime.Reflection;
+using ILRuntime.Runtime.Intepreter;
 #endif
 
 namespace CatJson
@@ -83,6 +85,38 @@ namespace CatJson
             bool needRemoveLastComma = false;
             
             Util.AppendLine("{");
+#if FUCK_LUA
+            if (obj is ILTypeInstance ilTypeInstance )
+            {
+                if (ilTypeInstance.Type.ReflectionType != type)
+                {
+                    AppendJsonKey("RealType", depth+1);
+                    AppendJsonValue($"{ilTypeInstance.Type.FullName}");
+                    Util.AppendLine(",");
+                    needRemoveLastComma = true;
+                }
+            }
+            else
+            {
+                if (obj.GetType() != type)
+                {
+                    AppendJsonKey("RealType", depth+1);
+                    AppendJsonValue($"{obj.GetType().FullName},{obj.GetType().Assembly.GetName().Name}");
+                    Util.AppendLine(",");
+                    needRemoveLastComma = true;
+                }
+            }
+          
+#else
+            if (obj.GetType() != type)
+            {
+                AppendJsonKey("RealType", depth+1);
+                AppendJsonValue($"{obj.GetType().FullName},{obj.GetType().Assembly.GetName().Name}");
+                Util.AppendLine(",");
+                needRemoveLastComma = true;
+            }
+#endif
+
             propertyInfoDict.TryGetValue(type, out Dictionary<RangeString, PropertyInfo> piDict);
             if (piDict != null)
             {
