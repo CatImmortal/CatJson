@@ -28,6 +28,14 @@ namespace CatJson
             curIndex = 0;
             hasNextTokenCache = false;
         }
+        public string GetJsonText()
+        {
+            return json;
+        }
+        public int GetCurrentIndex()
+        {
+            return curIndex;
+        }
 
         /// <summary>
         /// 查看下一个token的类型
@@ -282,6 +290,12 @@ namespace CatJson
             RangeString rs = new RangeString(json, startIndex, endIndex);
 
             return rs;
+        }
+
+        public void Reset(int index = 0, bool hasNext = false)
+        {
+            curIndex = index;
+            hasNextTokenCache = hasNext;
         }
     }
 

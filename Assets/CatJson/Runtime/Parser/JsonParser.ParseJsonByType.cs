@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 #if FUCK_LUA
@@ -262,15 +263,52 @@ namespace CatJson
                 AddToReflectionMap(type);
             }
 
-            ParseJsonObjectProcedure(obj, type,false, (userdata1, userdata2,isIntKey, key, nextTokenType) => {
-
-                Type t = (Type)userdata2;
+            ParseJsonObjectProcedure(obj, type, false, (userdata1, userdata2, isIntKey, key, nextTokenType) =>
+            {
+                Type t = (Type) userdata2;
 
                 propertyInfoDict.TryGetValue(t, out Dictionary<RangeString, PropertyInfo> dict1);
                 if (dict1 != null && dict1.TryGetValue(key, out PropertyInfo pi))
                 {
+                    Type realType = pi.PropertyType;
+
+                    if (pi.PropertyType.IsClass && pi.PropertyType!= typeof(string))
+                    {
+                        int currentIndex = Lexer.GetCurrentIndex();
+                        RangeString rs = Lexer.GetNextToken(out TokenType token);
+                        while (token != TokenType.Eof)
+                        {
+                            if (token == TokenType.String && rs.ToString() == "RealType")
+                            {
+                                currentIndex = Lexer.GetJsonText().LastIndexOf('{', Lexer.GetCurrentIndex());
+                                rs = Lexer.GetNextToken(out token);
+                                while (token != TokenType.String)
+                                {
+                                    rs = Lexer.GetNextToken(out token);
+                                }
+#if FUCK_LUA
+                                if (realType is ILRuntimeType)
+                                {
+                                    realType = s_AppDomain.GetType(rs.ToString()).ReflectionType;
+                                }
+                                else
+                                {
+                                    realType = Type.GetType(rs.ToString());
+                                }
+#else
+                                realType = Type.GetType(rs.ToString());
+#endif
+                              
+                                break;
+                            }
+                            rs = Lexer.GetNextToken(out token);
+                        }
+
+                        Lexer.Reset(currentIndex,realType == pi.PropertyType);
+                    }
+
                     //先尝试获取名为key的属性
-                    object value = ParseJsonValueByType(nextTokenType, pi.PropertyType);
+                    object value = ParseJsonValueByType(nextTokenType, realType);
                     pi.SetValue(userdata1, value);
                 }
                 else
