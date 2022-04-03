@@ -73,7 +73,7 @@ namespace CatJson
         /// <summary>
         /// 追加Json数据类对象文本
         /// </summary>
-        private static void AppendJsonObject(object obj, Type type, int depth)
+        private static void AppendJsonObject(object obj, Type type, int depth, bool isPolymorphic = false)
         {
             if (!propertyInfoDict.ContainsKey(type) && !fieldInfoDict.ContainsKey(type))
             {
@@ -85,38 +85,18 @@ namespace CatJson
             bool needRemoveLastComma = false;
             
             Util.AppendLine("{");
-#if FUCK_LUA
-            if (obj is ILTypeInstance ilTypeInstance )
+
+            //处理多态序列化
+            if (isPolymorphic)
             {
-                if (ilTypeInstance.Type.ReflectionType != type)
-                {
-                    AppendJsonKey("RealType", depth+1);
-                    AppendJsonValue($"{ilTypeInstance.Type.FullName}");
-                    Util.AppendLine(",");
-                    needRemoveLastComma = true;
-                }
-            }
-            else
-            {
-                if (obj.GetType() != type)
-                {
-                    AppendJsonKey("RealType", depth+1);
-                    AppendJsonValue($"{obj.GetType().FullName},{obj.GetType().Assembly.GetName().Name}");
-                    Util.AppendLine(",");
-                    needRemoveLastComma = true;
-                }
-            }
-          
-#else
-            if (obj.GetType() != type)
-            {
-                AppendJsonKey("RealType", depth+1);
-                AppendJsonValue($"{obj.GetType().FullName},{obj.GetType().Assembly.GetName().Name}");
+               
+                AppendJsonKey(RealTypeKey, depth + 1);
+                AppendJsonValue(GetRealTypeJsonValue(type));
                 Util.AppendLine(",");
                 needRemoveLastComma = true;
             }
-#endif
 
+            //序列化属性
             propertyInfoDict.TryGetValue(type, out Dictionary<RangeString, PropertyInfo> piDict);
             if (piDict != null)
             {
@@ -124,6 +104,7 @@ namespace CatJson
                 {
                     object value = item.Value.GetValue(obj);
                     Type piType = item.Value.PropertyType;
+                    Type realType = GetType(value);
                     string piName = item.Value.Name;
 
                     if (Util.IsDefaultValue(value))
@@ -132,13 +113,14 @@ namespace CatJson
                         continue;
                     }
 
-                    AppendJsonKey(piName, depth+1);
-                    AppendJsonValue(piType, value, depth+1);
+                    AppendJsonKey(piName, depth + 1);
+                    AppendJsonValue(realType, value, depth + 1, piType != realType);
                     Util.AppendLine(",");
                     needRemoveLastComma = true;
                 }
             }
 
+            //序列化字段
             fieldInfoDict.TryGetValue(type, out Dictionary<RangeString, FieldInfo> fiDict);
             if (fiDict != null)
             {
@@ -146,14 +128,15 @@ namespace CatJson
                 {
                     object value = item.Value.GetValue(obj);
                     Type fiType = item.Value.FieldType;
+                    Type realType = GetType(value);
                     string fiName = item.Value.Name;
                     if (Util.IsDefaultValue(value))
                     {
                         //默认值跳过序列化
                         continue;
                     }
-                    AppendJsonKey(fiName, depth+1);
-                    AppendJsonValue(fiType, value, depth+1);
+                    AppendJsonKey(fiName, depth + 1);
+                    AppendJsonValue(realType, value, depth + 1, fiType != realType);
                     Util.AppendLine(",");
                     needRemoveLastComma = true;
                 }
@@ -161,7 +144,8 @@ namespace CatJson
 
             if (needRemoveLastComma)
             {
-
+                //删除末尾多出来的逗号
+                
                 //需要删除的字符长度
                 int needRemoveLength = 1;
                 if (IsFormat)
@@ -192,9 +176,9 @@ namespace CatJson
         }
 
         /// <summary>
-        /// 追加Json 值文本
+        /// 追加Json值文本
         /// </summary>
-        public static void AppendJsonValue(Type valueType, object value, int depth)
+        public static void AppendJsonValue(Type valueType, object value, int depth, bool isPolymorphic = false)
         {
             valueType = CheckType(valueType);
 
@@ -262,7 +246,7 @@ namespace CatJson
             }
 
             //自定义类对象
-            AppendJsonObject(value, valueType, depth);
+            AppendJsonObject(value, valueType, depth, isPolymorphic);
         }
 
         /// <summary>
@@ -287,7 +271,7 @@ namespace CatJson
                     {
                         AppendJsonValue(GetType(element), element, depth+1);
                     }
-                    if (i< array.Length-1)
+                    if (i < array.Length-1)
                     {
                         Util.AppendLine(",");
                     }
@@ -310,7 +294,7 @@ namespace CatJson
                         AppendJsonValue(GetType(element), element, depth + 1);
                     }
 
-                    if (i< list.Count-1)
+                    if (i < list.Count-1)
                     {
                         Util.AppendLine(",");
                     }
@@ -341,7 +325,7 @@ namespace CatJson
                 }
                 else
                 {
-                    AppendJsonKey(enumerator.Key.ToString(), depth+1);
+                    AppendJsonKey(enumerator.Key.ToString(), depth + 1);
                     AppendJsonValue(GetType(enumerator.Value), enumerator.Value, depth+1);
                     if (index < dict.Count-1)
                     {

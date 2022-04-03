@@ -54,6 +54,11 @@ namespace CatJson
         /// </summary>
         public static bool IsFormat { get; set; } = true;
 
+        /// <summary>
+        /// 真实类型key
+        /// </summary>
+        private const string RealTypeKey = "<>RealType";
+
 #if FUCK_LUA
         private static ILRuntime.Runtime.Enviorment.AppDomain s_AppDomain;
 #endif
@@ -253,6 +258,18 @@ namespace CatJson
 
             return Activator.CreateInstance(type);
         }
+
+        /// <summary>
+        /// 获取用于多态序列化的真实类型的json value字符串
+        /// </summary>
+        private static string GetRealTypeJsonValue(Type type)
+        {
+#if FUCK_LUA
+             return $"{ilrtType.FullName}";
+#endif
+            return $"{type.FullName},{type.Assembly.GetName().Name}";
+        }
+        
 #if FUCK_LUA
          public unsafe static void RegisterILRuntimeCLRRedirection(ILRuntime.Runtime.Enviorment.AppDomain appdomain)
          {
