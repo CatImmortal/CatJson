@@ -16,7 +16,7 @@ namespace CatJson
         private TokenType nextTokenType;
         private RangeString nextToken;
 
-        public static StringBuilder sb = new StringBuilder();
+        private static StringBuilder cachedSB = new StringBuilder();
 
 
         /// <summary>
@@ -28,11 +28,8 @@ namespace CatJson
             curIndex = 0;
             hasNextTokenCache = false;
         }
-        public string GetJsonText()
-        {
-            return json;
-        }
-        public int GetCurrentIndex()
+
+        public int GetCurIndex()
         {
             return curIndex;
         }
@@ -220,7 +217,7 @@ namespace CatJson
         private string ScanNumber()
         {
             //第一个字符是0-9或者-
-            sb.Append(json[curIndex]);
+            cachedSB.Append(json[curIndex]);
             Next();
 
             while (
@@ -229,12 +226,12 @@ namespace CatJson
                 char.IsDigit(json[curIndex]) || json[curIndex] == '.' || json[curIndex] == '+'|| json[curIndex] == '-'|| json[curIndex] == 'e'|| json[curIndex] == 'E')
                 )
             {
-                sb.Append(json[curIndex]);
+                cachedSB.Append(json[curIndex]);
                 Next();
             }
 
-            string result = sb.ToString();
-            sb.Clear();
+            string result = cachedSB.ToString();
+            cachedSB.Clear();
 
             return result;
         }
@@ -292,7 +289,10 @@ namespace CatJson
             return rs;
         }
 
-        public void Reset(int index = 0, bool hasNext = false)
+        /// <summary>
+        /// 设置当前索引
+        /// </summary>
+        public void SetCurIndex(int index = 0, bool hasNext = false)
         {
             curIndex = index;
             hasNextTokenCache = hasNext;

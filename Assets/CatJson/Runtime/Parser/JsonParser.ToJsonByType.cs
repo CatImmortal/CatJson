@@ -75,6 +75,8 @@ namespace CatJson
         /// </summary>
         private static void AppendJsonObject(object obj, Type type, int depth, bool isPolymorphic = false)
         {
+            //保证了传入的type参数一定是真实类型，所以可以直接使用它的反射信息
+            
             if (!propertyInfoDict.ContainsKey(type) && !fieldInfoDict.ContainsKey(type))
             {
                 //初始化反射信息
@@ -89,7 +91,6 @@ namespace CatJson
             //处理多态序列化
             if (isPolymorphic)
             {
-               
                 AppendJsonKey(RealTypeKey, depth + 1);
                 AppendJsonValue(GetRealTypeJsonValue(type));
                 Util.AppendLine(",");

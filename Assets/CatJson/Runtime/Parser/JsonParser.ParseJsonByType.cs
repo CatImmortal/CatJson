@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEngine;
 
 #if FUCK_LUA
 using ILRuntime.CLR.Utils;
@@ -212,10 +213,10 @@ namespace CatJson
 #endif
                             {
                                 elementType = type.GenericTypeArguments[0];
+
                             }
 
                         }
-
                         return ParseJsonArrayByType(type,elementType);
                     }
 
@@ -255,6 +256,7 @@ namespace CatJson
         /// </summary>
         public static object ParseJsonObjectByType(Type type)
         {
+            //保证了传入的type参数一定是真实类型，，所以可以直接使用它来创建对象实例以及使用它的反射信息
             object obj = CreateInstance(type);
 
             if (!propertyInfoDict.ContainsKey(type) && !fieldInfoDict.ContainsKey(type))
@@ -265,59 +267,25 @@ namespace CatJson
 
             ParseJsonObjectProcedure(obj, type, false, (userdata1, userdata2, isIntKey, key, nextTokenType) =>
             {
-                Type t = (Type) userdata2;
+                object parentObj = userdata1;
+                Type parentType = (Type) userdata2;
 
-                propertyInfoDict.TryGetValue(t, out Dictionary<RangeString, PropertyInfo> dict1);
+                propertyInfoDict.TryGetValue(parentType, out Dictionary<RangeString, PropertyInfo> dict1);
                 if (dict1 != null && dict1.TryGetValue(key, out PropertyInfo pi))
                 {
-                    Type realType = pi.PropertyType;
-
-                    if (pi.PropertyType.IsClass && pi.PropertyType!= typeof(string))
-                    {
-                        int currentIndex = Lexer.GetCurrentIndex();
-                        RangeString rs = Lexer.GetNextToken(out TokenType token);
-                        while (token != TokenType.Eof)
-                        {
-                            if (token == TokenType.String && rs.ToString() == "RealType")
-                            {
-                                currentIndex = Lexer.GetJsonText().LastIndexOf('{', Lexer.GetCurrentIndex());
-                                rs = Lexer.GetNextToken(out token);
-                                while (token != TokenType.String)
-                                {
-                                    rs = Lexer.GetNextToken(out token);
-                                }
-#if FUCK_LUA
-                                if (realType is ILRuntimeType)
-                                {
-                                    realType = s_AppDomain.GetType(rs.ToString()).ReflectionType;
-                                }
-                                else
-                                {
-                                    realType = Type.GetType(rs.ToString());
-                                }
-#else
-                                realType = Type.GetType(rs.ToString());
-#endif
-                              
-                                break;
-                            }
-                            rs = Lexer.GetNextToken(out token);
-                        }
-
-                        Lexer.Reset(currentIndex,realType == pi.PropertyType);
-                    }
-
                     //先尝试获取名为key的属性
-                    object value = ParseJsonValueByType(nextTokenType, realType);
-                    pi.SetValue(userdata1, value);
+                    Type realType = TryParseRealType(pi.PropertyType);
+                    object value = ParseJsonValueByType(nextTokenType,realType);
+                    pi.SetValue(parentObj, value);
                 }
                 else
                 {
                     //属性没有 再试试字段
-                    fieldInfoDict.TryGetValue(t, out Dictionary<RangeString, FieldInfo> dict2);
+                    fieldInfoDict.TryGetValue(parentType, out Dictionary<RangeString, FieldInfo> dict2);
                     if (dict2 != null && dict2.TryGetValue(key, out FieldInfo fi))
                     {
-                        object value = ParseJsonValueByType(nextTokenType, fi.FieldType);
+                        Type realType = TryParseRealType(fi.FieldType);
+                        object value = ParseJsonValueByType(nextTokenType, realType);
                         fi.SetValue(userdata1, value);
                     }
                     else
@@ -333,7 +301,34 @@ namespace CatJson
         }
 
         /// <summary>
-        /// 解析Json数组为指定类型的Array或List<T>
+        /// 尝试解析真实类型
+        /// </summary>
+        private static Type TryParseRealType(Type memberType)
+        {
+            Type realType = memberType;
+            
+            if (Lexer.LookNextTokenType() == TokenType.LeftBrace)
+            {
+                int curIndex = Lexer.GetCurIndex(); //记下当前lexer的index，是在{后的第一个字符上
+                Lexer.GetNextTokenByType(TokenType.LeftBrace); // {
+                
+                RangeString rs = Lexer.GetNextToken(out TokenType tokenType);
+                if (tokenType == TokenType.String && rs.Equals(new RangeString(RealTypeKey))) //"<>RealType"
+                {
+                    Lexer.GetNextTokenByType(TokenType.Colon); // :
+                    
+                    rs = Lexer.GetNextTokenByType(TokenType.String); //RealType Value
+                    realType = GetRealType(memberType, rs.ToString());  //获取真实类型
+                }
+
+                Lexer.SetCurIndex(curIndex - 1); //回退到前一个{的位置上，并将缓存置空，因为被look过所以需要-1
+            }
+
+            return realType;
+        }
+
+        /// <summary>
+        /// 解析Json数组为指定类型的Array或List
         /// </summary>
         private static object ParseJsonArrayByType(Type arrayType,Type elementType)
         {

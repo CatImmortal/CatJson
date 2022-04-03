@@ -81,6 +81,7 @@ namespace CatJson
 
                 //提取value
                 //array和json obj需要完整的[]和{}，所以只能look
+                //此时curIndex停留在value后的第一个字符上
                 TokenType nextTokenType = Lexer.LookNextTokenType();
 
                 action(userdata1,userdata2,isIntKey,key, nextTokenType);
@@ -217,6 +218,7 @@ namespace CatJson
         private static Type CheckType(Type type)
         {
 #if FUCK_LUA
+            //处理像List<HotfixClass>这样的容器泛型参数被识别为ILRuntimeWrapperType的情况
             if (type is ILRuntimeWrapperType wt)
             {
                 return wt.RealType;
@@ -254,8 +256,6 @@ namespace CatJson
                 return ilrtType.ILType.Instantiate();
             }
 #endif
-
-
             return Activator.CreateInstance(type);
         }
 
@@ -265,9 +265,27 @@ namespace CatJson
         private static string GetRealTypeJsonValue(Type type)
         {
 #if FUCK_LUA
-             return $"{ilrtType.FullName}";
+            if (type is ILRuntimeType ilrtType)
+            {
+                 return $"{ilrtType.FullName}";
+            }
 #endif
             return $"{type.FullName},{type.Assembly.GetName().Name}";
+        }
+        
+        /// <summary>
+        /// 根据memberType和realTypeValue获取字段/属性的真实Type
+        /// </summary>
+        private static Type GetRealType(Type memberType, string realTypeValue)
+        {
+#if FUCK_LUA
+            if (memberType is ILRuntimeType ilrtType)
+            {
+                return s_AppDomain.GetType(realTypeValue).ReflectionType;
+            }
+#endif
+            
+            return Type.GetType(realTypeValue);
         }
         
 #if FUCK_LUA
