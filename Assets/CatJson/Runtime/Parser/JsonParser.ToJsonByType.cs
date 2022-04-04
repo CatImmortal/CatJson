@@ -13,19 +13,14 @@ namespace CatJson
 {
     public static partial class JsonParser
     {
-        /// <summary>
-        /// 将指定类型的对象转换为Json文本
-        /// </summary>
-        public static string ToJson<T>(T obj, bool reflection = true)
-        {
-            return ToJson(obj, GetType(obj), reflection);
-        }
 
         /// <summary>
         /// 将指定类型的对象转换为Json文本
         /// </summary>
-        public static string ToJson(object obj, Type type, bool reflection = true)
+        public static string ToJson(object obj, bool reflection = true)
         {
+            Type type = GetType(obj);
+            
             if (obj is IJsonParserCallbackReceiver receiver)
             {
                 //触发转换开始回调
@@ -44,7 +39,7 @@ namespace CatJson
                 else if (Util.IsDictionary(obj))
                 {
                     //字典
-                    AppendJsonDict(obj, 0);
+                    AppendJsonDict(type,obj, 0);
                 }
                 else
                 {
@@ -105,7 +100,6 @@ namespace CatJson
                 {
                     object value = item.Value.GetValue(obj);
                     Type piType = item.Value.PropertyType;
-                    Type realType = GetType(value);
                     string piName = item.Value.Name;
 
                     if (Util.IsDefaultValue(value))
@@ -113,7 +107,7 @@ namespace CatJson
                         //默认值跳过序列化
                         continue;
                     }
-
+                    Type realType = GetType(value);
                     AppendJsonKey(piName, depth + 1);
                     AppendJsonValue(realType, value, depth + 1, piType != realType);
                     Util.AppendLine(",");
@@ -129,13 +123,14 @@ namespace CatJson
                 {
                     object value = item.Value.GetValue(obj);
                     Type fiType = item.Value.FieldType;
-                    Type realType = GetType(value);
                     string fiName = item.Value.Name;
                     if (Util.IsDefaultValue(value))
                     {
                         //默认值跳过序列化
                         continue;
                     }
+                    
+                    Type realType = GetType(value);
                     AppendJsonKey(fiName, depth + 1);
                     AppendJsonValue(realType, value, depth + 1, fiType != realType);
                     Util.AppendLine(",");
@@ -242,7 +237,7 @@ namespace CatJson
             if (Util.IsDictionary(value))
             {
                 //字典
-                AppendJsonDict(value, depth);
+                AppendJsonDict(valueType, value, depth);
                 return;
             }
 
@@ -253,13 +248,14 @@ namespace CatJson
         /// <summary>
         /// 追加json数组文本
         /// </summary>
-        private static void AppendJsonArray(Type valueType, object value, int depth)
+        private static void AppendJsonArray(Type arrayType, object arrayObj, int depth)
         {
             Util.AppendLine("[");
             
-            if (valueType.IsArray)
+            if (arrayType.IsArray)
             {
-                Array array = (Array)value;
+                Array array = (Array)arrayObj;
+                Type elementType = arrayType.GetElementType();
                 for (int i = 0; i < array.Length; i++)
                 {
                     object element = array.GetValue(i);
@@ -270,7 +266,8 @@ namespace CatJson
                     }
                     else
                     {
-                        AppendJsonValue(GetType(element), element, depth+1);
+                        Type elementRealType = GetType(element);
+                        AppendJsonValue(elementRealType, element, depth + 1,elementType != elementRealType);
                     }
                     if (i < array.Length-1)
                     {
@@ -281,7 +278,8 @@ namespace CatJson
             }
             else
             {
-                IList list = (IList)value;
+                IList list = (IList)arrayObj;
+                Type elementType = arrayType.GetGenericArguments()[0];
                 for (int i = 0; i < list.Count; i++)
                 {
                     object element = list[i];
@@ -292,7 +290,8 @@ namespace CatJson
                     }
                     else
                     {
-                        AppendJsonValue(GetType(element), element, depth + 1);
+                        Type elementRealType = GetType(element);
+                        AppendJsonValue(elementRealType, element, depth + 1,elementType != elementRealType);
                     }
 
                     if (i < list.Count-1)
@@ -308,12 +307,12 @@ namespace CatJson
         /// <summary>
         /// 追加json字典文本
         /// </summary>
-        private static void AppendJsonDict(object value, int depth)
+        private static void AppendJsonDict(Type dictType, object dictObj, int depth)
         {
             //字典
-            IDictionary dict = (IDictionary)value;
+            IDictionary dict = (IDictionary)dictObj;
             IDictionaryEnumerator enumerator = dict.GetEnumerator();
-
+            Type valueType = dictType.GetGenericArguments()[1];
             Util.AppendLine("{");
             int index = 0;
             while (enumerator.MoveNext())
@@ -326,8 +325,9 @@ namespace CatJson
                 }
                 else
                 {
+                    Type realValueType = GetType(enumerator.Value);
                     AppendJsonKey(enumerator.Key.ToString(), depth + 1);
-                    AppendJsonValue(GetType(enumerator.Value), enumerator.Value, depth+1);
+                    AppendJsonValue(realValueType, enumerator.Value, depth + 1,valueType != realValueType);
                     if (index < dict.Count-1)
                     {
                         Util.AppendLine(",");
