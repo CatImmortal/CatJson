@@ -9,20 +9,20 @@ namespace CatJson
         private static void ToJson_TestJson1_Item(object obj,int depth)
         {
             TestJson1_Item data = (TestJson1_Item)obj;
-            Util.AppendLine("{");
+            TextUtil.AppendLine("{");
 
 			if (data.b != default)
 			{
 				JsonParser.AppendJsonKey("b", depth + 1);
 				JsonParser.AppendJsonValue(data.b);
-				Util.AppendLine(",");
+				TextUtil.AppendLine(",");
 			}
 				
 			if (Math.Abs(data.num - default(float)) > 1E-6f)
 			{
 				JsonParser.AppendJsonKey("num", depth + 1);
 				JsonParser.AppendJsonValue(data.num);
-				Util.AppendLine(",");
+				TextUtil.AppendLine(",");
 			}
 				
 			if (data.str != default)
@@ -33,8 +33,8 @@ namespace CatJson
 			}
 				
 
-            Util.AppendLine(string.Empty);
-            Util.Append("}", depth);
+            TextUtil.AppendLine(string.Empty);
+            TextUtil.Append("}", depth);
         }
     }
 

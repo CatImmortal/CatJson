@@ -78,10 +78,10 @@ namespace CatJson.Editor
 
             if (propertyInfos.Length > 0)
             {
-                int commaIndex = sb.ToString().LastIndexOf("Util.AppendLine(\",\");", StringComparison.Ordinal);
+                int commaIndex = sb.ToString().LastIndexOf("TextUtil.AppendLine(\",\");", StringComparison.Ordinal);
                 if (commaIndex!=-1)
                 {
-                    sb.Remove(commaIndex, 21);
+                    sb.Remove(commaIndex, 25);
                 }
             }
            
@@ -106,10 +106,10 @@ namespace CatJson.Editor
             }
             if (fieldInfos.Length > 0)
             {
-                int commaIndex = sb.ToString().LastIndexOf("Util.AppendLine(\",\");", StringComparison.Ordinal);
+                int commaIndex = sb.ToString().LastIndexOf("TextUtil.AppendLine(\",\");", StringComparison.Ordinal);
                 if (commaIndex!=-1)
                 {
-                    sb.Remove(commaIndex, 21);
+                    sb.Remove(commaIndex, 25);
                 }
             }
             string result = sb.ToString();
@@ -162,14 +162,14 @@ namespace CatJson.Editor
                 AppendLine("{", 3);
                 AppendLine($"JsonParser.AppendJsonKey(\"{name}\", depth + 1);", 4);
                 AppendToJsonValueCode(type, $"data.{name}",depth:4);
-                AppendLine("Util.AppendLine(\",\");", 4);
+                AppendLine("TextUtil.AppendLine(\",\");", 4);
                 AppendLine("}", 3);
             }
             else
             {
                 AppendLine($"JsonParser.AppendJsonKey(\"{name}\", depth + 1);", 3);
                 AppendToJsonValueCode(type, $"data.{name}",depth:3);
-                AppendLine("Util.AppendLine(\",\");", 3);
+                AppendLine("TextUtil.AppendLine(\",\");", 3);
             }
 
             AppendLine(string.Empty);
@@ -180,7 +180,7 @@ namespace CatJson.Editor
         /// </summary>
         private static void AppendToJsonValueCode(Type valueType, string valueName, string itemName = "item", string depthCode = "depth+1",int depth = 0)
         {
-            if (Util.IsBaseType(valueType))
+            if (TypeUtil.IsBaseType(valueType))
             {
                 //内置基础类型
                 AppendLine($"JsonParser.AppendJsonValue({valueName});", depth);
@@ -190,12 +190,12 @@ namespace CatJson.Editor
                 //枚举
                 AppendLine($"JsonParser.AppendJsonValue((int){valueName});", depth);
             }
-            else if (Util.IsArrayOrListType(valueType))
+            else if (TypeUtil.IsArrayOrListType(valueType))
             {
                 //数组或List
-                AppendToJsonArrayCode(valueType, Util.GetArrayElementType(valueType), valueName, itemName, depthCode,depth);
+                AppendToJsonArrayCode(valueType, TypeUtil.GetArrayOrListElementType(valueType), valueName, itemName, depthCode,depth);
             }
-            else if (Util.IsDictionaryType(valueType))
+            else if (TypeUtil.IsDictionaryType(valueType))
             {
                 //字典
                 AppendToJsonDictCode(valueType.GetGenericArguments()[0],valueType.GetGenericArguments()[1], valueName, itemName, depthCode,depth);
@@ -218,16 +218,16 @@ namespace CatJson.Editor
         /// </summary>
         private static void AppendToJsonArrayCode(Type arrayType, Type elementType, string arrayName, string itemName, string depthCode,int depth)
         {
-            AppendLine("Util.AppendLine(\"[\");", depth);
+            AppendLine("TextUtil.AppendLine(\"[\");", depth);
             AppendLine("int index = 0;", depth);
             AppendLine($"foreach (var {itemName} in {arrayName})", depth);
             AppendLine("{", depth);
-            AppendLine($"Util.AppendTab({depthCode}+1);", depth+1);
+            AppendLine($"TextUtil.AppendTab({depthCode}+1);", depth+1);
             if (!elementType.IsValueType)
             {
                 AppendLine($"if ({itemName} == null)",depth+1);
                 AppendLine("{",depth+1);
-                AppendLine("Util.Append(\"null\");", depth+2);
+                AppendLine("TextUtil.Append(\"null\");", depth+2);
                 AppendLine("}",depth+1);
                 AppendLine("else", depth+1);
                 AppendLine("{", depth+1);
@@ -248,12 +248,12 @@ namespace CatJson.Editor
                 AppendLine($"if (index < {arrayName}.Length-1)", depth+1);
             }
             AppendLine("{", depth+1);
-            AppendLine("Util.AppendLine(\",\");", depth+2);
+            AppendLine("TextUtil.AppendLine(\",\");", depth+2);
             AppendLine("}", depth+1);
             AppendLine("index++;", depth+1);
             AppendLine("}", depth);
-            AppendLine("Util.AppendLine(string.Empty);", depth);
-            AppendLine($"Util.Append(\"]\",{depthCode});", depth);
+            AppendLine("TextUtil.AppendLine(string.Empty);", depth);
+            AppendLine($"TextUtil.Append(\"]\",{depthCode});", depth);
         }
 
         /// <summary>
@@ -261,7 +261,7 @@ namespace CatJson.Editor
         /// </summary>
         private static void AppendToJsonDictCode(Type keyType,Type valueType, string dictName, string itemName, string depthCode,int depth)
         {
-            AppendLine("Util.AppendLine(\"{\");", depth);
+            AppendLine("TextUtil.AppendLine(\"{\");", depth);
             AppendLine("int index = 0;", depth);
             AppendLine($"foreach (var {itemName} in {dictName})", depth);
             AppendLine("{", depth);
@@ -281,7 +281,7 @@ namespace CatJson.Editor
                 //对引用类型添加null检查
                 AppendLine($"if ({itemName}.Value == null)", depth+1);
                 AppendLine("{", depth+1);
-                AppendLine("Util.Append(\"null\");", depth+2);
+                AppendLine("TextUtil.Append(\"null\");", depth+2);
                 AppendLine("}", depth+1);
                 AppendLine("else", depth+1);
                 AppendLine("{", depth+1);
@@ -295,12 +295,12 @@ namespace CatJson.Editor
 
             AppendLine($"if (index < {dictName}.Count-1)", depth+1);
             AppendLine("{", depth+1);
-            AppendLine("Util.AppendLine(\",\");", depth+2);
+            AppendLine("TextUtil.AppendLine(\",\");", depth+2);
             AppendLine("}", depth+1);
             AppendLine("index++;", depth+1);
             AppendLine("}", depth);
-            AppendLine("Util.AppendLine(string.Empty);", depth);
-            AppendLine($"Util.Append(\"}}\",{depthCode});", depth);
+            AppendLine("TextUtil.AppendLine(string.Empty);", depth);
+            AppendLine($"TextUtil.Append(\"}}\",{depthCode});", depth);
         }
     }
 

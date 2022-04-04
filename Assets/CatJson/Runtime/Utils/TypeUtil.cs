@@ -1,59 +1,84 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 using System;
-using System.Reflection;
+using System.Collections;
+using System.Collections.Generic;
+
+#if FUCK_LUA
+using ILRuntime.CLR.Utils;
+using ILRuntime.Reflection;
+using ILRuntime.Runtime.Intepreter;
+#endif
+
 namespace CatJson
 {
-    public static class Util
+    /// <summary>
+    /// 类型相关的工具类
+    /// </summary>
+    public static class TypeUtil
     {
-        public static StringBuilder CachedSB = new StringBuilder();
+                
+        /// <summary>
+        /// 检查Type,如果是ILRuntimeWrapperType需要返回正确的RealType
+        /// </summary>
+        public static Type CheckType(Type type)
+        {
+#if FUCK_LUA
+            if (type is ILRuntimeWrapperType wt)
+            {
+                return wt.RealType;
+            }
+#endif
+            return type;
+        }
+        
+        /// <summary>
+        /// 获取obj的Type
+        /// </summary>
+        public static Type GetType(object obj)
+        {
+#if FUCK_LUA
+            if (obj is ILTypeInstance ins)
+            {
+               return ins.Type.ReflectionType;
+            }
+            if (obj is CrossBindingAdaptorType cross)
+            {
+                return cross.ILInstance.Type.ReflectionType;
+            }
+#endif
+            return obj.GetType();
+        }
+        
+        /// <summary>
+        /// 根据memberType和realTypeValue获取字段/属性的真实Type
+        /// </summary>
+        public static Type GetRealType(Type memberType, string realTypeValue)
+        {
+#if FUCK_LUA
+            if (memberType is ILRuntimeType ilrtType)
+            {
+                return s_AppDomain.GetType(realTypeValue).ReflectionType;
+            }
+#endif
+            
+            return Type.GetType(realTypeValue);
+        }
 
         /// <summary>
-        /// 当前平台的换行符长度
+        /// 创建type的实例
         /// </summary>
-        public static int NewLineLength => Environment.NewLine.Length;
-
-
-        public static void AppendTab(int tabNum)
+        public static object CreateInstance(Type type)
         {
-            if (!JsonParser.IsFormat)
+#if FUCK_LUA
+            if (type is ILRuntimeType ilrtType)
             {
-                return;
+                return ilrtType.ILType.Instantiate();
             }
-            for (int i = 0; i < tabNum; i++)
-            {
-                CachedSB.Append("\t");
-            }
+#endif
+            return Activator.CreateInstance(type);
         }
+        
 
-        public static void Append(string str,int tabNum = 0)
-        {
-            if (tabNum > 0 && JsonParser.IsFormat)
-            {
-                AppendTab(tabNum);
-            }
-           
-            CachedSB.Append(str);
-        }
-
-        public static void AppendLine(string str, int tabNum = 0)
-        {
-            if (tabNum > 0 && JsonParser.IsFormat)
-            {
-                AppendTab(tabNum);
-            }
-
-            if (JsonParser.IsFormat)
-            {
-                CachedSB.AppendLine(str);
-            }
-            else
-            {
-                CachedSB.Append(str);
-            }
-        }
-
+        
         /// <summary>
         /// type是否为内置基础类型 (string char bool 数字)
         /// </summary>
@@ -61,7 +86,17 @@ namespace CatJson
         {
             return type == typeof(string) || type == typeof(char) || type == typeof(bool) || IsNumberType(type);
         }
-
+        
+        /// <summary>
+        /// obj是否为数字
+        /// </summary>
+        public static bool IsNumber(object obj)
+        {
+            return obj is byte || obj is int || obj is long || obj is float || obj is double
+                   ||obj is uint||obj is ulong ||obj is ushort ||obj is short ||obj is decimal 
+                   ||obj is sbyte ;
+        }
+        
         /// <summary>
         /// type是否为数字类型
         /// </summary>
@@ -72,15 +107,6 @@ namespace CatJson
             ||type == typeof(sbyte);
         }
 
-        /// <summary>
-        /// obj是否为数字
-        /// </summary>
-        public static bool IsNumber(object obj)
-        {
-            return obj is byte || obj is int || obj is long || obj is float || obj is double
-                   ||obj is uint||obj is ulong ||obj is ushort ||obj is short ||obj is decimal 
-                   ||obj is sbyte ;
-        }
 
         /// <summary>
         /// obj是否为数组或List
@@ -96,6 +122,45 @@ namespace CatJson
         public static bool IsArrayOrListType(Type type)
         {
             return type.IsArray || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>));
+        }
+        
+        /// <summary>
+        /// 获取数组或List的元素类型
+        /// </summary>
+        public static Type GetArrayOrListElementType(Type arrayType)
+        {
+            Type elementType;
+            if (arrayType.IsArray)
+            {
+                //数组
+#if FUCK_LUA
+                if (arrayType is ILRuntimeWrapperType wt)
+                {
+                    elementType = wt.CLRType.ElementType.ReflectionType;
+                }
+                else
+#endif
+                {
+                    elementType = arrayType.GetElementType();
+                }
+            }
+            else
+            {
+                //List
+#if FUCK_LUA
+                if (arrayType is ILRuntimeWrapperType wt)
+                {
+                    elementType = wt.CLRType.GenericArguments[0].Value.ReflectionType;
+                }
+                else
+#endif
+                {
+                    elementType = arrayType.GenericTypeArguments[0];
+
+                }
+            }
+
+            return elementType;
         }
 
         /// <summary>
@@ -115,17 +180,24 @@ namespace CatJson
         }
 
         /// <summary>
-        /// 获取数组和List的元素类型
+        /// 获取字典value的类型
         /// </summary>
-        public static Type GetArrayElementType(Type type)
-        {
-            if (type.IsArray)
+        public static Type GetDictValueType(Type dictType)
+        {                       
+            Type valueType;
+#if FUCK_LUA
+            if (dictType is ILRuntimeWrapperType wt)
             {
-                return type.GetElementType();
+                valueType = wt2.CLRType.GenericArguments[1].Value.ReflectionType;
             }
-
-            return type.GetGenericArguments()[0];
+            else         
+#endif
+            {
+                valueType = dictType.GetGenericArguments()[1];
+            }
+            return valueType;
         }
+
 
         /// <summary>
         /// value是否为内置基础类型的默认值(null 0 false)
@@ -192,39 +264,8 @@ namespace CatJson
             return false;
         }
 
-        /// <summary>
-        /// 获取4个字符代表的unicode码点
-        /// </summary>
-        public static char GetUnicodeCodePoint(char c1,char c2,char c3,char c4)
-        {
-            int temp = UnicodeChar2Int(c1) * 0x1000 + UnicodeChar2Int(c2) *0x100 + UnicodeChar2Int(c3)*0x10 + UnicodeChar2Int(c4);
-            return (char)temp;
-        }
 
-        private static int UnicodeChar2Int(char c)
-        {
-            //0-9
-            if (char.IsDigit(c))
-            {
-                return c - '0';
-            }
-            
-            //A-F
-            if (c >= 65 && c <= 70)
-            {
-                return c - 'A' + 10;
-            }
-
-            //a-f
-            if (c >= 97 && c <= 102)
-            {
-                return c - 'a' + 10;
-            }
-
-            throw new Exception("Char2Int调用失败，当前字符为：" + c);
-        }
-    
 
     }
-
 }
+

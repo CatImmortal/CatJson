@@ -55,7 +55,7 @@ namespace CatJson
   
         public void ToJson(int depth)
         {
-            Util.AppendLine("{");
+            TextUtil.AppendLine("{");
 
             if (valueDict != null)
             {
@@ -63,23 +63,23 @@ namespace CatJson
                 foreach (KeyValuePair<string, JsonValue> item in valueDict)
                 {
 
-                    Util.Append("\"", depth + 1);
-                    Util.Append(item.Key);
-                    Util.Append("\"");
+                    TextUtil.Append("\"", depth + 1);
+                    TextUtil.Append(item.Key);
+                    TextUtil.Append("\"");
 
-                    Util.Append(":");
+                    TextUtil.Append(":");
 
                     item.Value.ToJson(depth + 1);
 
                     if (index<valueDict.Count-1)
                     {
-                        Util.AppendLine(",");
+                        TextUtil.AppendLine(",");
                     }
                     index++;
                 }
             }
 
-            Util.Append("}", depth);
+            TextUtil.Append("}", depth);
         }
     }
 }

@@ -212,52 +212,7 @@ namespace CatJson
             fieldInfoDict.Add(type, dict2);
         }
 
-        /// <summary>
-        /// 检查Type,如果是热更层的需要进行转换
-        /// </summary>
-        private static Type CheckType(Type type)
-        {
-#if FUCK_LUA
-            //处理像List<HotfixClass>这样的容器泛型参数被识别为ILRuntimeWrapperType的情况
-            if (type is ILRuntimeWrapperType wt)
-            {
-                return wt.RealType;
-            }
-#endif
-            return type;
-        }
-
-        /// <summary>
-        /// 获取obj的Type
-        /// </summary>
-        private static Type GetType(object obj)
-        {
-#if FUCK_LUA
-            if (obj is ILTypeInstance ins)
-            {
-               return ins.Type.ReflectionType;
-            }
-            if (obj is CrossBindingAdaptorType cross)
-            {
-                return cross.ILInstance.Type.ReflectionType;
-            }
-#endif
-            return obj.GetType();
-        }
-
-        /// <summary>
-        /// 创建type的实例
-        /// </summary>
-        private static object CreateInstance(Type type)
-        {
-#if FUCK_LUA
-            if (type is ILRuntimeType ilrtType)
-            {
-                return ilrtType.ILType.Instantiate();
-            }
-#endif
-            return Activator.CreateInstance(type);
-        }
+       
 
         /// <summary>
         /// 获取用于多态序列化的真实类型的json value字符串
@@ -273,20 +228,7 @@ namespace CatJson
             return $"{type.FullName},{type.Assembly.GetName().Name}";
         }
         
-        /// <summary>
-        /// 根据memberType和realTypeValue获取字段/属性的真实Type
-        /// </summary>
-        private static Type GetRealType(Type memberType, string realTypeValue)
-        {
-#if FUCK_LUA
-            if (memberType is ILRuntimeType ilrtType)
-            {
-                return s_AppDomain.GetType(realTypeValue).ReflectionType;
-            }
-#endif
-            
-            return Type.GetType(realTypeValue);
-        }
+
         
 #if FUCK_LUA
          public unsafe static void RegisterILRuntimeCLRRedirection(ILRuntime.Runtime.Enviorment.AppDomain appdomain)
@@ -297,10 +239,6 @@ namespace CatJson
                 if (mi.Name == "ParseJson" && mi.IsGenericMethodDefinition)
                 {
                     appdomain.RegisterCLRMethodRedirection(mi, RedirectionParseJson);
-                }
-                else if (mi.Name == "ToJson" && mi.IsGenericMethodDefinition)
-                {
-                    appdomain.RegisterCLRMethodRedirection(mi, RedirectionToJson);
                 }
             }
         }
@@ -322,29 +260,6 @@ namespace CatJson
             Type type = method.GenericArguments[0].ReflectionType;
 
             object result_of_this_method = ParseJson(json, type);
-
-            return ILIntepreter.PushObject(__ret, mStack, result_of_this_method);
-        }
-
-        public unsafe static StackObject* RedirectionToJson(ILIntepreter intp, StackObject* esp, IList<object> mStack, CLRMethod method, bool isNewObj)
-        {
-            ILRuntime.Runtime.Enviorment.AppDomain __domain = intp.AppDomain;
-            StackObject* ptr_of_this_method;
-            StackObject* __ret = ILIntepreter.Minus(esp, 2);
-
-            ptr_of_this_method = ILIntepreter.Minus(esp, 1);
-            bool reflection = ptr_of_this_method->Value == 1;
-
-            ptr_of_this_method = ILIntepreter.Minus(esp, 2);
-            ILTypeInstance obj =
-                (ILTypeInstance)typeof(ILTypeInstance).CheckCLRTypes(
-                    StackObject.ToObject(ptr_of_this_method, __domain, mStack), 0);
-
-            intp.Free(ptr_of_this_method);
-
-            Type type = method.GenericArguments[0].ReflectionType;
-
-            string result_of_this_method = ToJson(obj, type, reflection);
 
             return ILIntepreter.PushObject(__ret, mStack, result_of_this_method);
         }

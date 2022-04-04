@@ -36,7 +36,7 @@ namespace CatJson
             {
                 //使用反射解析
 
-                if (Util.IsArrayOrListType(type) || Util.IsDictionaryType(type))
+                if (TypeUtil.IsArrayOrListType(type) || TypeUtil.IsDictionaryType(type))
                 {
                     //数组或list或字典
                     TokenType nextTokenType = Lexer.LookNextTokenType();
@@ -77,9 +77,7 @@ namespace CatJson
         /// </summary>
         public static object ParseJsonValueByType(TokenType nextTokenType, Type type)
         {
-            Type realType = CheckType(type);
-
-            if (ExtensionParseFuncDict.TryGetValue(realType, out Func<object> func))
+            if (ExtensionParseFuncDict.TryGetValue(type, out Func<object> func))
             {
                 //自定义解析
                 return func();
@@ -89,7 +87,7 @@ namespace CatJson
             {
                 case TokenType.Null:
                     Lexer.GetNextToken(out _);
-                    if (!realType.IsValueType)
+                    if (!type.IsValueType)
                     {
                         return null;
                     }
@@ -98,7 +96,7 @@ namespace CatJson
                 case TokenType.True:
                 case TokenType.False:
                     Lexer.GetNextToken(out _);
-                    if (realType == typeof(bool))
+                    if (type == typeof(bool))
                     {
                         return nextTokenType == TokenType.True;
                     }
@@ -107,48 +105,48 @@ namespace CatJson
                 case TokenType.Number:
                     RangeString token = Lexer.GetNextToken(out _);
                     string str = token.ToString();
-                    if (realType == typeof(byte))
+                    if (type == typeof(byte))
                     {
                         return byte.Parse(str);
                     }
-                    if (realType == typeof(int))
+                    if (type == typeof(int))
                     {
                         return int.Parse(str);
                     }
-                    if (realType == typeof(long))
+                    if (type == typeof(long))
                     {
                         return long.Parse(str);
                     }
-                    if (realType == typeof(float))
+                    if (type == typeof(float))
                     {
                         return float.Parse(str);
                     }
-                    if (realType == typeof(double))
+                    if (type == typeof(double))
                     {
                         return double.Parse(str);
                     }
                     
-                    if (realType == typeof(sbyte))
+                    if (type == typeof(sbyte))
                     {
                         return sbyte.Parse(str);
                     }
-                    if (realType == typeof(short))
+                    if (type == typeof(short))
                     {
                         return short.Parse(str);
                     }
-                    if (realType == typeof(uint))
+                    if (type == typeof(uint))
                     {
                         return uint.Parse(str);
                     }
-                    if (realType == typeof(ulong))
+                    if (type == typeof(ulong))
                     {
                         return ulong.Parse(str);
                     }
-                    if (realType == typeof(ushort))
+                    if (type == typeof(ushort))
                     {
                         return ushort.Parse(str);
                     }
-                    if (realType == typeof(decimal))
+                    if (type == typeof(decimal))
                     {
                         return decimal.Parse(str);
                     }
@@ -161,21 +159,21 @@ namespace CatJson
                     }
 #endif
 
-                    if (realType.IsEnum)
+                    if (type.IsEnum)
                     {
                         //枚举
                         int enumInt = int.Parse(str);
-                        return Enum.ToObject(realType, enumInt);
+                        return Enum.ToObject(type, enumInt);
                     }
                     break;
 
                 case TokenType.String:
                     token = Lexer.GetNextToken(out _);
-                    if (realType == typeof(string))
+                    if (type == typeof(string))
                     {
                         return token.ToString();
                     }
-                    if (realType == typeof(char))
+                    if (type == typeof(char))
                     {
                         return char.Parse(token.ToString());
                     }
@@ -183,41 +181,9 @@ namespace CatJson
 
                 case TokenType.LeftBracket:
 
-                    if (Util.IsArrayOrListType(type))
+                    if (TypeUtil.IsArrayOrListType(type))
                     {
-                        Type elementType;
-
-                        if (type.IsArray)
-                        {
-                            //数组
-#if FUCK_LUA
-                            if (type is ILRuntimeWrapperType wt)
-                            {
-                                elementType = wt.CLRType.ElementType.ReflectionType;
-                            }
-                            else
-#endif
-                            {
-                                elementType = type.GetElementType();
-                            }
-                        }
-                        else
-                        {
-                            //List
-#if FUCK_LUA
-                            if (type is ILRuntimeWrapperType wt)
-                            {
-                                elementType = wt.CLRType.GenericArguments[0].Value.ReflectionType;
-                            }
-                            else
-#endif
-                            {
-                                elementType = type.GenericTypeArguments[0];
-
-                            }
-
-                        }
-                        
+                        Type elementType = TypeUtil.GetArrayOrListElementType(type);
                         return ParseJsonArrayByType(type,elementType);
                     }
 
@@ -225,22 +191,11 @@ namespace CatJson
 
                 case TokenType.LeftBrace:
 
-                    if (Util.IsDictionaryType(type))
+                    if (TypeUtil.IsDictionaryType(type))
                     {
                         //字典
 
-                        Type valueType;
-#if FUCK_LUA
-                        if (type is ILRuntimeWrapperType wt2)
-                        {
-                            valueType = wt2.CLRType.GenericArguments[1].Value.ReflectionType;
-                        }
-                        else
-#endif
-                        {
-                            valueType = type.GetGenericArguments()[1];
-                        }
-        
+                        Type valueType = TypeUtil.GetDictValueType(type);
                         return ParseJsonObjectByDict(type, valueType);
                     }
 
@@ -258,7 +213,7 @@ namespace CatJson
         public static object ParseJsonObjectByType(Type type)
         {
             //保证了传入的type参数一定是真实类型，，所以可以直接使用它来创建对象实例以及使用它的反射信息
-            object obj = CreateInstance(type);
+            object obj = TypeUtil.CreateInstance(type);
 
             if (!propertyInfoDict.ContainsKey(type) && !fieldInfoDict.ContainsKey(type))
             {
@@ -300,9 +255,7 @@ namespace CatJson
             return obj;
 
         }
-
-
-
+        
         /// <summary>
         /// 解析Json数组为指定类型的Array或List
         /// </summary>
@@ -391,7 +344,7 @@ namespace CatJson
                     Lexer.GetNextTokenByType(TokenType.Colon); // :
                     
                     rs = Lexer.GetNextTokenByType(TokenType.String); //RealType Value
-                    realType = GetRealType(memberType, rs.ToString());  //获取真实类型
+                    realType = TypeUtil.GetRealType(memberType, rs.ToString());  //获取真实类型
                 }
 
                 Lexer.SetCurIndex(curIndex - 1); //回退到前一个{的位置上，并将缓存置空，因为被look过所以需要-1

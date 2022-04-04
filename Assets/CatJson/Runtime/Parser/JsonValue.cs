@@ -54,40 +54,40 @@ namespace CatJson
             switch (Type)
             {
                 case ValueType.Null:
-                    Util.Append("null");
+                    TextUtil.Append("null");
                     break;
                 case ValueType.Boolean:
                     if (Boolean == true)
                     {
-                        Util.Append("true");
+                        TextUtil.Append("true");
                     }
                     else
                     {
-                        Util.Append("false");
+                        TextUtil.Append("false");
                     }
                     break;
                 case ValueType.Number:
-                    Util.Append(Number.ToString());
+                    TextUtil.Append(Number.ToString());
                     break;
                 case ValueType.String:
-                    Util.Append("\"");
-                    Util.Append(Str);
-                    Util.Append("\"");
+                    TextUtil.Append("\"");
+                    TextUtil.Append(Str);
+                    TextUtil.Append("\"");
                     break;
                 case ValueType.Array:
-                    Util.AppendLine("[");
+                    TextUtil.AppendLine("[");
                     for (int i = 0; i < Array.Length; i++)
                     {
-                        Util.AppendTab(depth + 1);
+                        TextUtil.AppendTab(depth + 1);
                         JsonValue jv = Array[i];
                         jv.ToJson(depth + 1);
                         if (i<Array.Length-1)
                         {
-                            Util.AppendLine(",");
+                            TextUtil.AppendLine(",");
                         }
                     }
-                    Util.AppendLine(string.Empty);
-                    Util.Append("]",depth);
+                    TextUtil.AppendLine(string.Empty);
+                    TextUtil.Append("]",depth);
                     break;
                 case ValueType.Object:
                     Obj.ToJson(depth);

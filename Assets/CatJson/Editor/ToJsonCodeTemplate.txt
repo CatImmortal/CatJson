@@ -7,11 +7,11 @@ namespace CatJson
         private static void #MethodName#(#Type# obj,int depth)
         {
             #ClassName# data = (#ClassName#)obj;
-            Util.AppendLine("{");
+            TextUtil.AppendLine("{");
 
 #ToJsonCode#
-            Util.AppendLine(string.Empty);
-            Util.Append("}", depth);
+            TextUtil.AppendLine(string.Empty);
+            TextUtil.Append("}", depth);
         }
     }
 
