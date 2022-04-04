@@ -217,6 +217,7 @@ namespace CatJson
                             }
 
                         }
+                        
                         return ParseJsonArrayByType(type,elementType);
                     }
 
@@ -239,7 +240,7 @@ namespace CatJson
                         {
                             valueType = type.GetGenericArguments()[1];
                         }
-
+        
                         return ParseJsonObjectByDict(type, valueType);
                     }
 
@@ -300,32 +301,7 @@ namespace CatJson
 
         }
 
-        /// <summary>
-        /// 尝试解析真实类型
-        /// </summary>
-        private static Type TryParseRealType(Type memberType)
-        {
-            Type realType = memberType;
-            
-            if (Lexer.LookNextTokenType() == TokenType.LeftBrace)
-            {
-                int curIndex = Lexer.GetCurIndex(); //记下当前lexer的index，是在{后的第一个字符上
-                Lexer.GetNextTokenByType(TokenType.LeftBrace); // {
-                
-                RangeString rs = Lexer.GetNextToken(out TokenType tokenType);
-                if (tokenType == TokenType.String && rs.Equals(new RangeString(RealTypeKey))) //"<>RealType"
-                {
-                    Lexer.GetNextTokenByType(TokenType.Colon); // :
-                    
-                    rs = Lexer.GetNextTokenByType(TokenType.String); //RealType Value
-                    realType = GetRealType(memberType, rs.ToString());  //获取真实类型
-                }
 
-                Lexer.SetCurIndex(curIndex - 1); //回退到前一个{的位置上，并将缓存置空，因为被look过所以需要-1
-            }
-
-            return realType;
-        }
 
         /// <summary>
         /// 解析Json数组为指定类型的Array或List
@@ -346,7 +322,8 @@ namespace CatJson
 
             ParseJsonArrayProcedure(list, elementType, (userdata1, userdata2, nextTokenType) =>
             {
-                object value = ParseJsonValueByType(nextTokenType, (Type)userdata2);
+                
+                object value = ParseJsonValueByType(nextTokenType, TryParseRealType((Type)userdata2));
                 ((IList)userdata1).Add(value);
             });
 
@@ -379,8 +356,7 @@ namespace CatJson
             IDictionary dict = (IDictionary)Activator.CreateInstance(dictType);
             Type keyType = dictType.GetGenericArguments()[0];
             ParseJsonObjectProcedure(dict, valueType,keyType == typeof(int), (userdata1, userdata2,isIntKey, key, nextTokenType) => {
-                Type t = (Type)userdata2;
-                object value = ParseJsonValueByType(nextTokenType, t);
+                object value = ParseJsonValueByType(nextTokenType, TryParseRealType((Type)userdata2));
                 if (!isIntKey)
                 {
                     ((IDictionary)userdata1).Add(key.ToString(), value);
@@ -397,7 +373,32 @@ namespace CatJson
         }
 
 
-     
+        /// <summary>
+        /// 尝试解析真实类型
+        /// </summary>
+        private static Type TryParseRealType(Type memberType)
+        {
+            Type realType = memberType;
+            
+            if (Lexer.LookNextTokenType() == TokenType.LeftBrace)
+            {
+                int curIndex = Lexer.GetCurIndex(); //记下当前lexer的index，是在{后的第一个字符上
+                Lexer.GetNextTokenByType(TokenType.LeftBrace); // {
+                
+                RangeString rs = Lexer.GetNextToken(out TokenType tokenType);
+                if (tokenType == TokenType.String && rs.Equals(new RangeString(RealTypeKey))) //"<>RealType"
+                {
+                    Lexer.GetNextTokenByType(TokenType.Colon); // :
+                    
+                    rs = Lexer.GetNextTokenByType(TokenType.String); //RealType Value
+                    realType = GetRealType(memberType, rs.ToString());  //获取真实类型
+                }
+
+                Lexer.SetCurIndex(curIndex - 1); //回退到前一个{的位置上，并将缓存置空，因为被look过所以需要-1
+            }
+
+            return realType;
+        }
 
     }
 }
