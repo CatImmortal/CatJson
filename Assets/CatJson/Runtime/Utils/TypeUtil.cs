@@ -56,7 +56,7 @@ namespace CatJson
 #if FUCK_LUA
             if (memberType is ILRuntimeType ilrtType)
             {
-                return s_AppDomain.GetType(realTypeValue).ReflectionType;
+                return AppDomain.GetType(realTypeValue).ReflectionType;
             }
 #endif
             

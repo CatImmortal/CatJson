@@ -166,38 +166,31 @@ namespace CatJson
             }
 
             //序列化属性
-            propertyInfoDict.TryGetValue(type, out Dictionary<RangeString, PropertyInfo> piDict);
-            if (piDict != null)
+            
+            foreach (KeyValuePair<RangeString, PropertyInfo> item in propertyInfoDict[type])
             {
-                foreach (KeyValuePair<RangeString, PropertyInfo> item in piDict)
+                object value = item.Value.GetValue(obj);
+                if (TypeUtil.IsDefaultValue(value))
                 {
-                    object value = item.Value.GetValue(obj);
-                    if (TypeUtil.IsDefaultValue(value))
-                    {
-                        //默认值跳过序列化
-                        continue;
-                    }
-                    
-                    AppendMember(item.Value.PropertyType,item.Value.Name,value,depth);
-                    needRemoveLastComma = true;
+                    //默认值跳过序列化
+                    continue;
                 }
+                    
+                AppendMember(item.Value.PropertyType,item.Value.Name,value,depth);
+                needRemoveLastComma = true;
             }
 
             //序列化字段
-            fieldInfoDict.TryGetValue(type, out Dictionary<RangeString, FieldInfo> fiDict);
-            if (fiDict != null)
+            foreach (KeyValuePair<RangeString, FieldInfo> item in fieldInfoDict[type])
             {
-                foreach (KeyValuePair<RangeString, FieldInfo> item in fiDict)
+                object value = item.Value.GetValue(obj);
+                if (TypeUtil.IsDefaultValue(value))
                 {
-                    object value = item.Value.GetValue(obj);
-                    if (TypeUtil.IsDefaultValue(value))
-                    {
-                        //默认值跳过序列化
-                        continue;
-                    }
-                    AppendMember(item.Value.FieldType,item.Value.Name,value,depth);
-                    needRemoveLastComma = true;
+                    //默认值跳过序列化
+                    continue;
                 }
+                AppendMember(item.Value.FieldType,item.Value.Name,value,depth);
+                needRemoveLastComma = true;
             }
 
             if (needRemoveLastComma)

@@ -59,9 +59,64 @@ namespace CatJson
         /// </summary>
         private const string RealTypeKey = "<>RealType";
 
-#if FUCK_LUA
-        private static ILRuntime.Runtime.Enviorment.AppDomain s_AppDomain;
-#endif
+
+        /// <summary>
+        /// 将type的公有实例字段和属性都放入字典中缓存
+        /// </summary>
+        private static void AddToReflectionMap(Type type)
+        {
+            IgnoreSet.TryGetValue(type, out HashSet<string> set);
+
+            PropertyInfo[] pis = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            Dictionary<RangeString, PropertyInfo>  dict1 = new Dictionary<RangeString, PropertyInfo>(pis.Length);
+            for (int i = 0; i < pis.Length; i++)
+            {
+                PropertyInfo pi = pis[i];
+
+                if (Attribute.IsDefined(pi, typeof(JsonIgnoreAttribute)))
+                {
+                    //需要忽略
+                    continue;
+                }
+
+                if (set != null && set.Contains(pi.Name))
+                {
+                    //需要忽略
+                    continue;
+                }
+
+                if (pi.SetMethod != null && pi.GetMethod != null && pi.Name != "Item")
+                {
+                    //属性必须同时具有get set 并且不能是索引器item
+                    dict1.Add(new RangeString(pi.Name), pi);
+                }
+                    
+            }
+            propertyInfoDict.Add(type, dict1);
+
+            FieldInfo[] fis = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
+            Dictionary<RangeString, FieldInfo> dict2 = new Dictionary<RangeString, FieldInfo>(fis.Length);
+            for (int i = 0; i < fis.Length; i++)
+            {
+                FieldInfo fi = fis[i];
+
+                if (Attribute.IsDefined(fi,typeof(JsonIgnoreAttribute)))
+                {
+                    //需要忽略
+                    continue;
+                }
+
+                if (set != null && set.Contains(fi.Name))
+                {
+                    //需要忽略
+                    continue;
+                }
+
+                dict2.Add(new RangeString(fi.Name), fi);
+            }
+            fieldInfoDict.Add(type, dict2);
+        }
+        
         /// <summary>
         /// 解析Json对象的通用流程
         /// </summary>
@@ -144,75 +199,7 @@ namespace CatJson
             //跳过]
             Lexer.GetNextTokenByType(TokenType.RightBracket);
         }
-
-        /// <summary>
-        /// 将type的公有实例字段和属性都放入字典中缓存
-        /// </summary>
-        private static void AddToReflectionMap(Type type)
-        {
-            IgnoreSet.TryGetValue(type, out HashSet<string> set);
-
-            PropertyInfo[] pis = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-            Dictionary<RangeString, PropertyInfo> dict1 = null;
-            if (pis.Length > 0)
-            {
-                dict1 = new Dictionary<RangeString, PropertyInfo>(pis.Length);
-                for (int i = 0; i < pis.Length; i++)
-                {
-                    PropertyInfo pi = pis[i];
-
-                    if (Attribute.IsDefined(pi, typeof(JsonIgnoreAttribute)))
-                    {
-                        //需要忽略
-                        continue;
-                    }
-
-                    if (set != null && set.Contains(pi.Name))
-                    {
-                        //需要忽略
-                        continue;
-                    }
-
-                    if (pi.SetMethod != null && pi.GetMethod != null && pi.Name != "Item")
-                    {
-                        //属性必须同时具有get set 并且不能是索引器item
-                        dict1.Add(new RangeString(pi.Name), pi);
-                    }
-                    
-                }
-                
-            }
-            propertyInfoDict.Add(type, dict1);
-
-            FieldInfo[] fis = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
-            Dictionary<RangeString, FieldInfo> dict2 = null;
-            if (fis.Length > 0)
-            {
-                dict2 = new Dictionary<RangeString, FieldInfo>(fis.Length);
-                for (int i = 0; i < fis.Length; i++)
-                {
-                    FieldInfo fi = fis[i];
-
-                    if (Attribute.IsDefined(fi,typeof(JsonIgnoreAttribute)))
-                    {
-                        //需要忽略
-                        continue;
-                    }
-
-                    if (set != null && set.Contains(fi.Name))
-                    {
-                        //需要忽略
-                        continue;
-                    }
-
-                    dict2.Add(new RangeString(fi.Name), fi);
-                }
-
-            }
-            fieldInfoDict.Add(type, dict2);
-        }
-
-       
+        
 
         /// <summary>
         /// 获取用于多态序列化的真实类型的json value字符串
@@ -233,7 +220,7 @@ namespace CatJson
 #if FUCK_LUA
          public unsafe static void RegisterILRuntimeCLRRedirection(ILRuntime.Runtime.Enviorment.AppDomain appdomain)
          {
-             s_AppDomain = appdomain;
+            TypeUtil.AppDomain = appdomain;
             foreach (MethodInfo mi in typeof(JsonParser).GetMethods())
             {
                 if (mi.Name == "ParseJson" && mi.IsGenericMethodDefinition)
