@@ -16,6 +16,10 @@ namespace CatJson
     public static class TypeUtil
     {
                 
+#if FUCK_LUA
+        public static ILRuntime.Runtime.Enviorment.AppDomain AppDomain;
+#endif
+        
         /// <summary>
         /// 检查Type,如果是ILRuntimeWrapperType需要返回正确的RealType
         /// </summary>
