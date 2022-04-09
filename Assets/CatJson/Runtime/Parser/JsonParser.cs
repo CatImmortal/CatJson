@@ -49,15 +49,7 @@ namespace CatJson
         /// </summary>
         public static Dictionary<Type, HashSet<string>> IgnoreSet = new Dictionary<Type, HashSet<string>>();
 
-        /// <summary>
-        /// 序列化时是否开启格式化
-        /// </summary>
-        public static bool IsFormat { get; set; } = true;
 
-        /// <summary>
-        /// 真实类型key
-        /// </summary>
-        private const string RealTypeKey = "<>RealType";
 
 
         /// <summary>

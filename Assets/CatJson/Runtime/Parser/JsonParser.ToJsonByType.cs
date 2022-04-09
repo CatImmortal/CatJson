@@ -176,7 +176,7 @@ namespace CatJson
             foreach (KeyValuePair<RangeString, PropertyInfo> item in propertyInfoDict[realType])
             {
                 object value = item.Value.GetValue(obj);
-                if (TypeUtil.IsDefaultValue(value))
+                if (IgnoreDefaultValue && TypeUtil.IsDefaultValue(value))
                 {
                     //默认值跳过序列化
                     continue;
@@ -190,7 +190,7 @@ namespace CatJson
             foreach (KeyValuePair<RangeString, FieldInfo> item in fieldInfoDict[realType])
             {
                 object value = item.Value.GetValue(obj);
-                if (TypeUtil.IsDefaultValue(value))
+                if (IgnoreDefaultValue && TypeUtil.IsDefaultValue(value))
                 {
                     //默认值跳过序列化
                     continue;
