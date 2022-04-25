@@ -9,8 +9,6 @@ namespace CatJson
     /// </summary>
     public class JsonValue
     {
-        
-
         public ValueType Type;
 
         public bool Boolean;
@@ -19,6 +17,43 @@ namespace CatJson
         public JsonValue[] Array;
         public JsonObject Obj;
 
+        #region 构造方法
+
+        public JsonValue()
+        {
+            Type = ValueType.Null;
+        }
+        
+        public JsonValue(bool b)
+        {
+            Type = ValueType.Boolean;
+            Boolean = b;
+        }
+        public JsonValue(double d)
+        {
+            Type = ValueType.Number;
+            Number = d;
+        }
+        public JsonValue(string s)
+        {
+            Type = ValueType.String;
+            Str = s;
+        }
+        public JsonValue(JsonValue[] arr)
+        {
+            Type = ValueType.Array;
+            Array = arr;
+        }
+        public JsonValue(JsonObject jo)
+        {
+            Type = ValueType.Object;
+            Obj = jo;
+        }
+
+        #endregion
+        
+       
+        
         public JsonValue this[int index]
         {
             get
@@ -62,82 +97,103 @@ namespace CatJson
                 Obj[key] = value;
             }
         }
+
+        #region 隐式类型转换
+
+        public static implicit operator JsonValue(bool b)
+        {
+            JsonValue value = new JsonValue();
+            value.Type = ValueType.Boolean;
+            value.Boolean = b;
+            return value;
+        }
+        
+        public static implicit operator bool(JsonValue value)
+        {
+            if (value.Type != ValueType.Boolean)
+            {
+                throw new Exception("JsonValue转换bool失败");
+            }
+            return value.Boolean;
+        }
+
+        public static implicit operator double(JsonValue value)
+        {
+            if (value.Type != ValueType.Number)
+            {
+                throw new Exception("JsonValue转换double失败");
+            }
+            
+            return value.Number;
+        }
+        
+        public static implicit operator JsonValue(double d)
+        {
+            JsonValue value = new JsonValue();
+            value.Type = ValueType.Number;
+            value.Number = d;
+            return value;
+        }
+        
+        public static implicit operator JsonValue(string s)
+        {
+            JsonValue value = new JsonValue();
+            value.Type = ValueType.String;
+            value.Str = s;
+            return value;
+        }
+        
+        
+        public static implicit operator string(JsonValue value)
+        {
+            if (value.Type != ValueType.String)
+            {
+                throw new Exception("JsonValue转换string失败");
+            }
+            return value.Str;
+        }
+        public static implicit operator JsonValue(JsonObject obj)
+        {
+            JsonValue value = new JsonValue();
+            value.Type = ValueType.Object;
+            value.Obj = obj;
+            return value;
+        }
+        
+        public static implicit operator JsonValue[](JsonValue value)
+        {
+            if (value.Type != ValueType.Array)
+            {
+                throw new Exception("JsonValue转换JsonValue[]失败");
+            }
+
+            return value.Array;
+        }
+        public static implicit operator JsonValue(JsonValue[] arr)
+        {
+            JsonValue value = new JsonValue();
+            value.Type = ValueType.Array;
+            value.Array = arr;
+            return value;
+        }
+        
+        public static implicit operator JsonObject(JsonValue value)
+        {
+            if (value.Type != ValueType.Object)
+            {
+                throw new Exception("JsonValue转换JsonObject失败");
+            }
+
+            return value.Obj;
+        }
+
+        #endregion
+        
         
         public override string ToString()
         {
-            switch (Type)
-            {
-                case ValueType.Null:
-                    return "null";
-                case ValueType.Boolean:
-                    return Boolean.ToString();
-                case ValueType.Number:
-                    return Number.ToString();
-                case ValueType.String:
-                    return "\"" + Str + "\"";
-                case ValueType.Array:
-                    string str = "[";
-                    for (int i = 0; i < Array.Length; i++)
-                    {
-                        str += Array[i];
-
-                        if (i != Array.Length - 1)
-                        {
-                            str += " ,";
-                        };
-                    }
-                    str += "] ";
-                    return str;
-                case ValueType.Object:
-                    return Obj.ToString();
-            }
-
-            return "";
-        }
-        public void ToJson(int depth)
-        {
-            switch (Type)
-            {
-                case ValueType.Null:
-                    TextUtil.Append("null");
-                    break;
-                case ValueType.Boolean:
-                    if (Boolean == true)
-                    {
-                        TextUtil.Append("true");
-                    }
-                    else
-                    {
-                        TextUtil.Append("false");
-                    }
-                    break;
-                case ValueType.Number:
-                    TextUtil.Append(Number.ToString());
-                    break;
-                case ValueType.String:
-                    TextUtil.Append("\"");
-                    TextUtil.Append(Str);
-                    TextUtil.Append("\"");
-                    break;
-                case ValueType.Array:
-                    TextUtil.AppendLine("[");
-                    for (int i = 0; i < Array.Length; i++)
-                    {
-                        TextUtil.AppendTab(depth + 1);
-                        JsonValue jv = Array[i];
-                        jv.ToJson(depth + 1);
-                        if (i<Array.Length-1)
-                        {
-                            TextUtil.AppendLine(",");
-                        }
-                    }
-                    TextUtil.AppendLine(string.Empty);
-                    TextUtil.Append("]",depth);
-                    break;
-                case ValueType.Object:
-                    Obj.ToJson(depth);
-                    break;
-            }
+            string json = JsonParser.ToJson(this);
+            return json;
         }
     }
 
