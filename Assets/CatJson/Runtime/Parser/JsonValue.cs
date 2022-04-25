@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace CatJson
@@ -18,6 +19,50 @@ namespace CatJson
         public JsonValue[] Array;
         public JsonObject Obj;
 
+        public JsonValue this[int index]
+        {
+            get
+            {
+                if (Type != ValueType.Array)
+                {
+                    return null;
+                }
+
+                return Array[index];
+            }
+            set
+            {
+                if (Type != ValueType.Array)
+                {
+                    return;
+                }
+
+                Array[index] = value;
+            }
+        }
+
+        public JsonValue this[string key]
+        {
+            get
+            {
+                if (Type != ValueType.Object)
+                {
+                    return null;
+                }
+
+                return Obj[key];
+            }
+            set
+            {
+                if (Type != ValueType.Object)
+                {
+                    return;
+                }
+
+                Obj[key] = value;
+            }
+        }
+        
         public override string ToString()
         {
             switch (Type)
