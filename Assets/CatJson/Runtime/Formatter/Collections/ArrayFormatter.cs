@@ -1,21 +1,19 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace CatJson
 {
+    /// <summary>
+    /// 数组类型的Json格式化器
+    /// </summary>
     public class ArrayFormatter : BaseJsonFormatter<Array>
     {
-        public Type ElementType { 
-            get;
-            set; 
-        }
-        
-        public override void ToJson(Array value, int depth)
+        /// <inheritdoc />
+        public override void ToJson(Array value,Type type,int depth)
         {
             TextUtil.AppendLine("[");
-            Type elementType = TypeUtil.GetArrayOrListElementType(value.GetType());
+            Type elementType = TypeUtil.GetArrayOrListElementType(type);
             for (int i = 0; i < value.Length; i++)
             {
                 object element = value.GetValue(i);
@@ -38,17 +36,18 @@ namespace CatJson
             TextUtil.Append("]", depth);
         }
 
-        public override Array ParseJson()
+        /// <inheritdoc />
+        public override Array ParseJson(Type type)
         {
             List<object> list = new List<object>();
-            
-            JsonParser.ParseJsonArrayProcedure(list, ElementType, (userdata1, userdata2) =>
+            Type elementType = TypeUtil.GetArrayOrListElementType(type);
+            ParserHelper.ParseJsonArrayProcedure(list, elementType, (userdata1, userdata2) =>
             {
                 object value = JsonParser.InternalParseJson((Type) userdata2);
                 ((IList) userdata1).Add(value);
             });
             
-            Array array = Array.CreateInstance(ElementType, list.Count);
+            Array array = Array.CreateInstance(elementType, list.Count);
             for (int i = 0; i < list.Count; i++)
             {
                 object element = list[i];

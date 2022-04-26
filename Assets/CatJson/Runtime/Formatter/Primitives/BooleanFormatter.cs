@@ -1,8 +1,14 @@
-﻿namespace CatJson
+﻿using System;
+
+namespace CatJson
 {
+    /// <summary>
+    /// bool类型的Json格式化器
+    /// </summary>
     public class BooleanFormatter : BaseJsonFormatter<bool>
     {
-        public override void ToJson(bool value, int depth)
+        /// <inheritdoc />
+        public override void ToJson(bool value,Type type,int depth)
         {
             string json = "true";
             if (!value)
@@ -13,7 +19,8 @@
             TextUtil.Append(json);
         }
 
-        public override bool ParseJson()
+        /// <inheritdoc />
+        public override bool ParseJson(Type type)
         {
             JsonParser.Lexer.GetNextToken(out TokenType nextTokenType);
             return nextTokenType == TokenType.True;

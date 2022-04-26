@@ -1,13 +1,20 @@
-﻿namespace CatJson
+﻿using System;
+
+namespace CatJson
 {
+    /// <summary>
+    /// double类型的Json格式化器
+    /// </summary>
     public class DoubleFormatter : BaseJsonFormatter<double>
     {
-        public override void ToJson(double value, int depth)
+        /// <inheritdoc />
+        public override void ToJson(double value,Type type,int depth)
         {
             TextUtil.Append(value.ToString());
         }
 
-        public override double ParseJson()
+        /// <inheritdoc />
+        public override double ParseJson(Type type)
         {
             RangeString rs = JsonParser.Lexer.GetNextTokenByType(TokenType.Number);
             return double.Parse(rs.ToString());

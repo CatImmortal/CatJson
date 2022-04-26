@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-
-namespace CatJson
+﻿namespace CatJson
 {
     /// <summary>
     /// Json序列化/反序列化回调接收接口

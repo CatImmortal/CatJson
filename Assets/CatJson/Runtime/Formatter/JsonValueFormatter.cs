@@ -2,9 +2,13 @@
 
 namespace CatJson
 {
+    /// <summary>
+    /// JsonValue类型的Json格式化器
+    /// </summary>
     public class JsonValueFormatter : BaseJsonFormatter<JsonValue>
     {
-        public override void ToJson(JsonValue value, int depth)
+        /// <inheritdoc />
+        public override void ToJson(JsonValue value,Type type,int depth)
         {
             switch (value.Type)
             {
@@ -29,45 +33,34 @@ namespace CatJson
             }
         }
 
-        public override JsonValue ParseJson()
+        /// <inheritdoc />
+        public override JsonValue ParseJson(Type type)
         {
-            JsonValue value = new JsonValue();
-            
             //这里只能look不能get，get交给各类型的formatter去进行
             TokenType nextTokenType = JsonParser.Lexer.LookNextTokenType();
             
             switch (nextTokenType)
             {
-                case TokenType.Null:
-                    JsonParser.Lexer.GetNextToken(out _);
-                    value.Type = ValueType.Null;
-                    break;
                 case TokenType.True:
                 case TokenType.False:
-                    value.Type = ValueType.Boolean;
-                    value.Boolean = JsonParser.InternalParseJson<bool>();
-                    break;
+                    return new JsonValue(JsonParser.InternalParseJson<bool>());
+                
                 case TokenType.Number:
-                    value.Type = ValueType.Number;
-                    value.Number = JsonParser.InternalParseJson<double>();
-                    break;
+                    return new JsonValue(JsonParser.InternalParseJson<double>());
+                
                 case TokenType.String:
-                    value.Type = ValueType.String;
-                    value.Str = JsonParser.InternalParseJson<string>();
-                    break;
+                    return new JsonValue(JsonParser.InternalParseJson<string>());
+                
                 case TokenType.LeftBracket:
-                    value.Type = ValueType.Array;
-                    value.Array = JsonParser.InternalParseJson<JsonValue[]>();
-                    break;
+                    return new JsonValue(JsonParser.InternalParseJson<JsonValue[]>());
+                
                 case TokenType.LeftBrace:
-                    value.Type = ValueType.Object;
-                    value.Obj  = JsonParser.InternalParseJson<JsonObject>();
-                    break;
+                    return new JsonValue(JsonParser.InternalParseJson<JsonObject>());
+                
                 default:
                     throw new Exception("JsonValue解析失败，tokenType == " + nextTokenType);
             }
 
-            return value;
         }
     }
 }

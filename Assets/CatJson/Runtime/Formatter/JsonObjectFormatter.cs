@@ -3,9 +3,13 @@ using System.Collections.Generic;
 
 namespace CatJson
 {
+    /// <summary>
+    /// JsonObject类型的Json格式化器
+    /// </summary>
     public class JsonObjectFormatter : BaseJsonFormatter<JsonObject>
     {
-        public override void ToJson(JsonObject value, int depth)
+        /// <inheritdoc />
+        public override void ToJson(JsonObject value,Type type,int depth)
         {
             TextUtil.AppendLine("{");
 
@@ -35,11 +39,12 @@ namespace CatJson
             TextUtil.Append("}", depth);
         }
 
-        public override JsonObject ParseJson()
+        /// <inheritdoc />
+        public override JsonObject ParseJson(Type type)
         {
             JsonObject obj = new JsonObject();
 
-            JsonParser.ParseJsonKeyValuePairProcedure(obj, (userdata, key) =>
+            ParserHelper.ParseJsonKeyValuePairProcedure(obj,default,default, (userdata,_,_, key) =>
             {
                  JsonValue value = JsonParser.InternalParseJson<JsonValue>();
                 ((JsonObject)userdata)[key.ToString()] = value;
