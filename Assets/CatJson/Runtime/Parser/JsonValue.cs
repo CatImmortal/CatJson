@@ -60,7 +60,7 @@ namespace CatJson
             {
                 if (Type != ValueType.Array)
                 {
-                    return null;
+                    return default;
                 }
 
                 return Array[index];
@@ -82,7 +82,7 @@ namespace CatJson
             {
                 if (Type != ValueType.Object)
                 {
-                    return null;
+                    return default;
                 }
 
                 return Obj[key];

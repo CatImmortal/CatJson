@@ -14,7 +14,7 @@ public class Entry : MonoBehaviour
         jo["str"] = "jsonTest";
         JsonValue[] values = {new JsonValue(4),new JsonValue(5),new JsonValue(6)};
         jo["array"] = values;
-        jo["nil"] = null;
+        jo["nil"] = default;
         
         JsonObject jo2 = new JsonObject();
         jo2["b"] = false;

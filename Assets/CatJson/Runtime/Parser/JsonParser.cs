@@ -20,7 +20,6 @@ namespace CatJson
 
         private static NullFormatter nullFormatter = new NullFormatter();
         private static ArrayFormatter arrayFormatter = new ArrayFormatter();
-        private static DictionaryFormatter dictionaryFormatter = new DictionaryFormatter();
 
         public static Dictionary<Type, IJsonFormatter> FormatterDict = new Dictionary<Type, IJsonFormatter>()
         {
@@ -39,7 +38,7 @@ namespace CatJson
 
         public static string ToJson<T>(T obj)
         {
-            InternalToJson(obj);
+            InternalToJson<T>(obj);
 
             string json = TextUtil.CachedSB.ToString();
             TextUtil.CachedSB.Clear();
@@ -93,18 +92,18 @@ namespace CatJson
                 formatter.ToJson(obj,type, depth);
                 return;
             }
+
+            if (type.IsGenericType && FormatterDict.TryGetValue(type.GetGenericTypeDefinition(), out formatter))
+            {
+                //特殊处理泛型类型
+                formatter.ToJson(obj,type,depth);
+                return;
+            }
             
             if (obj is Array array)
             {
                 //特殊处理数组
                 arrayFormatter.ToJson(array,type, depth);
-                return;
-            }
-            
-            if (type.IsGenericType && FormatterDict.TryGetValue(type.GetGenericTypeDefinition(), out formatter))
-            {
-                //特殊处理泛型类型
-                formatter.ToJson(obj,type,depth);
                 return;
             }
 

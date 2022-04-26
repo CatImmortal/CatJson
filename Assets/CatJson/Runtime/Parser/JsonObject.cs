@@ -16,7 +16,7 @@ namespace CatJson
             {
                 if (ValueDict == null)
                 {
-                    return null;
+                    return default;
                 }
 
                 return ValueDict[key];
