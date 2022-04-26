@@ -50,7 +50,7 @@ namespace CatJson
             Type keyType = type.GetGenericArguments()[0];
             Type valueType = TypeUtil.GetDictValueType(type);
             
-            ParserHelper.ParseJsonKeyValuePairProcedure(dict,valueType,TypeUtil.TypeEquals(keyType,typeof(int)), (userdata1,userdata2,isIntKey, key) =>
+            ParserHelper.ParseJsonObjectProcedure(dict,valueType,TypeUtil.TypeEquals(keyType,typeof(int)), (userdata1,userdata2,isIntKey, key) =>
             {
                 object value = JsonParser.InternalParseJson((Type)userdata2);
                 

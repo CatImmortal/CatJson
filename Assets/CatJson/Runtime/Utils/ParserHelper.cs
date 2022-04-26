@@ -5,9 +5,9 @@ namespace CatJson
     public static class ParserHelper
     {
         /// <summary>
-        /// 解析Json键值对的通用流程
+        /// 解析Json对象的通用流程
         /// </summary>
-        public static void ParseJsonKeyValuePairProcedure(object userdata1,object userdata2,bool isIntKey,Action<object,object,bool,RangeString> action)
+        public static void ParseJsonObjectProcedure(object userdata1,object userdata2,bool isIntKey,Action<object,object,bool,RangeString> action)
         {
             //跳过 {
             JsonParser.Lexer.GetNextTokenByType(TokenType.LeftBrace);

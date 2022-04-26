@@ -11,27 +11,33 @@ namespace CatJson
         /// <summary>
         /// Json词法分析器
         /// </summary>
-        public static JsonLexer Lexer = new JsonLexer();
+        public static readonly JsonLexer Lexer = new JsonLexer();
 
         /// <summary>
         /// 序列化时是否开启格式化
         /// </summary>
         public static bool IsFormat { get; set; } = true;
 
-        private static NullFormatter nullFormatter = new NullFormatter();
-        private static ArrayFormatter arrayFormatter = new ArrayFormatter();
+        private static readonly NullFormatter nullFormatter = new NullFormatter();
+        private static readonly ArrayFormatter arrayFormatter = new ArrayFormatter();
+        private static readonly DefaultFormatter defaultFormatter = new DefaultFormatter();
 
-        public static Dictionary<Type, IJsonFormatter> FormatterDict = new Dictionary<Type, IJsonFormatter>()
+        private static readonly Dictionary<Type, IJsonFormatter> formatterDict = new Dictionary<Type, IJsonFormatter>()
         {
+            //基元类型
             {typeof(bool), new BooleanFormatter()},
+            {typeof(int), new Int32Formatter()},
+            {typeof(float), new SingleFormatter()},
             {typeof(double), new DoubleFormatter()},
             {typeof(string), new StringFormatter()},
-            {typeof(int), new Int32Formatter()},
-
+            
+            //容器类型
+            {typeof(List<>), new ListFormatter()},
+            {typeof(Dictionary<,>), new DictionaryFormatter()},
+            
+            //特殊类型
             {typeof(JsonObject), new JsonObjectFormatter()},
             {typeof(JsonValue), new JsonValueFormatter()},
-
-            {typeof(Dictionary<,>), new DictionaryFormatter()}
         };
 
 
@@ -87,13 +93,13 @@ namespace CatJson
             }
             
             
-            if (FormatterDict.TryGetValue(type, out IJsonFormatter formatter))
+            if (formatterDict.TryGetValue(type, out IJsonFormatter formatter))
             {
                 formatter.ToJson(obj,type, depth);
                 return;
             }
 
-            if (type.IsGenericType && FormatterDict.TryGetValue(type.GetGenericTypeDefinition(), out formatter))
+            if (type.IsGenericType && formatterDict.TryGetValue(type.GetGenericTypeDefinition(), out formatter))
             {
                 //特殊处理泛型类型
                 formatter.ToJson(obj,type,depth);
@@ -106,8 +112,9 @@ namespace CatJson
                 arrayFormatter.ToJson(array,type, depth);
                 return;
             }
-
-            throw new Exception($"未找到{type}类型的Json格式化器");
+            
+            //使用处理自定义类的formatter
+            defaultFormatter.ToJson(obj,type,depth);
         }
         
         internal static object InternalParseJson(Type type)
@@ -117,27 +124,32 @@ namespace CatJson
                 return nullFormatter.ParseJson(type);
             }
 
-            if (FormatterDict.TryGetValue(type, out IJsonFormatter formatter))
+            object result;
+            
+            if (formatterDict.TryGetValue(type, out IJsonFormatter formatter))
             {
-               object result = formatter.ParseJson(type);
+               result = formatter.ParseJson(type);
                return result;
             }
             
-            if (type.IsGenericType &&  FormatterDict.TryGetValue(type.GetGenericTypeDefinition(), out formatter))
+            if (type.IsGenericType &&  formatterDict.TryGetValue(type.GetGenericTypeDefinition(), out formatter))
             {
                 //特殊处理泛型类型
-                object result = formatter.ParseJson(type);
+                result = formatter.ParseJson(type);
                 return result;
             }
             
             if (type.IsArray)
             {
                 //特殊处理数组
-                object result = arrayFormatter.ParseJson(type);
+                result = arrayFormatter.ParseJson(type);
                 return result;
+ 
             }
             
-            throw new Exception($"未找到{type}类型的Json格式化器");
+            //使用处理自定义类的formatter
+            result = defaultFormatter.ParseJson(type);
+            return result;
         }
 
     }
