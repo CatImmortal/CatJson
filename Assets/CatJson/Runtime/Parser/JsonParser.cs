@@ -21,7 +21,8 @@ namespace CatJson
         private static readonly NullFormatter nullFormatter = new NullFormatter();
         private static readonly ArrayFormatter arrayFormatter = new ArrayFormatter();
         private static readonly DefaultFormatter defaultFormatter = new DefaultFormatter();
-
+        private static readonly PolymorphicFormatter polymorphicFormatter = new PolymorphicFormatter();
+        
         private static readonly Dictionary<Type, IJsonFormatter> formatterDict = new Dictionary<Type, IJsonFormatter>()
         {
             //基元类型
@@ -91,7 +92,14 @@ namespace CatJson
                 nullFormatter.ToJson(null,type, depth);
                 return;
             }
-            
+
+            Type realType = TypeUtil.GetType(obj);
+            if (!TypeUtil.TypeEquals(type,realType))
+            {
+                //处理多态
+                polymorphicFormatter.ToJson(obj,type,depth);
+                return;;
+            }
             
             if (formatterDict.TryGetValue(type, out IJsonFormatter formatter))
             {
@@ -125,6 +133,14 @@ namespace CatJson
             }
 
             object result;
+
+            Type realType = ParserHelper.TryParseRealType(type);
+            if (!TypeUtil.TypeEquals(type,realType))
+            {
+                //处理多态
+                result = polymorphicFormatter.ParseJson(realType);
+                return result;
+            }
             
             if (formatterDict.TryGetValue(type, out IJsonFormatter formatter))
             {

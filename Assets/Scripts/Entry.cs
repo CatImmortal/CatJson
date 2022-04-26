@@ -48,40 +48,103 @@ public class Entry : MonoBehaviour
         // Debug.Log(JsonParser.ToJson(dict2));
         // Debug.Log(JsonParser.ToJson(JsonParser.ParseJson<Dictionary<int, string>>(JsonParser.ToJson(dict2))));
 
-        TestDataRoot root = new TestDataRoot()
+        // TestDataRoot root = new TestDataRoot()
+        // {
+        //     b = true,
+        //     num = 3.14f,
+        //     str = "textJson",
+        //     item = new TestDataItem()
+        //     {
+        //         b = false,
+        //         num = 6,
+        //         str = "testDataItem",
+        //     },
+        //     intList = new List<int>() {1, 2, 3, 4},
+        //     itemList = new List<TestDataItem>()
+        //     {
+        //         new TestDataItem() {b = true, num = 7, str = "item1"},
+        //         new TestDataItem() {b = true, num = 8, str = "item2"},
+        //         new TestDataItem() {b = true, num = 9, str = "item3"},
+        //     },
+        //     intDict = new Dictionary<string, int>()
+        //     {
+        //         {"key1", 1},
+        //         {"key2", 2},
+        //         {"key3", 3},
+        //     },
+        //     itemDict = new Dictionary<string, TestDataItem>()
+        //     {
+        //         { "key4", new TestDataItem() {b = true, num = 10, str = "value1"}},
+        //         { "key5", new TestDataItem() {b = true, num = 10, str = "value2"}},
+        //         { "key6", new TestDataItem() {b = true, num = 10, str = "value3"}},
+        //     }
+        // };
+        //
+        // Debug.Log(JsonParser.ToJson(root));
+        // Debug.Log(JsonParser.ToJson(JsonParser.ParseJson<TestDataRoot>(JsonParser.ToJson(root))));
+
+        TestPolymorph tp = new TestPolymorph()
         {
-            b = true,
-            num = 3.14f,
-            str = "textJson",
-            item = new TestDataItem()
+            intA = 1,
+            floatB = 2.15f,
+            boolC = true,
+            strD = "polymorph",
+            
+            intList = new List<int>(){1,2,3},
+            intDict = new Dictionary<int,int>()
             {
-                b = false,
-                num = 6,
-                str = "testDataItem",
+                {1,1},
+                {2,2}
             },
-            intList = new List<int>() {1, 2, 3, 4},
-            itemList = new List<TestDataItem>()
+            strList = new List<string>(){"item1","item2"},
+            strDict = new Dictionary<string,string>()
             {
-                new TestDataItem() {b = true, num = 7, str = "item1"},
-                new TestDataItem() {b = true, num = 8, str = "item2"},
-                new TestDataItem() {b = true, num = 9, str = "item3"},
+                {"key1","value1"},
+                {"key2","value2"},
             },
-            intDict = new Dictionary<string, int>()
+            testChlid = new TestChild()
             {
-                {"key1", 1},
-                {"key2", 2},
-                {"key3", 3},
+                baseBool = true,
+                baseInt = 1,
+                baseStr = "base",
+                ChildBool = false,
+                ChildInt = 2,
+                ChlidStr = "child"
             },
-            itemDict = new Dictionary<string, TestDataItem>()
+            childList = new List<TestBase>()
             {
-                { "key4", new TestDataItem() {b = true, num = 10, str = "value1"}},
-                { "key5", new TestDataItem() {b = true, num = 10, str = "value2"}},
-                { "key6", new TestDataItem() {b = true, num = 10, str = "value3"}},
+                new TestChild()
+                {
+                    baseBool = true,
+                    baseInt = 1,
+                    baseStr = "base",
+                    ChildBool = false,
+                    ChildInt = 2,
+                    ChlidStr = "child"
+                },
+                new TestChild()
+                {
+                    baseBool = true,
+                    baseInt = 1,
+                    baseStr = "base",
+                    ChildBool = false,
+                    ChildInt = 2,
+                    ChlidStr = "child"
+                },
+                new TestChild()
+                {
+                    baseBool = true,
+                    baseInt = 1,
+                    baseStr = "base",
+                    ChildBool = false,
+                    ChildInt = 2,
+                    ChlidStr = "child"
+                },
             }
+            
         };
-        
-        Debug.Log(JsonParser.ToJson(root));
-        Debug.Log(JsonParser.ToJson(JsonParser.ParseJson<TestDataRoot>(JsonParser.ToJson(root))));
+        Debug.Log(JsonParser.ToJson(tp));
+        Debug.Log(JsonParser.ToJson(JsonParser.ParseJson<TestPolymorph>(JsonParser.ToJson(tp))));
     }
 
 

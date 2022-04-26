@@ -20,3 +20,33 @@ public class TestDataItem
     public float num;
     public string str;
 }
+
+public class TestPolymorph
+{
+    public object intA;
+    public object floatB;
+    public object boolC;
+    public object strD;
+    
+    public object intList;
+    public object intDict;
+    public IList strList;
+    public IDictionary strDict;
+    public TestBase testChlid;
+
+    public List<TestBase> childList;
+}
+
+public class TestBase
+{
+    public bool baseBool;
+    public int baseInt;
+    public string baseStr;
+}
+
+public class TestChild : TestBase
+{
+    public bool ChildBool;
+    public int ChildInt;
+    public string ChlidStr;
+}
