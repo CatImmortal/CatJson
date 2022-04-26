@@ -11,9 +11,14 @@ namespace CatJson
     {
 
         /// <inheritdoc />
-        public override void ToJson(IDictionary value,Type type,int depth)
+        public override void ToJson(IDictionary value, Type type, Type realType, int depth)
         {
-            Type valueType = TypeUtil.GetDictValueType(type);
+            Type dictType = type;
+            if (!type.IsGenericType)
+            {
+                dictType = realType;
+            }
+            Type valueType = TypeUtil.GetDictValueType(dictType);
 
             TextUtil.AppendLine("{");
 
@@ -29,7 +34,7 @@ namespace CatJson
 
                     TextUtil.Append(":");
 
-                    JsonParser.InternalToJson(item.Value,valueType,depth + 1);
+                    JsonParser.InternalToJson(item.Value,valueType,null,depth + 1);
 
                     if (index < value.Count-1)
                     {
@@ -44,11 +49,16 @@ namespace CatJson
         }
 
         /// <inheritdoc />
-        public override IDictionary ParseJson(Type type)
+        public override IDictionary ParseJson(Type type, Type realType)
         {
-            IDictionary dict = (IDictionary)Activator.CreateInstance(type);
-            Type keyType = type.GetGenericArguments()[0];
-            Type valueType = TypeUtil.GetDictValueType(type);
+            IDictionary dict = (IDictionary)TypeUtil.CreateInstance(realType);
+            Type dictType = type;
+            if (!type.IsGenericType)
+            {
+                dictType = realType;
+            }
+            Type keyType = dictType.GetGenericArguments()[0];
+            Type valueType = TypeUtil.GetDictValueType(dictType);
             
             ParserHelper.ParseJsonObjectProcedure(dict,valueType,TypeUtil.TypeEquals(keyType,typeof(int)), (userdata1,userdata2,isIntKey, key) =>
             {

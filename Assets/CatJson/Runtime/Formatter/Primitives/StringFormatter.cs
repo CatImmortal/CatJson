@@ -8,13 +8,13 @@ namespace CatJson
     public class StringFormatter : BaseJsonFormatter<string>
     {
         /// <inheritdoc />
-        public override void ToJson(string value,Type type,int depth)
+        public override void ToJson(string value, Type type, Type realType, int depth)
         {
             TextUtil.Append($"\"{value}\"");
         }
 
         /// <inheritdoc />
-        public override string ParseJson(Type type)
+        public override string ParseJson(Type type, Type realType)
         {
             RangeString rs = JsonParser.Lexer.GetNextTokenByType(TokenType.String);
             return rs.ToString();

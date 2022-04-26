@@ -10,10 +10,15 @@ namespace CatJson
     public class ListFormatter : BaseJsonFormatter<IList>
     {
         /// <inheritdoc />
-        public override void ToJson(IList value, Type type, int depth)
+        public override void ToJson(IList value, Type type, Type realType, int depth)
         {
             TextUtil.AppendLine("[");
-            Type elementType = TypeUtil.GetArrayOrListElementType(type);
+            Type listType = type;
+            if (!listType.IsGenericType)
+            {
+                listType = realType;
+            }
+            Type elementType = TypeUtil.GetArrayOrListElementType(listType);
             for (int i = 0; i < value.Count; i++)
             {
                 object element = value[i];
@@ -24,7 +29,7 @@ namespace CatJson
                 }
                 else
                 {
-                    JsonParser.InternalToJson(element,elementType,depth + 1);
+                    JsonParser.InternalToJson(element,elementType,null,depth + 1);
                 }
                 if (i < value.Count - 1)
                 {
@@ -37,10 +42,17 @@ namespace CatJson
         }
 
         /// <inheritdoc />
-        public override IList ParseJson(Type type)
+        public override IList ParseJson(Type type, Type realType)
         {
-            IList list = (IList)Activator.CreateInstance(type);
-            Type elementType = TypeUtil.GetArrayOrListElementType(type);
+            IList list = (IList)TypeUtil.CreateInstance(realType);
+            
+            Type listType = type;
+            if (!listType.IsGenericType)
+            {
+                listType = realType;
+            }
+            Type elementType = TypeUtil.GetArrayOrListElementType(listType);
+            
             ParserHelper.ParseJsonArrayProcedure(list, elementType, (userdata1, userdata2) =>
             {
                 object value = JsonParser.InternalParseJson((Type) userdata2);

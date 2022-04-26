@@ -9,13 +9,13 @@ namespace CatJson
     public class SingleFormatter : BaseJsonFormatter<float>
     {
         /// <inheritdoc />
-        public override void ToJson(float value,Type type,int depth)
+        public override void ToJson(float value, Type type, Type realType, int depth)
         {
-            TextUtil.Append(value.ToString(CultureInfo.InvariantCulture));
+            TextUtil.Append(value.ToString());
         }
 
         /// <inheritdoc />
-        public override float ParseJson(Type type)
+        public override float ParseJson(Type type, Type realType)
         {
             RangeString rs = JsonParser.Lexer.GetNextTokenByType(TokenType.Number);
             return float.Parse(rs.ToString());

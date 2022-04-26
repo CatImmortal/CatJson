@@ -30,11 +30,11 @@ public class TestPolymorph
     
     public object intList;
     public object intDict;
-    public IList strList;
-    public IDictionary strDict;
-    public TestBase testChlid;
-
-    public List<TestBase> childList;
+    public object strList;
+    public object strDict;
+    public object testChlid;
+    
+    public object childList;
 }
 
 public class TestBase
@@ -49,4 +49,14 @@ public class TestChild : TestBase
     public bool ChildBool;
     public int ChildInt;
     public string ChlidStr;
+}
+
+public class TestBase2
+{
+    public TestBase2 Base;
+}
+
+public class TestChild2 : TestBase2
+{
+    public int intA;
 }

@@ -85,9 +85,9 @@ namespace CatJson
         /// <summary>
         /// 尝试从多态序列化的Json文本中读取真实类型
         /// </summary>
-        public static Type TryParseRealType(Type type)
+        public static bool TryParseRealType(Type type, out Type realType)
         {
-            Type realType  = type;
+            realType = null;
             
             if (JsonParser.Lexer.LookNextTokenType() == TokenType.LeftBrace)
             {
@@ -102,18 +102,20 @@ namespace CatJson
                     
                     rs = JsonParser.Lexer.GetNextTokenByType(TokenType.String); //RealType Value
                     realType = TypeUtil.GetRealType(type, rs.ToString());  //获取真实类型
-                }
-                else
-                {
-                    //不是被多态序列化的
-                    //回退到前一个{的位置上，并将缓存置空，因为被look过所以需要-1
-                    JsonParser.Lexer.SetCurIndex(curIndex - 1); 
-                }
 
-              
+                    return true;
+                }
+               
+                //不是被多态序列化的
+                //回退到前一个{的位置上，并将缓存置空，因为被look过所以需要-1
+                JsonParser.Lexer.SetCurIndex(curIndex - 1);
+                return false;
+
+
             }
 
-            return realType;
+            return false;
+
         }
     }
 }

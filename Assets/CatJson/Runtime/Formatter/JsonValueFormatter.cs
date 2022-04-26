@@ -8,7 +8,7 @@ namespace CatJson
     public class JsonValueFormatter : BaseJsonFormatter<JsonValue>
     {
         /// <inheritdoc />
-        public override void ToJson(JsonValue value,Type type,int depth)
+        public override void ToJson(JsonValue value, Type type, Type realType, int depth)
         {
             switch (value.Type)
             {
@@ -34,7 +34,7 @@ namespace CatJson
         }
 
         /// <inheritdoc />
-        public override JsonValue ParseJson(Type type)
+        public override JsonValue ParseJson(Type type, Type realType)
         {
             //这里只能look不能get，get交给各类型的formatter去进行
             TokenType nextTokenType = JsonParser.Lexer.LookNextTokenType();

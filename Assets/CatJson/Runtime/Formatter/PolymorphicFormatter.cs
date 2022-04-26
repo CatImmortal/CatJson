@@ -18,9 +18,8 @@ namespace CatJson
         private const string objectKey = "<>Object";
         
         /// <inheritdoc />
-        public void ToJson(object value, Type type, int depth)
+        public void ToJson(object value, Type type, Type realType, int depth)
         {
-            Type realType = TypeUtil.GetType(value);
             TextUtil.AppendLine("{");
                 
             //写入真实类型
@@ -37,14 +36,14 @@ namespace CatJson
             TextUtil.Append(objectKey);
             TextUtil.Append("\"");
             TextUtil.Append(":");
-            JsonParser.InternalToJson(value,realType,depth + 1);
+            JsonParser.InternalToJson(value,type,realType,depth + 1,false);
                 
             TextUtil.AppendLine(string.Empty);
             TextUtil.Append("}", depth);
         }
 
         /// <inheritdoc />
-        public object ParseJson(Type type)
+        public object ParseJson(Type type, Type realType)
         {
            
             //{
@@ -66,11 +65,13 @@ namespace CatJson
             JsonParser.Lexer.GetNextTokenByType(TokenType.Colon);
             
             //读取被多态序列化的对象的Json文本
-            object obj = JsonParser.InternalParseJson(type);
+            object obj = JsonParser.InternalParseJson(type,realType);
             
             //跳过}
             JsonParser.Lexer.GetNextTokenByType(TokenType.RightBrace);
 
+            
+            
             return obj;
         }
         

@@ -8,13 +8,13 @@ namespace CatJson
     public class NullFormatter : IJsonFormatter
     {
         /// <inheritdoc />
-        public void ToJson(object value,Type type,int depth)
+        public void ToJson(object value, Type type, Type realType, int depth)
         {
             TextUtil.Append("null");
         }
 
         /// <inheritdoc />
-        public object ParseJson(Type type)
+        public object ParseJson(Type type, Type realType)
         {
             JsonParser.Lexer.GetNextTokenByType(TokenType.Null);
             return null;

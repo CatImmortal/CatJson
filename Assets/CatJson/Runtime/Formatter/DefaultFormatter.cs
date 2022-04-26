@@ -20,12 +20,12 @@ namespace CatJson
         private static readonly Dictionary<Type, Dictionary<RangeString, FieldInfo>> fieldInfoDict = new Dictionary<Type, Dictionary<RangeString, FieldInfo>>();
 
         /// <inheritdoc />
-        public void ToJson(object value, Type type, int depth)
+        public void ToJson(object value, Type type, Type realType, int depth)
         {
-            if (!propertyInfoDict.ContainsKey(type) && !fieldInfoDict.ContainsKey(type))
+            if (!propertyInfoDict.ContainsKey(realType) && !fieldInfoDict.ContainsKey(realType))
             {
                 //初始化反射信息
-                AddReflectionInfo(type);
+                AddReflectionInfo(realType);
             }
             
             //是否需要删除最后一个逗号
@@ -34,7 +34,7 @@ namespace CatJson
             TextUtil.AppendLine("{");
             
             //序列化属性
-            foreach (KeyValuePair<RangeString, PropertyInfo> item in propertyInfoDict[type])
+            foreach (KeyValuePair<RangeString, PropertyInfo> item in propertyInfoDict[realType])
             {
                 object propValue = item.Value.GetValue(value);
                 
@@ -43,7 +43,7 @@ namespace CatJson
             }
             
             //序列化字段
-            foreach (KeyValuePair<RangeString, FieldInfo> item in fieldInfoDict[type])
+            foreach (KeyValuePair<RangeString, FieldInfo> item in fieldInfoDict[realType])
             {
                 object fieldValue = item.Value.GetValue(value);
 
@@ -74,17 +74,17 @@ namespace CatJson
         }
 
         /// <inheritdoc />
-        public object ParseJson(Type type)
+        public object ParseJson(Type type, Type realType)
         {
-            if (!propertyInfoDict.ContainsKey(type) && !fieldInfoDict.ContainsKey(type))
+            if (!propertyInfoDict.ContainsKey(realType) && !fieldInfoDict.ContainsKey(realType))
             {
                 //初始化反射信息
-                AddReflectionInfo(type);
+                AddReflectionInfo(realType);
             }
             
-            object obj = TypeUtil.CreateInstance(type);
+            object obj = TypeUtil.CreateInstance(realType);
             
-            ParserHelper.ParseJsonObjectProcedure(obj, type, default, (userdata1, userdata2, _, key) =>
+            ParserHelper.ParseJsonObjectProcedure(obj, realType, default, (userdata1, userdata2, _, key) =>
             {
                 Type t = (Type) userdata2;
                 if (propertyInfoDict[t].TryGetValue(key, out PropertyInfo pi))
@@ -149,7 +149,7 @@ namespace CatJson
             TextUtil.Append("\"");
             TextUtil.Append(":");
         
-            JsonParser.InternalToJson(value,memberType,depth + 1);
+            JsonParser.InternalToJson(value,memberType,null,depth + 1);
 
             TextUtil.AppendLine(",");
         }
