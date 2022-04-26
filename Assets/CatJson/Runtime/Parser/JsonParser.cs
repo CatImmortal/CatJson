@@ -109,7 +109,7 @@ namespace CatJson
         /// <summary>
         /// 将指定类型的对象序列化为Json文本
         /// </summary>
-        internal static void InternalToJson(object obj, Type type, Type realType = null, int depth = 0,bool isPolymorphicCheck = true)
+        internal static void InternalToJson(object obj, Type type, Type realType = null, int depth = 0,bool checkPolymorphic = true)
         {
             if (obj is null)
             {
@@ -122,7 +122,7 @@ namespace CatJson
                 realType = TypeUtil.GetType(obj);
             }
             
-            if (isPolymorphicCheck && !TypeUtil.TypeEquals(type,realType))
+            if (checkPolymorphic && !TypeUtil.TypeEquals(type,realType))
             {
                 //开启了多态序列化检测
                 //只要定义类型和真实类型不一致，就要进行多态序列化
@@ -157,7 +157,7 @@ namespace CatJson
         /// <summary>
         /// 将Json文本反序列化为指定类型的对象
         /// </summary>
-        internal static object InternalParseJson(Type type,Type realType = null,bool isPolymorphicCheck = true)
+        internal static object InternalParseJson(Type type,Type realType = null,bool checkPolymorphic = true)
         {
             if (Lexer.LookNextTokenType() == TokenType.Null)
             {
@@ -172,7 +172,7 @@ namespace CatJson
                 realType = type;
             }
 
-            if (isPolymorphicCheck && !TypeUtil.TypeEquals(type,realType))
+            if (checkPolymorphic && !TypeUtil.TypeEquals(type,realType))
             {
                 //开启了多态检查并且type和realType不一致
                 //进行多态处理
