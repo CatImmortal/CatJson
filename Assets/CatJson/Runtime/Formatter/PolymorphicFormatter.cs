@@ -65,7 +65,7 @@ namespace CatJson
             JsonParser.Lexer.GetNextTokenByType(TokenType.Colon);
             
             //读取被多态序列化的对象的Json文本
-            object obj = JsonParser.InternalParseJson(type,realType);
+            object obj = JsonParser.InternalParseJson(type,realType,false);
             
             //跳过}
             JsonParser.Lexer.GetNextTokenByType(TokenType.RightBrace);

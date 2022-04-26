@@ -30,9 +30,9 @@ public class TestPolymorph
     
     public object intList;
     public object intDict;
-    public object strList;
-    public object strDict;
-    public object testChlid;
+    public IList strList;
+    public IDictionary strDict;
+    public TestBase testChlid;
     
     public object childList;
 }
@@ -58,5 +58,5 @@ public class TestBase2
 
 public class TestChild2 : TestBase2
 {
-    public int intA;
+    //public int intA;
 }

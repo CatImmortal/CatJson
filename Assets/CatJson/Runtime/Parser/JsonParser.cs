@@ -157,7 +157,7 @@ namespace CatJson
         /// <summary>
         /// 将Json文本反序列化为指定类型的对象
         /// </summary>
-        internal static object InternalParseJson(Type type,Type realType = null)
+        internal static object InternalParseJson(Type type,Type realType = null,bool isPolymorphicCheck = true)
         {
             if (Lexer.LookNextTokenType() == TokenType.Null)
             {
@@ -166,26 +166,16 @@ namespace CatJson
 
             object result;
 
-            //这段多态序列化处理有点复杂
-            //首先根据是否能读取到realTypeKey来判断是否进行多态处理
-            //如果没读取到，并且调用者没传入realType参数，那么就将type作为realType来使用
-            //如果读取到了，就将读取到的tempRealType作为realType使用，并且调用多态处理
-            if (!ParserHelper.TryParseRealType(type,out Type tempRealType))
+            if (realType == null && !ParserHelper.TryParseRealType(type,out realType))
             {
-                //未进行多态序列化
-                if (realType == null)
-                {
-                    //未传入realType，使用type作为realType
-                    realType = type;
-                }
-
+                //未传入realType并且读取不到realType，就把type作为realType使用
+                realType = type;
             }
-            else
-            {
-                //进行了多态序列化
-                //处理多态
-                realType = tempRealType;
 
+            if (isPolymorphicCheck && !TypeUtil.TypeEquals(type,realType))
+            {
+                //开启了多态检查并且type和realType不一致
+                //进行多态处理
                 result = polymorphicFormatter.ParseJson(type, realType);
                 return result;
             }

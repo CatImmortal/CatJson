@@ -82,69 +82,69 @@ public class Entry : MonoBehaviour
         //
         // Debug.Log(JsonParser.ToJson(root));
         // Debug.Log(JsonParser.ToJson(JsonParser.ParseJson<TestDataRoot>(JsonParser.ToJson(root))));
-        //
-        // TestPolymorph tp = new TestPolymorph()
-        // {
-        //     intA = 1,
-        //     floatB = 2.15f,
-        //     boolC = true,
-        //     strD = "polymorph",
-        //     
-        //     intList = new List<int>(){1,2,3},
-        //     intDict = new Dictionary<int,int>()
-        //     {
-        //         {1,1},
-        //         {2,2}
-        //     },
-        //     strList = new List<string>(){"item1","item2"},
-        //     strDict = new Dictionary<string,string>()
-        //     {
-        //         {"key1","value1"},
-        //         {"key2","value2"},
-        //     },
-        //     testChlid = new TestChild()
-        //     {
-        //         baseBool = true,
-        //         baseInt = 1,
-        //         baseStr = "base",
-        //         ChildBool = false,
-        //         ChildInt = 2,
-        //         ChlidStr = "child"
-        //     },
-        //     childList = new List<TestBase>()
-        //     {
-        //         new TestChild()
-        //         {
-        //             baseBool = true,
-        //             baseInt = 1,
-        //             baseStr = "base",
-        //             ChildBool = false,
-        //             ChildInt = 2,
-        //             ChlidStr = "child"
-        //         },
-        //         new TestChild()
-        //         {
-        //             baseBool = true,
-        //             baseInt = 1,
-        //             baseStr = "base",
-        //             ChildBool = false,
-        //             ChildInt = 2,
-        //             ChlidStr = "child"
-        //         },
-        //         new TestChild()
-        //         {
-        //             baseBool = true,
-        //             baseInt = 1,
-        //             baseStr = "base",
-        //             ChildBool = false,
-        //             ChildInt = 2,
-        //             ChlidStr = "child"
-        //         },
-        //     }
-        //     
-        // };
-        // Debug.Log(JsonParser.ToJson(tp));
-        // Debug.Log(JsonParser.ToJson(JsonParser.ParseJson<TestPolymorph>(JsonParser.ToJson(tp))));
+        
+        TestPolymorph tp = new TestPolymorph()
+        {
+            intA = 1,
+            floatB = 2.15f,
+            boolC = true,
+            strD = "polymorph",
+            
+            intList = new List<int>(){1,2,3},
+            intDict = new Dictionary<int,int>()
+            {
+                {1,1},
+                {2,2}
+            },
+            strList = new List<string>(){"item1","item2"},
+            strDict = new Dictionary<string,string>()
+            {
+                {"key1","value1"},
+                {"key2","value2"},
+            },
+            testChlid = new TestChild()
+            {
+                baseBool = true,
+                baseInt = 1,
+                baseStr = "base",
+                ChildBool = false,
+                ChildInt = 2,
+                ChlidStr = "child"
+            },
+            childList = new List<TestBase>()
+            {
+                new TestChild()
+                {
+                    baseBool = true,
+                    baseInt = 1,
+                    baseStr = "base",
+                    ChildBool = false,
+                    ChildInt = 2,
+                    ChlidStr = "child"
+                },
+                new TestChild()
+                {
+                    baseBool = true,
+                    baseInt = 1,
+                    baseStr = "base",
+                    ChildBool = false,
+                    ChildInt = 2,
+                    ChlidStr = "child"
+                },
+                new TestChild()
+                {
+                    baseBool = true,
+                    baseInt = 1,
+                    baseStr = "base",
+                    ChildBool = false,
+                    ChildInt = 2,
+                    ChlidStr = "child"
+                },
+            }
+            
+        };
+        Debug.Log(JsonParser.ToJson(tp));
+        Debug.Log(JsonParser.ToJson(JsonParser.ParseJson<TestPolymorph>(JsonParser.ToJson(tp))));
 
         TestBase2 base2 = new TestChild2()
         {
@@ -154,7 +154,7 @@ public class Entry : MonoBehaviour
                 {
                     Base = new TestChild2()
                     {
-                        intA = 1
+
                     }
                 }
             }
