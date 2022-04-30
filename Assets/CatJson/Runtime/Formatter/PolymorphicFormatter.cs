@@ -81,7 +81,7 @@ namespace CatJson
         private static string GetRealTypeJsonValue(Type realType)
         {
 #if FUCK_LUA
-            if (realType is ILRuntimeType ilrtType)
+            if (realType is ILRuntime.Reflection.ILRuntimeType ilrtType)
             {
                  return $"\"{ilrtType.FullName}\"";
             }

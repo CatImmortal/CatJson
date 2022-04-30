@@ -1,6 +1,5 @@
 using System.Collections.Generic;
-using  System;
-using UnityEngine;
+using System;
 
 namespace CatJson
 {
@@ -9,6 +8,16 @@ namespace CatJson
     /// </summary>
     public static class JsonParser
     {
+#if FUCK_LUA
+        static JsonParser()
+        {
+            if (TypeUtil.AppDomain == null)
+            {
+                throw new Exception("请先调用CatJson.ILRuntimeHelper.RegisterILRuntimeCLRRedirection(appDomain)进行CatJson重定向");
+            }
+        }
+#endif
+        
         /// <summary>
         /// Json词法分析器
         /// </summary>
@@ -119,7 +128,7 @@ namespace CatJson
 
             if (realType == null)
             {
-                realType = TypeUtil.GetType(obj);
+                realType = TypeUtil.GetType(obj,type);
             }
             
             if (checkPolymorphic && !TypeUtil.TypeEquals(type,realType))
@@ -169,7 +178,10 @@ namespace CatJson
             if (realType == null && !ParserHelper.TryParseRealType(type,out realType))
             {
                 //未传入realType并且读取不到realType，就把type作为realType使用
-                realType = type;
+                //这里不能直接赋值type，因为type有可能是一个包装了主工程类型的ILRuntimeWrapperType
+                //直接赋值type会导致无法从formatterDict拿到正确的formatter从而进入到defaultFormatter的处理中
+                //realType = type;  
+                realType = TypeUtil.CheckType(type);
             }
 
             if (checkPolymorphic && !TypeUtil.TypeEquals(type,realType))

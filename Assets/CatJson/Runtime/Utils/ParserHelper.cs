@@ -2,6 +2,9 @@ using System;
 
 namespace CatJson
 {
+    /// <summary>
+    /// Json解析器辅助类
+    /// </summary>
     public static class ParserHelper
     {
         /// <summary>
