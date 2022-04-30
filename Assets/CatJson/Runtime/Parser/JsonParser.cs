@@ -8,16 +8,16 @@ namespace CatJson
     /// </summary>
     public static class JsonParser
     {
-#if FUCK_LUA
         static JsonParser()
         {
+#if FUCK_LUA
             if (TypeUtil.AppDomain == null)
             {
                 throw new Exception("请先调用CatJson.ILRuntimeHelper.RegisterILRuntimeCLRRedirection(appDomain)进行CatJson重定向");
             }
-        }
 #endif
-        
+        }
+
         /// <summary>
         /// Json词法分析器
         /// </summary>
