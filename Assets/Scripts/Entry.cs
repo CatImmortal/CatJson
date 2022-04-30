@@ -47,41 +47,41 @@ public class Entry : MonoBehaviour
         // };
         // Debug.Log(JsonParser.ToJson(dict2));
         // Debug.Log(JsonParser.ToJson(JsonParser.ParseJson<Dictionary<int, string>>(JsonParser.ToJson(dict2))));
-        //
-        // TestDataRoot root = new TestDataRoot()
-        // {
-        //     b = true,
-        //     num = 3.14f,
-        //     str = "textJson",
-        //     item = new TestDataItem()
-        //     {
-        //         b = false,
-        //         num = 6,
-        //         str = "testDataItem",
-        //     },
-        //     intList = new List<int>() {1, 2, 3, 4},
-        //     itemList = new List<TestDataItem>()
-        //     {
-        //         new TestDataItem() {b = true, num = 7, str = "item1"},
-        //         new TestDataItem() {b = true, num = 8, str = "item2"},
-        //         new TestDataItem() {b = true, num = 9, str = "item3"},
-        //     },
-        //     intDict = new Dictionary<string, int>()
-        //     {
-        //         {"key1", 1},
-        //         {"key2", 2},
-        //         {"key3", 3},
-        //     },
-        //     itemDict = new Dictionary<string, TestDataItem>()
-        //     {
-        //         { "key4", new TestDataItem() {b = true, num = 10, str = "value1"}},
-        //         { "key5", new TestDataItem() {b = true, num = 10, str = "value2"}},
-        //         { "key6", new TestDataItem() {b = true, num = 10, str = "value3"}},
-        //     }
-        // };
-        //
-        // Debug.Log(JsonParser.ToJson(root));
-        // Debug.Log(JsonParser.ToJson(JsonParser.ParseJson<TestDataRoot>(JsonParser.ToJson(root))));
+
+        TestDataRoot root = new TestDataRoot()
+        {
+            // b = true,
+            // num = 3.14f,
+            // str = "textJson",
+            // item = new TestDataItem()
+            // {
+            //     b = false,
+            //     num = 6,
+            //     str = "testDataItem",
+            // },
+            intList = new List<int>() {1, 2, 3, 4},
+            // itemList = new List<TestDataItem>()
+            // {
+            //     new TestDataItem() {b = true, num = 7, str = "item1"},
+            //     new TestDataItem() {b = true, num = 8, str = "item2"},
+            //     new TestDataItem() {b = true, num = 9, str = "item3"},
+            // },
+            intDict = new Dictionary<string, int>()
+            {
+                {"key1", 1},
+                {"key2", 2},
+                {"key3", 3},
+            },
+            // itemDict = new Dictionary<string, TestDataItem>()
+            // {
+            //     { "key4", new TestDataItem() {b = true, num = 10, str = "value1"}},
+            //     { "key5", new TestDataItem() {b = true, num = 10, str = "value2"}},
+            //     { "key6", new TestDataItem() {b = true, num = 10, str = "value3"}},
+            // }
+        };
+        
+        Debug.Log(JsonParser.ToJson(root));
+        Debug.Log(JsonParser.ToJson(JsonParser.ParseJson<TestDataRoot>(JsonParser.ToJson(root))));
         
         // TestPolymorph tp = new TestPolymorph()
         // {
@@ -146,21 +146,21 @@ public class Entry : MonoBehaviour
         // Debug.Log(JsonParser.ToJson(tp));
         // Debug.Log(JsonParser.ToJson(JsonParser.ParseJson<TestPolymorph>(JsonParser.ToJson(tp))));
 
-        TestBase2 base2 = new TestChild2()
-        {
-            Base = new TestChild2()
-            {
-                Base = new TestChild2()
-                {
-                    Base = new TestChild2()
-                    {
-
-                    }
-                }
-            }
-        };
-        Debug.Log(JsonParser.ToJson(base2));
-        Debug.Log(JsonParser.ToJson(JsonParser.ParseJson<TestBase2>(JsonParser.ToJson(base2))));
+        // TestBase2 base2 = new TestChild2()
+        // {
+        //     Base = new TestChild2()
+        //     {
+        //         Base = new TestChild2()
+        //         {
+        //             Base = new TestChild2()
+        //             {
+        //
+        //             }
+        //         }
+        //     }
+        // };
+        // Debug.Log(JsonParser.ToJson(base2));
+        // Debug.Log(JsonParser.ToJson(JsonParser.ParseJson<TestBase2>(JsonParser.ToJson(base2))));
 
     }
 

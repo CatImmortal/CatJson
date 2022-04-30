@@ -16,6 +16,7 @@ namespace CatJson
             Type dictType = type;
             if (!type.IsGenericType)
             {
+                //处理type是非泛型类型的情况
                 dictType = realType;
             }
             Type valueType = TypeUtil.GetDictValueType(dictType);

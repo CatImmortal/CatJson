@@ -16,6 +16,7 @@ namespace CatJson
             Type arrayType = type;
             if (!type.IsArray)
             {
+                //处理type是非泛型类型的情况
                 arrayType = realType;
             }
             Type elementType = TypeUtil.GetArrayOrListElementType(arrayType);

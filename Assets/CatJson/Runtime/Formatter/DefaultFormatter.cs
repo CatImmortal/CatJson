@@ -19,6 +19,11 @@ namespace CatJson
         /// </summary>
         private static readonly Dictionary<Type, Dictionary<RangeString, FieldInfo>> fieldInfoDict = new Dictionary<Type, Dictionary<RangeString, FieldInfo>>();
 
+        /// <summary>
+        /// 需要忽略的类型字段/属性名称
+        /// </summary>
+        private static Dictionary<Type, HashSet<string>> ignoreSet = new Dictionary<Type, HashSet<string>>();
+        
         /// <inheritdoc />
         public void ToJson(object value, Type type, Type realType, int depth)
         {
@@ -38,6 +43,12 @@ namespace CatJson
             {
                 object propValue = item.Value.GetValue(value);
                 
+                if (JsonParser.IgnoreDefaultValue && TypeUtil.IsDefaultValue(propValue))
+                {
+                    //默认值跳过序列化
+                    continue;
+                }
+                
                 AppendMember(item.Value.PropertyType,item.Value.Name,propValue,depth + 1);
                 needRemoveLastComma = true;
             }
@@ -47,6 +58,12 @@ namespace CatJson
             {
                 object fieldValue = item.Value.GetValue(value);
 
+                if (JsonParser.IgnoreDefaultValue && TypeUtil.IsDefaultValue(fieldValue))
+                {
+                    //默认值跳过序列化
+                    continue;
+                }
+                
                 AppendMember(item.Value.FieldType,item.Value.Name,fieldValue,depth + 1);
                 needRemoveLastComma = true;
             }
@@ -115,28 +132,73 @@ namespace CatJson
         private void AddReflectionInfo(Type type)
         {
             PropertyInfo[] pis = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-            Dictionary<RangeString, PropertyInfo>  dict1 = new Dictionary<RangeString, PropertyInfo>(pis.Length);
+            Dictionary<RangeString, PropertyInfo>  piDict = new Dictionary<RangeString, PropertyInfo>(pis.Length);
             for (int i = 0; i < pis.Length; i++)
             {
                 PropertyInfo pi = pis[i];
+
+                if (IsIgnore(pi,type,pi.Name))
+                {
+                    //需要忽略
+                    continue;
+                }
                 
                 if (pi.SetMethod != null && pi.GetMethod != null && pi.Name != "Item")
                 {
                     //属性必须同时具有get set 并且不能是索引器item
-                    dict1.Add(new RangeString(pi.Name), pi);
+                    piDict.Add(new RangeString(pi.Name), pi);
                 }
                     
             }
-            propertyInfoDict.Add(type, dict1);
+            propertyInfoDict.Add(type, piDict);
 
             FieldInfo[] fis = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
-            Dictionary<RangeString, FieldInfo> dict2 = new Dictionary<RangeString, FieldInfo>(fis.Length);
+            Dictionary<RangeString, FieldInfo> fiDict = new Dictionary<RangeString, FieldInfo>(fis.Length);
             for (int i = 0; i < fis.Length; i++)
             {
                 FieldInfo fi = fis[i];
-                dict2.Add(new RangeString(fi.Name), fi);
+                
+                if (IsIgnore(fi,type,fi.Name))
+                {
+                    //需要忽略
+                    continue;
+                }
+                
+                fiDict.Add(new RangeString(fi.Name), fi);
             }
-            fieldInfoDict.Add(type, dict2);
+            fieldInfoDict.Add(type, fiDict);
+        }
+
+        /// <summary>
+        /// 是否需要忽略此字段/属性
+        /// </summary>
+        private bool IsIgnore(MemberInfo mi,Type type,string name)
+        {
+            if (Attribute.IsDefined(mi, typeof(JsonIgnoreAttribute)))
+            {
+                return true;
+            }
+
+            if (ignoreSet.TryGetValue(type, out HashSet<string> set) && set.Contains(name))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 添加需要忽略的成员
+        /// </summary>
+        public void AddIgnoreMember(Type type,string memberName)
+        {
+            if (!ignoreSet.TryGetValue(type,out HashSet<string> set))
+            {
+                set = new HashSet<string>();
+                ignoreSet.Add(type,set);
+            }
+
+            set.Add(memberName);
         }
         
         /// <summary>

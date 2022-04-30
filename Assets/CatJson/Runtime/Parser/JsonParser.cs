@@ -28,6 +28,11 @@ namespace CatJson
         /// </summary>
         public static bool IsFormat { get; set; } = true;
 
+        /// <summary>
+        /// 序列化时是否忽略默认值
+        /// </summary>
+        public static bool IgnoreDefaultValue { get; set; } = true;
+        
         private static readonly NullFormatter nullFormatter = new NullFormatter();
         private static readonly ArrayFormatter arrayFormatter = new ArrayFormatter();
         private static readonly DefaultFormatter defaultFormatter = new DefaultFormatter();
@@ -54,6 +59,13 @@ namespace CatJson
             {typeof(JsonValue), new JsonValueFormatter()},
         };
 
+        /// <summary>
+        /// 添加需要忽略的成员
+        /// </summary>
+        public static void AddIgnoreMember(Type type, string memberName)
+        {
+            defaultFormatter.AddIgnoreMember(type,memberName);
+        }
 
         /// <summary>
         /// 将指定类型的对象序列化为Json文本
