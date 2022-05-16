@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace CatJson
 {
@@ -10,7 +11,22 @@ namespace CatJson
         /// <inheritdoc />
         public override void ToJson(string value, Type type, Type realType, int depth)
         {
-            TextUtil.Append($"\"{value}\"");
+            //TextUtil.Append($"\"{value}\"");
+            
+            TextUtil.Append("\"");
+            for (int i = 0; i < value.Length; i++)
+            {
+               TextUtil.CachedSB.Append(value[i]);
+
+               if (value[i] == '\\')
+               {
+                   //特殊处理包含\字符的情况，要额外多写入一个\，这样在ParseJson的时候才能被正确解析
+                   TextUtil.CachedSB.Append('\\');
+               }
+            }
+            TextUtil.Append("\"");
+            
+          
         }
 
         /// <inheritdoc />
