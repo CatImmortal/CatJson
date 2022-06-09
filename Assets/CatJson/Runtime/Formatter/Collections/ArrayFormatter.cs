@@ -16,7 +16,9 @@ namespace CatJson
             Type arrayType = type;
             if (!type.IsArray)
             {
-                //处理type是非泛型类型的情况
+                //type可能是object,这时需要用realType作为arrayType
+                //但又不能一开始就把realType当arrayType，因为value可能是热更层数组，这样realType会是ILTypeInstance[]，会导致后续获取到的元素类型为ILTypeInstance
+                //因此这里有限制，无法多态序列化热更层的定义类型为object的任意数组字段/属性，因为真实类型信息根本没有
                 arrayType = realType;
             }
             Type elementType = TypeUtil.GetArrayOrListElementType(arrayType);

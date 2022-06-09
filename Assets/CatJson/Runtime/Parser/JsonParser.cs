@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System;
+using UnityEngine;
 
 namespace CatJson
 {
@@ -16,6 +17,8 @@ namespace CatJson
                 throw new Exception("请先调用CatJson.ILRuntimeHelper.RegisterILRuntimeCLRRedirection(appDomain)进行CatJson重定向");
             }
 #endif
+            //Type类型的变量其对象一般为RuntimeType类型，但是不能直接typeof(RuntimeType)，只能这样了
+            formatterDict.Add(Type.GetType("System.RuntimeType,mscorlib"),new RuntimeTypeFormatter());
         }
 
         /// <summary>
@@ -46,6 +49,7 @@ namespace CatJson
             //基元类型
             {typeof(bool), new BooleanFormatter()},
             {typeof(int), new Int32Formatter()},
+            {typeof(long), new Int64Formatter()},
             {typeof(float), new SingleFormatter()},
             {typeof(double), new DoubleFormatter()},
             {typeof(string), new StringFormatter()},
@@ -57,7 +61,12 @@ namespace CatJson
             //特殊类型
             {typeof(JsonObject), new JsonObjectFormatter()},
             {typeof(JsonValue), new JsonValueFormatter()},
+            
+            //Unity特有类型
+            {typeof(Hash128), new Hash128Formatter()},
         };
+
+
 
         /// <summary>
         /// 添加需要忽略的成员
@@ -146,7 +155,8 @@ namespace CatJson
             if (checkPolymorphic && !TypeUtil.TypeEquals(type,realType))
             {
                 //开启了多态序列化检测
-                //只要定义类型和真实类型不一致，就要进行多态序列化
+                //并且定义类型和真实类型不一致
+                //就要进行多态序列化
                 polymorphicFormatter.ToJson(obj,type,realType,depth);
                 return;;
             }

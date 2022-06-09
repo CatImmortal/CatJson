@@ -16,6 +16,7 @@ namespace CatJson
             Type listType = type;
             if (!listType.IsGenericType)
             {
+                //此处的处理原因类似ArrayFormatter
                 listType = realType;
             }
             Type elementType = TypeUtil.GetArrayOrListElementType(listType);
