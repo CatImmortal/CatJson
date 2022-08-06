@@ -24,7 +24,7 @@ namespace CatJson
         /// <summary>
         /// Json词法分析器
         /// </summary>
-        public static readonly JsonLexer Lexer = new JsonLexer();
+        public static JsonLexer Lexer { get; } = new JsonLexer();
 
         /// <summary>
         /// 序列化时是否开启格式化

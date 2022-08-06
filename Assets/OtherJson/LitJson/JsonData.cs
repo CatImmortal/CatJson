@@ -960,8 +960,8 @@ namespace LitJson
 
         public string ToJson ()
         {
-            if (json != null)
-                return json;
+            // if (json != null)
+            //     return json;
 
             StringWriter sw = new StringWriter ();
             JsonWriter writer = new JsonWriter (sw);

@@ -8,12 +8,12 @@ namespace CatJson
     /// </summary>
     public static class TextUtil
     {
-        public static StringBuilder CachedSB = new StringBuilder();
+        public static StringBuilder CachedSB { get; } = new StringBuilder();
 
         /// <summary>
         /// 当前平台的换行符长度
         /// </summary>
-        public static int NewLineLength => Environment.NewLine.Length;
+        public static  int NewLineLength => Environment.NewLine.Length;
 
 
         public static void AppendTab(int tabNum)

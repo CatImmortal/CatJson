@@ -139,7 +139,7 @@ public class Test : MonoBehaviour
         Profiler.BeginSample("Lit Json");
         for (int i = 0; i < TestCount; i++)
         {
-            string json = JsonMapper.ToJson(result2_2);
+            string json = result2_2.ToJson();
         }
         Profiler.EndSample();
 
@@ -169,20 +169,20 @@ public class Test : MonoBehaviour
         }
         Profiler.EndSample();
 
-        //JSONNode result2_6 = JSON.Parse(testJson1Text);
-        //Profiler.BeginSample("Simple Json");
-        //for (int i = 0; i < TestCount; i++)
-        //{
+        JSONNode result2_6 = JSON.Parse(testJson1Text);
+        Profiler.BeginSample("Simple Json");
+        for (int i = 0; i < TestCount; i++)
+        {
+           string json = result2_6.ToString();
+        }
+        Profiler.EndSample();
 
-        //}
-        //Profiler.EndSample();
-
-        //MojoJson.JsonValue result2_7 = MojoJson.Json.Parse(testJson1Text);
-        //Profiler.BeginSample("Mojo Json");
-        //for (int i = 0; i < TestCount; i++)
-        //{
-         
-        //}
+        // MojoJson.JsonValue result2_7 = MojoJson.Json.Parse(testJson1Text);
+        // Profiler.BeginSample("Mojo Json");
+        // for (int i = 0; i < TestCount; i++)
+        // {
+        //
+        // }
         //Profiler.EndSample();
     }
 
