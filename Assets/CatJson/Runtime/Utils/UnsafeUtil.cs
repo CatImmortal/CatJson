@@ -15,8 +15,7 @@ namespace CatJson
         /// </summary>
         public static IntPtr GetPtr(object obj)
         {
-            ulong gcHandle;
-            IntPtr ptr = (IntPtr)UnsafeUtility.PinGCObjectAndGetAddress(obj, out gcHandle);
+            IntPtr ptr = (IntPtr)UnsafeUtility.PinGCObjectAndGetAddress(obj, out ulong gcHandle);
             UnsafeUtility.ReleaseGCObject(gcHandle);
             return ptr;
         }

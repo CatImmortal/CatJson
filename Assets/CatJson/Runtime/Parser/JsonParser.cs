@@ -44,7 +44,8 @@ namespace CatJson
         /// <summary>
         /// Json格式化器字典
         /// </summary>
-        private static readonly Dictionary<Type, IJsonFormatter> formatterDict = new Dictionary<Type, IJsonFormatter>()
+        private static readonly Dictionary<Type, IJsonFormatter> formatterDict = 
+            new Dictionary<Type, IJsonFormatter>()
         {
             //基元类型
             {typeof(bool), new BooleanFormatter()},
@@ -66,6 +67,16 @@ namespace CatJson
             {typeof(Hash128), new Hash128Formatter()},
         };
 
+        /// <summary>
+        /// 非托管类型Json格式化器字典
+        /// </summary>
+        private static readonly Dictionary<Type, IUnmanagedJsonFormatter> unmanagedFormatterDict =
+            new Dictionary<Type, IUnmanagedJsonFormatter>()
+            {
+                {typeof(bool), new BooleanFormatter()},
+                {typeof(int), new Int32Formatter()},
+                {typeof(float), new SingleFormatter()},
+            };
 
 
         /// <summary>
@@ -81,8 +92,7 @@ namespace CatJson
         /// </summary>
         public static string ToJson<T>(T obj)
         {
-            InternalToJson<T>(obj);
-
+            InternalToJson(obj, typeof(T),null, 0);
             string json = TextUtil.CachedSB.ToString();
             TextUtil.CachedSB.Clear();
 
@@ -103,24 +113,6 @@ namespace CatJson
         }
         
         /// <summary>
-        /// 将Json文本反序列化为指定类型的对象
-        /// </summary>
-        public static T ParseJson<T>(string json)
-        {
-            Lexer.SetJsonText(json);
-            return InternalParseJson<T>();
-        }
-
-        /// <summary>
-        /// 将Json文本反序列化为指定类型的对象
-        /// </summary>
-        public static object ParseJson(string json, Type type)
-        {
-            Lexer.SetJsonText(json);
-            return InternalParseJson(type);
-        }
-
-        /// <summary>
         /// 将指定类型的对象序列化为Json文本
         /// </summary>
         internal static void InternalToJson<T>(T obj, int depth = 0)
@@ -128,14 +120,7 @@ namespace CatJson
             InternalToJson(obj, typeof(T),null, depth);
         }
         
-        /// <summary>
-        /// 将Json文本反序列化为指定类型的对象
-        /// </summary>
-        internal static T InternalParseJson<T>()
-        {
-            return (T) InternalParseJson(typeof(T));
-        }
-
+      
         /// <summary>
         /// 将指定类型的对象序列化为Json文本
         /// </summary>
@@ -184,7 +169,42 @@ namespace CatJson
             //使用处理自定义类的formatter
             defaultFormatter.ToJson(obj,type,realType,depth);
         }
+
+        internal static unsafe void UnmanagedToJson(void* obj,Type type,int depth = 0)
+        {
+            if (unmanagedFormatterDict.TryGetValue(type, out IUnmanagedJsonFormatter formatter))
+            {
+                formatter.ToJson(obj,type,null,depth);
+            }
+        }
         
+        /// <summary>
+        /// 将Json文本反序列化为指定类型的对象
+        /// </summary>
+        public static T ParseJson<T>(string json)
+        {
+            Lexer.SetJsonText(json);
+            return (T)InternalParseJson(typeof(T),null,false);
+        }
+
+        /// <summary>
+        /// 将Json文本反序列化为指定类型的对象
+        /// </summary>
+        public static object ParseJson(string json, Type type)
+        {
+            Lexer.SetJsonText(json);
+            return InternalParseJson(type,null,true);
+        }
+        
+        /// <summary>
+        /// 将Json文本反序列化为指定类型的对象
+        /// </summary>
+        internal static T InternalParseJson<T>()
+        {
+            return (T) InternalParseJson(typeof(T),null,false);
+        }
+
+       
         /// <summary>
         /// 将Json文本反序列化为指定类型的对象
         /// </summary>
@@ -195,7 +215,7 @@ namespace CatJson
                 return nullFormatter.ParseJson(type,null);
             }
 
-            object result;
+            object result = null;
 
             if (realType == null && !ParserHelper.TryParseRealType(type,out realType))
             {
@@ -240,6 +260,10 @@ namespace CatJson
             return result;
         }
 
+        internal static BaseUnmanagedJsonFormatter<TValue> GetUnmanagedJsonFormatter<TValue>() where TValue: unmanaged
+        {
+            return ( BaseUnmanagedJsonFormatter<TValue>)unmanagedFormatterDict[typeof(TValue)];
+        }
     }
 
 }
