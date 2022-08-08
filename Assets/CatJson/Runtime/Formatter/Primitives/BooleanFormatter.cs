@@ -5,7 +5,7 @@ namespace CatJson
     /// <summary>
     /// bool类型的Json格式化器
     /// </summary>
-    public class BooleanFormatter : BaseUnmanagedJsonFormatter<bool>
+    public class BooleanFormatter : BaseJsonFormatter<bool>
     {
         /// <inheritdoc />
         public override void ToJson(bool value, Type type, Type realType, int depth)

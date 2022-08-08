@@ -1,21 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Unity.Collections.LowLevel.Unsafe;
 
 namespace CatJson
 {
     /// <summary>
     /// 默认的json格式化器，会通过反射来序列化/反序列化字段/属性
     /// </summary>
-    public unsafe class DefaultFormatter : IJsonFormatter
+    public class DefaultFormatter : IJsonFormatter
     {
         /// <summary>
         /// 类型与其对应的属性信息
         /// </summary>
         private static readonly Dictionary<Type, Dictionary<RangeString, PropertyInfo>> propertyInfoDict = new Dictionary<Type, Dictionary<RangeString, PropertyInfo>>();
         
-        private static readonly Dictionary<Type, Dictionary<RangeString, FieldInfo>> fieldInfoDict = new Dictionary<Type, Dictionary<RangeString, FieldInfo>>();
+       // private static readonly Dictionary<Type, Dictionary<RangeString, FieldInfo>> fieldInfoDict = new Dictionary<Type, Dictionary<RangeString, FieldInfo>>();
 
         /// <summary>
         /// 需要忽略的类型字段/属性名称
@@ -55,35 +54,16 @@ namespace CatJson
             Dictionary<RangeString, UnsafeFieldInfo> fieldInfos = UnsafeReflection.GetFieldInfos(realType);
             foreach (KeyValuePair<RangeString, UnsafeFieldInfo> item in fieldInfos)
             {
-                if (!TypeUtil.IsUnmanagedType(item.Value.FieldType))
-                {
-                    object fieldValue = item.Value.GetValue(value);
+                object fieldValue = item.Value.GetValue(value);
 
-                    if (JsonParser.IgnoreDefaultValue && TypeUtil.IsDefaultValue(fieldValue))
-                    {
-                        //默认值跳过序列化
-                        continue;
-                    }
-                
-                    AppendMember(item.Value.FieldType,item.Value.Name,fieldValue,depth + 1);
-                    needRemoveLastComma = true;
-                }
-                else
+                if (JsonParser.IgnoreDefaultValue && TypeUtil.IsDefaultValue(fieldValue))
                 {
-                    void* fieldValue = item.Value.UnsafeGetValue(value);
-                    
-                    if (JsonParser.IgnoreDefaultValue && TypeUtil.IsUnmanagedDefaultValue(fieldValue))
-                    {
-                        //默认值跳过序列化
-                        continue;
-                    }
-                    
-                    AppendMember(item.Value.FieldType,item.Value.Name,fieldValue,depth + 1);
-                    needRemoveLastComma = true;
+                    //默认值跳过序列化
+                    continue;
                 }
                 
-              
-              
+                AppendMember(item.Value.FieldType,item.Value.Name,fieldValue,depth + 1);
+                needRemoveLastComma = true;
             }
             
             if (needRemoveLastComma)
@@ -121,28 +101,19 @@ namespace CatJson
             
             ParserHelper.ParseJsonObjectProcedure(obj, realType, default, (userdata1, userdata2, _, key) =>
             {
-                object localObj = userdata1;
-                Type localRealType = (Type) userdata2;
-                Dictionary<RangeString, UnsafeFieldInfo> fieldInfos = UnsafeReflection.GetFieldInfos(localRealType);
-                if (propertyInfoDict[localRealType].TryGetValue(key, out PropertyInfo pi))
+                Type t = (Type) userdata2;
+                Dictionary<RangeString, UnsafeFieldInfo> fieldInfos = UnsafeReflection.GetFieldInfos(t);
+                if (propertyInfoDict[t].TryGetValue(key, out PropertyInfo pi))
                 {
                     //先尝试获取名为key的属性信息
                     object value = JsonParser.InternalParseJson(pi.PropertyType);
-                    pi.SetValue(localObj, value);
+                    pi.SetValue(userdata1, value);
                 }
                 else if (fieldInfos.TryGetValue(key, out UnsafeFieldInfo fi))
                 {
                     //属性没有 再试试字段
-                    if (!TypeUtil.IsUnmanagedType(fi.FieldType))
-                    {
-                        object value = JsonParser.InternalParseJson(fi.FieldType);
-                        fi.SetValue(localObj, value);
-                    }
-                    else
-                    {
-                        UnsafeReflection.UnsafeSetValue(fi,localObj);
-                    }
-                  
+                    object value = JsonParser.InternalParseJson(fi.FieldType);
+                    fi.SetValue(userdata1, value);
                 }
                 else
                 {
@@ -195,8 +166,6 @@ namespace CatJson
             //     fiDict.Add(new RangeString(fi.Name), fi);
             // }
             // fieldInfoDict.Add(type, fiDict);
-            
-            
             UnsafeReflection.AddReflectionInfo(type);
         }
 
@@ -244,21 +213,6 @@ namespace CatJson
         
             JsonParser.InternalToJson(value,memberType,null,depth + 1);
 
-            TextUtil.AppendLine(",");
-        }
-        
-        /// <summary>
-        /// 追加字段/属性的json文本
-        /// </summary>
-        private static void AppendMember(Type memberType,string memberName,void* value,int depth)
-        {
-            TextUtil.Append("\"", depth);
-            TextUtil.Append(memberName);
-            TextUtil.Append("\"");
-            TextUtil.Append(":");
-            
-            JsonParser.UnmanagedToJson(value,memberType,depth + 1);
-            
             TextUtil.AppendLine(",");
         }
     }

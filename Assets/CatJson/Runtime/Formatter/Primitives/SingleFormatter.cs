@@ -5,7 +5,7 @@ namespace CatJson
     /// <summary>
     /// float类型的Json格式化器
     /// </summary>
-    public class SingleFormatter : BaseUnmanagedJsonFormatter<float>
+    public class SingleFormatter : BaseJsonFormatter<float>
     {
         /// <inheritdoc />
         public override void ToJson(float value, Type type, Type realType, int depth)

@@ -289,19 +289,8 @@ namespace CatJson
             return false;
         }
 
-        /// <summary>
-        /// type是否为非托管类型
-        /// </summary>
-        public static bool IsUnmanagedType(Type type)
-        {
-            return type == typeof(int) || type == typeof(bool) || type == typeof(float);
-        }
 
-        public static unsafe bool IsUnmanagedDefaultValue(void* value)
-        {
-            int result = *(int*) value;
-            return result == 0;
-        }
+
     }
 }
 
