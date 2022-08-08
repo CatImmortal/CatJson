@@ -14,7 +14,10 @@ namespace CatJson
         /// </summary>
         private static readonly Dictionary<Type, Dictionary<RangeString, PropertyInfo>> propertyInfoDict = new Dictionary<Type, Dictionary<RangeString, PropertyInfo>>();
         
-       // private static readonly Dictionary<Type, Dictionary<RangeString, FieldInfo>> fieldInfoDict = new Dictionary<Type, Dictionary<RangeString, FieldInfo>>();
+        /// <summary>
+        /// 类型与其对应的字段信息
+        /// </summary>
+        private static readonly Dictionary<Type, Dictionary<RangeString, FieldInfo>> fieldInfoDict = new Dictionary<Type, Dictionary<RangeString, FieldInfo>>();
 
         /// <summary>
         /// 需要忽略的类型字段/属性名称
@@ -24,7 +27,7 @@ namespace CatJson
         /// <inheritdoc />
         public void ToJson(object value, Type type, Type realType, int depth)
         {
-            if (!propertyInfoDict.ContainsKey(realType))
+            if (!propertyInfoDict.ContainsKey(realType) && !fieldInfoDict.ContainsKey(realType))
             {
                 //初始化反射信息
                 AddReflectionInfo(realType);
@@ -51,8 +54,7 @@ namespace CatJson
             }
             
             //序列化字段
-            Dictionary<RangeString, UnsafeFieldInfo> fieldInfos = UnsafeReflection.GetFieldInfos(realType);
-            foreach (KeyValuePair<RangeString, UnsafeFieldInfo> item in fieldInfos)
+            foreach (KeyValuePair<RangeString, FieldInfo> item in fieldInfoDict[realType])
             {
                 object fieldValue = item.Value.GetValue(value);
 
@@ -91,7 +93,7 @@ namespace CatJson
         /// <inheritdoc />
         public object ParseJson(Type type, Type realType)
         {
-            if (!propertyInfoDict.ContainsKey(realType))
+            if (!propertyInfoDict.ContainsKey(realType) && !fieldInfoDict.ContainsKey(realType))
             {
                 //初始化反射信息
                 AddReflectionInfo(realType);
@@ -102,14 +104,13 @@ namespace CatJson
             ParserHelper.ParseJsonObjectProcedure(obj, realType, default, (userdata1, userdata2, _, key) =>
             {
                 Type t = (Type) userdata2;
-                Dictionary<RangeString, UnsafeFieldInfo> fieldInfos = UnsafeReflection.GetFieldInfos(t);
                 if (propertyInfoDict[t].TryGetValue(key, out PropertyInfo pi))
                 {
                     //先尝试获取名为key的属性信息
                     object value = JsonParser.InternalParseJson(pi.PropertyType);
                     pi.SetValue(userdata1, value);
                 }
-                else if (fieldInfos.TryGetValue(key, out UnsafeFieldInfo fi))
+                else if (fieldInfoDict[t].TryGetValue(key, out FieldInfo fi))
                 {
                     //属性没有 再试试字段
                     object value = JsonParser.InternalParseJson(fi.FieldType);
@@ -151,22 +152,21 @@ namespace CatJson
             }
             propertyInfoDict.Add(type, piDict);
 
-            // FieldInfo[] fis = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
-            // Dictionary<RangeString, FieldInfo> fiDict = new Dictionary<RangeString, FieldInfo>(fis.Length);
-            // for (int i = 0; i < fis.Length; i++)
-            // {
-            //     FieldInfo fi = fis[i];
-            //     
-            //     if (IsIgnore(fi,type,fi.Name))
-            //     {
-            //         //需要忽略
-            //         continue;
-            //     }
-            //     
-            //     fiDict.Add(new RangeString(fi.Name), fi);
-            // }
-            // fieldInfoDict.Add(type, fiDict);
-            UnsafeReflection.AddReflectionInfo(type);
+            FieldInfo[] fis = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
+            Dictionary<RangeString, FieldInfo> fiDict = new Dictionary<RangeString, FieldInfo>(fis.Length);
+            for (int i = 0; i < fis.Length; i++)
+            {
+                FieldInfo fi = fis[i];
+                
+                if (IsIgnore(fi,type,fi.Name))
+                {
+                    //需要忽略
+                    continue;
+                }
+                
+                fiDict.Add(new RangeString(fi.Name), fi);
+            }
+            fieldInfoDict.Add(type, fiDict);
         }
 
         /// <summary>
