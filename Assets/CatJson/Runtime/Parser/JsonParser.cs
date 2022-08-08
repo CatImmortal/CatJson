@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace CatJson
 {
@@ -69,19 +70,11 @@ namespace CatJson
 
 
         /// <summary>
-        /// 添加需要忽略的成员
-        /// </summary>
-        public static void AddIgnoreMember(Type type, string memberName)
-        {
-            defaultFormatter.AddIgnoreMember(type,memberName);
-        }
-
-        /// <summary>
         /// 将指定类型的对象序列化为Json文本
         /// </summary>
         public static string ToJson<T>(T obj)
         {
-            InternalToJson<T>(obj);
+            InternalToJson(obj, typeof(T));
 
             string json = TextUtil.CachedSB.ToString();
             TextUtil.CachedSB.Clear();
@@ -102,39 +95,16 @@ namespace CatJson
             return json;
         }
         
-        /// <summary>
-        /// 将Json文本反序列化为指定类型的对象
-        /// </summary>
-        public static T ParseJson<T>(string json)
-        {
-            Lexer.SetJsonText(json);
-            return InternalParseJson<T>();
-        }
-
-        /// <summary>
-        /// 将Json文本反序列化为指定类型的对象
-        /// </summary>
-        public static object ParseJson(string json, Type type)
-        {
-            Lexer.SetJsonText(json);
-            return InternalParseJson(type);
-        }
 
         /// <summary>
         /// 将指定类型的对象序列化为Json文本
         /// </summary>
-        internal static void InternalToJson<T>(T obj, int depth = 0)
+        internal static void ToJson<T>(T obj, int depth)
         {
             InternalToJson(obj, typeof(T),null, depth);
         }
         
-        /// <summary>
-        /// 将Json文本反序列化为指定类型的对象
-        /// </summary>
-        internal static T InternalParseJson<T>()
-        {
-            return (T) InternalParseJson(typeof(T));
-        }
+
 
         /// <summary>
         /// 将指定类型的对象序列化为Json文本
@@ -188,6 +158,32 @@ namespace CatJson
         /// <summary>
         /// 将Json文本反序列化为指定类型的对象
         /// </summary>
+        public static T ParseJson<T>(string json)
+        {
+            Lexer.SetJsonText(json);
+            return (T)InternalParseJson(typeof(T));
+        }
+
+        /// <summary>
+        /// 将Json文本反序列化为指定类型的对象
+        /// </summary>
+        public static object ParseJson(string json, Type type)
+        {
+            Lexer.SetJsonText(json);
+            return InternalParseJson(type);
+        }
+        
+        /// <summary>
+        /// 将Json文本反序列化为指定类型的对象
+        /// </summary>
+        internal static T ParseJson<T>()
+        {
+            return (T) InternalParseJson(typeof(T));
+        }
+        
+        /// <summary>
+        /// 将Json文本反序列化为指定类型的对象
+        /// </summary>
         internal static object InternalParseJson(Type type,Type realType = null,bool checkPolymorphic = true)
         {
             if (Lexer.LookNextTokenType() == TokenType.Null)
@@ -216,10 +212,10 @@ namespace CatJson
 
             if (formatterDict.TryGetValue(realType, out IJsonFormatter formatter))
             {
-               result = formatter.ParseJson(type,realType);
-               return result;
+                result = formatter.ParseJson(type, realType);
+                return result;
             }
-            
+
             if (realType.IsGenericType &&  formatterDict.TryGetValue(realType.GetGenericTypeDefinition(), out formatter))
             {
                 //特殊处理泛型类型
@@ -240,6 +236,13 @@ namespace CatJson
             return result;
         }
 
+        /// <summary>
+        /// 添加需要忽略的成员
+        /// </summary>
+        public static void AddIgnoreMember(Type type, string memberName)
+        {
+            defaultFormatter.AddIgnoreMember(type,memberName);
+        }
     }
 
 }

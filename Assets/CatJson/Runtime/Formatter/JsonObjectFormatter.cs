@@ -25,7 +25,7 @@ namespace CatJson
 
                     TextUtil.Append(":");
 
-                    JsonParser.InternalToJson(item.Value,depth);
+                    JsonParser.ToJson(item.Value,depth);
 
                     if (index < value.ValueDict.Count-1)
                     {
@@ -47,7 +47,7 @@ namespace CatJson
             ParserHelper.ParseJsonObjectProcedure(obj, default, default, (userdata1, _, _, key) =>
             {
                 JsonObject localObj = (JsonObject) userdata1;
-                JsonValue value = JsonParser.InternalParseJson<JsonValue>();
+                JsonValue value = JsonParser.ParseJson<JsonValue>();
                 localObj[key.ToString()] = value;
             });
 
