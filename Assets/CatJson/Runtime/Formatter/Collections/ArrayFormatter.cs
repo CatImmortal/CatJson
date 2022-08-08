@@ -56,8 +56,9 @@ namespace CatJson
             Type elementType = TypeUtil.GetArrayOrListElementType(arrayType);
             ParserHelper.ParseJsonArrayProcedure(list, elementType, (userdata1, userdata2) =>
             {
+                IList localList = (IList) userdata1;
                 object value = JsonParser.InternalParseJson((Type) userdata2);
-                ((IList) userdata1).Add(value);
+                localList.Add(value);
             });
             
             Array array = Array.CreateInstance(elementType, list.Count);

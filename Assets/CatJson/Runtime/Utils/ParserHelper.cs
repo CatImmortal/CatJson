@@ -98,7 +98,7 @@ namespace CatJson
                 JsonParser.Lexer.GetNextTokenByType(TokenType.LeftBrace); // {
                 
                 RangeString rs = JsonParser.Lexer.GetNextToken(out TokenType tokenType);
-                if (tokenType == TokenType.String && rs.Equals(new RangeString(PolymorphicFormatter.RealTypeKey))) //"<>RealType"
+                if (tokenType == TokenType.String && rs.Equals(PolymorphicFormatter.RealTypeKey)) //"<>RealType"
                 {
                     //是被多态序列化的 获取真实类型
                     JsonParser.Lexer.GetNextTokenByType(TokenType.Colon); // :

@@ -56,8 +56,11 @@ namespace CatJson
             
             ParserHelper.ParseJsonArrayProcedure(list, elementType, (userdata1, userdata2) =>
             {
-                object value = JsonParser.InternalParseJson((Type) userdata2);
-                ((IList) userdata1).Add(value);
+                IList localList = (IList) userdata1;
+                Type localElementType = (Type) userdata2;
+                
+                object value = JsonParser.InternalParseJson(localElementType);
+                localList.Add(value);
             });
 
             return list;

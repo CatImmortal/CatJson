@@ -144,9 +144,9 @@ namespace CatJson
             //扫描数字
             if (char.IsDigit(json[curIndex]) || json[curIndex] == '-')
             {
-                string str = ScanNumber();
+                RangeString rs = ScanNumber();
                 type = TokenType.Number;
-                return new RangeString(str);
+                return rs;
             }
 
             //扫描字符串
@@ -223,10 +223,11 @@ namespace CatJson
         /// <summary>
         /// 扫描数字
         /// </summary>
-        private string ScanNumber()
+        private RangeString ScanNumber()
         {
+            int startIndex = curIndex;
+            
             //第一个字符是0-9或者-
-            cachedSB.Append(json[curIndex]);
             Next();
 
             while (
@@ -235,14 +236,16 @@ namespace CatJson
                 char.IsDigit(json[curIndex]) || json[curIndex] == '.' || json[curIndex] == '+'|| json[curIndex] == '-'|| json[curIndex] == 'e'|| json[curIndex] == 'E')
                 )
             {
-                cachedSB.Append(json[curIndex]);
+
                 Next();
             }
 
-            string result = cachedSB.ToString();
-            cachedSB.Clear();
+            int endIndex = curIndex - 1;
 
-            return result;
+            RangeString rs = new RangeString(json, startIndex, endIndex);
+
+            return rs;
+            
         }
 
         /// <summary>

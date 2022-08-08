@@ -44,10 +44,11 @@ namespace CatJson
         {
             JsonObject obj = new JsonObject();
 
-            ParserHelper.ParseJsonObjectProcedure(obj,default,default, (userdata1,_,_, key) =>
+            ParserHelper.ParseJsonObjectProcedure(obj, default, default, (userdata1, _, _, key) =>
             {
-                 JsonValue value = JsonParser.InternalParseJson<JsonValue>();
-                ((JsonObject)userdata1)[key.ToString()] = value;
+                JsonObject localObj = (JsonObject) userdata1;
+                JsonValue value = JsonParser.InternalParseJson<JsonValue>();
+                localObj[key.ToString()] = value;
             });
 
             return obj;

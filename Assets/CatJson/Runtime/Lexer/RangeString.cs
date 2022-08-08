@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine.Profiling;
 
 
 namespace CatJson
@@ -43,7 +44,6 @@ namespace CatJson
 
         public bool Equals(RangeString other)
         {
-            
             bool isSourceNullOrEmpty = string.IsNullOrEmpty(source);
             bool isOtherNullOrEmpty = string.IsNullOrEmpty(other.source);
 
@@ -70,10 +70,17 @@ namespace CatJson
                     return false;
                 }
             }
-
+            
             return true;
+            
+      
         }
 
+        public bool Equals(string str)
+        {
+            return Equals(new RangeString(str));
+        }
+        
         public override int GetHashCode()
         {
             if (hashCode == 0 && !string.IsNullOrEmpty(source))
@@ -167,7 +174,12 @@ namespace CatJson
 
             return str;
         }
-    
-       
+
+        public ReadOnlySpan<char> AsSpan()
+        {
+            int length = endIndex - startIndex + 1;
+            ReadOnlySpan<char> span = source.AsSpan(startIndex, length);
+            return span;
+        }
     }
 }

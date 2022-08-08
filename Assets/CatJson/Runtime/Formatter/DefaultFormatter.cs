@@ -103,18 +103,20 @@ namespace CatJson
             
             ParserHelper.ParseJsonObjectProcedure(obj, realType, default, (userdata1, userdata2, _, key) =>
             {
-                Type t = (Type) userdata2;
-                if (propertyInfoDict[t].TryGetValue(key, out PropertyInfo pi))
+                object localObj = userdata1;
+                Type localRealType = (Type) userdata2;
+                
+                if (propertyInfoDict[localRealType].TryGetValue(key, out PropertyInfo pi))
                 {
                     //先尝试获取名为key的属性信息
                     object value = JsonParser.InternalParseJson(pi.PropertyType);
-                    pi.SetValue(userdata1, value);
+                    pi.SetValue(localObj, value);
                 }
-                else if (fieldInfoDict[t].TryGetValue(key, out FieldInfo fi))
+                else if (fieldInfoDict[localRealType].TryGetValue(key, out FieldInfo fi))
                 {
                     //属性没有 再试试字段
                     object value = JsonParser.InternalParseJson(fi.FieldType);
-                    fi.SetValue(userdata1, value);
+                    fi.SetValue(localObj, value);
                 }
                 else
                 {
