@@ -109,7 +109,7 @@ namespace CatJson
         /// <summary>
         /// 将指定类型的对象序列化为Json文本
         /// </summary>
-        internal static void InternalToJson(object obj, Type type, Type realType = null, int depth = 0,bool checkPolymorphic = true)
+        internal static void InternalToJson(object obj, Type type, Type realType = null, int depth = 1,bool checkPolymorphic = true)
         {
             if (obj is null)
             {

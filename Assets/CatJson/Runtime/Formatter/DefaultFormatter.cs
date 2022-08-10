@@ -49,7 +49,7 @@ namespace CatJson
                     continue;
                 }
                 
-                AppendMember(item.Value.PropertyType,item.Value.Name,propValue,depth + 1);
+                AppendMember(item.Value.PropertyType,item.Value.Name,propValue,depth);
                 needRemoveLastComma = true;
             }
             
@@ -64,7 +64,7 @@ namespace CatJson
                     continue;
                 }
                 
-                AppendMember(item.Value.FieldType,item.Value.Name,fieldValue,depth + 1);
+                AppendMember(item.Value.FieldType,item.Value.Name,fieldValue,depth);
                 needRemoveLastComma = true;
             }
             
@@ -87,7 +87,7 @@ namespace CatJson
             }
             
             TextUtil.AppendLine(string.Empty);
-            TextUtil.Append("}",depth);
+            TextUtil.Append("}",depth - 1);
         }
 
         /// <inheritdoc />
@@ -208,11 +208,14 @@ namespace CatJson
         /// </summary>
         private static void AppendMember(Type memberType,string memberName,object value,int depth)
         {
+            //key
             TextUtil.Append("\"", depth);
             TextUtil.Append(memberName);
             TextUtil.Append("\"");
+            
             TextUtil.Append(":");
         
+            //value
             JsonParser.InternalToJson(value,memberType,null,depth + 1);
 
             TextUtil.AppendLine(",");

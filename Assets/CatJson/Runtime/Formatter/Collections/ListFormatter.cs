@@ -23,7 +23,7 @@ namespace CatJson
             for (int i = 0; i < value.Count; i++)
             {
                 object element = value[i];
-                TextUtil.AppendTab(depth + 1);
+                TextUtil.AppendTab(depth);
                 if (element == null)
                 {
                     TextUtil.Append("null");
@@ -39,7 +39,7 @@ namespace CatJson
                  
             }
             TextUtil.AppendLine(string.Empty);
-            TextUtil.Append("]", depth);
+            TextUtil.Append("]", depth - 1);
         }
 
         /// <inheritdoc />

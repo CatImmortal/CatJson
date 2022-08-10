@@ -29,7 +29,7 @@ namespace CatJson
                 foreach (DictionaryEntry item in value)
                 {
                     
-                    TextUtil.Append("\"", depth + 1);
+                    TextUtil.Append("\"", depth);
                     TextUtil.Append(item.Key.ToString());
                     TextUtil.Append("\"");
 
@@ -46,7 +46,7 @@ namespace CatJson
             }
 
             TextUtil.AppendLine(string.Empty);
-            TextUtil.Append("}", depth);
+            TextUtil.Append("}", depth - 1);
         }
 
         /// <inheritdoc />

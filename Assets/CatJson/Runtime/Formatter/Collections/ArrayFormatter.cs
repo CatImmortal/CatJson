@@ -25,7 +25,7 @@ namespace CatJson
             for (int i = 0; i < value.Length; i++)
             {
                 object element = value.GetValue(i);
-                TextUtil.AppendTab(depth + 1);
+                TextUtil.AppendTab(depth);
                 if (element == null)
                 {
                     TextUtil.Append("null");
@@ -41,7 +41,7 @@ namespace CatJson
                  
             }
             TextUtil.AppendLine(string.Empty);
-            TextUtil.Append("]", depth);
+            TextUtil.Append("]", depth - 1);
         }
 
         /// <inheritdoc />
@@ -54,10 +54,12 @@ namespace CatJson
                 arrayType = realType;
             }
             Type elementType = TypeUtil.GetArrayOrListElementType(arrayType);
+            
             ParserHelper.ParseJsonArrayProcedure(list, elementType, (userdata1, userdata2) =>
             {
                 IList localList = (IList) userdata1;
-                object value = JsonParser.InternalParseJson((Type) userdata2);
+                Type localElementType = (Type) userdata2;
+                object value = JsonParser.InternalParseJson(localElementType);
                 localList.Add(value);
             });
             
