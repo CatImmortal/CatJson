@@ -163,11 +163,7 @@ namespace CatJson
                     return;
                 }
             }
-            
-          
 
-            
-            
             if (obj is Array array)
             {
                 //特殊处理数组
@@ -175,7 +171,7 @@ namespace CatJson
                 return;
             }
             
-            //使用处理自定义类的formatter
+            //使用处理自定义数据类的formatter
             defaultFormatter.ToJson(obj,type,realType,depth);
         }
         

@@ -19,13 +19,13 @@ namespace CatJson
                 foreach (KeyValuePair<string, JsonValue> item in value.ValueDict)
                 {
                     
-                    TextUtil.Append("\"", depth + 1);
+                    TextUtil.Append("\"", depth);
                     TextUtil.Append(item.Key);
                     TextUtil.Append("\"");
 
                     TextUtil.Append(":");
 
-                    JsonParser.ToJson(item.Value,depth);
+                    JsonParser.ToJson(item.Value,depth + 1);
 
                     if (index < value.ValueDict.Count-1)
                     {
@@ -36,7 +36,7 @@ namespace CatJson
             }
 
             TextUtil.AppendLine(string.Empty);
-            TextUtil.Append("}", depth);
+            TextUtil.Append("}", depth - 1);
         }
 
         /// <inheritdoc />

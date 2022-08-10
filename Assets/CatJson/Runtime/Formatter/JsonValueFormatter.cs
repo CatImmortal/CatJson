@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace CatJson
 {
@@ -16,19 +17,19 @@ namespace CatJson
                     TextUtil.Append("null");
                     break;
                 case ValueType.Boolean:
-                    JsonParser.ToJson(value.Boolean,0);
+                    JsonParser.ToJson((bool)value,0);
                     break;
                 case ValueType.Number:
-                    JsonParser.ToJson(value.Number,0);
+                    JsonParser.ToJson((double)value,0);
                     break;
                 case ValueType.String:
-                    JsonParser.ToJson(value.Str,0);
+                    JsonParser.ToJson((string)value,0);
                     break;
                 case ValueType.Array:
-                    JsonParser.ToJson(value.Array, depth + 1);
+                    JsonParser.ToJson((List<JsonValue>)value, depth);
                     break;
                 case ValueType.Object:
-                    JsonParser.ToJson(value.Obj, depth + 1);
+                    JsonParser.ToJson((JsonObject)value, depth);
                     break;
             }
         }
@@ -52,7 +53,7 @@ namespace CatJson
                     return new JsonValue(JsonParser.ParseJson<string>());
                 
                 case TokenType.LeftBracket:
-                    return new JsonValue(JsonParser.ParseJson<JsonValue[]>());
+                    return new JsonValue(JsonParser.ParseJson<List<JsonValue>>());
                 
                 case TokenType.LeftBrace:
                     return new JsonValue(JsonParser.ParseJson<JsonObject>());
