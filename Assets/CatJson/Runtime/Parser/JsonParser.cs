@@ -82,7 +82,7 @@ namespace CatJson
         /// </summary>
         public static void SetBindingFlags(BindingFlags bindingFlags)
         {
-            reflectionFormatter.SetBindingFlags(bindingFlags);
+            TypeMetaDataManager.Flags = bindingFlags;
         }
         
         /// <summary>
@@ -90,9 +90,8 @@ namespace CatJson
         /// </summary>
         public static void AddIgnoreMember(Type type, string memberName)
         {
-            reflectionFormatter.AddIgnoreMember(type,memberName);
+            TypeMetaDataManager.AddIgnoreMember(type,memberName);
         }
-        
 
         /// <summary>
         /// 将指定类型的对象序列化为Json文本
