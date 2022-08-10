@@ -196,7 +196,12 @@ namespace CatJson
         public static T ParseJson<T>(string json)
         {
             Lexer.SetJsonText(json);
-            return (T)InternalParseJson(typeof(T));
+
+            T result = (T) InternalParseJson(typeof(T));
+            
+            Lexer.SetJsonText(null);
+            
+            return result;
         }
 
         /// <summary>
@@ -205,7 +210,12 @@ namespace CatJson
         public static object ParseJson(string json, Type type)
         {
             Lexer.SetJsonText(json);
-            return InternalParseJson(type);
+            
+            object result = InternalParseJson(type);
+            
+            Lexer.SetJsonText(null);
+            
+            return result;
         }
         
         /// <summary>
