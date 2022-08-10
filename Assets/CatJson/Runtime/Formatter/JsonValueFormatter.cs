@@ -42,6 +42,10 @@ namespace CatJson
             
             switch (nextTokenType)
             {
+                case TokenType.Null:
+                    JsonParser.Lexer.GetNextTokenByType(TokenType.Null);
+                    return new JsonValue();
+                
                 case TokenType.True:
                 case TokenType.False:
                     return new JsonValue(JsonParser.ParseJson<bool>());
@@ -57,7 +61,6 @@ namespace CatJson
                 
                 case TokenType.LeftBrace:
                     return new JsonValue(JsonParser.ParseJson<JsonObject>());
-                
                 default:
                     throw new Exception("JsonValue解析失败，tokenType == " + nextTokenType);
             }

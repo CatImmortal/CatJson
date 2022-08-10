@@ -5,9 +5,9 @@ using System.Reflection;
 namespace CatJson
 {
     /// <summary>
-    /// 默认的json格式化器，会通过反射来序列化/反序列化字段/属性
+    /// 基于反射的json格式化器，会通过反射来 序列化/反序列化 字段/属性
     /// </summary>
-    public class DefaultFormatter : IJsonFormatter
+    public class ReflectionFormatter : IJsonFormatter
     {
         /// <summary>
         /// 类型与其对应的属性信息
@@ -23,6 +23,11 @@ namespace CatJson
         /// 需要忽略的类型字段/属性名称
         /// </summary>
         private static Dictionary<Type, HashSet<string>> ignoreSet = new Dictionary<Type, HashSet<string>>();
+
+        /// <summary>
+        /// 用于获取字段/属性的BindingFlags
+        /// </summary>
+        private static BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public;
         
         /// <inheritdoc />
         public void ToJson(object value, Type type, Type realType, int depth)
@@ -128,6 +133,14 @@ namespace CatJson
             return obj;
         }
 
+        /// <summary>
+        /// 设置用于获取字段/属性的BindingFlags
+        /// </summary>
+        public void SetBindingFlags(BindingFlags bindingFlags)
+        {
+            ReflectionFormatter.bindingFlags = bindingFlags;
+        }
+        
         /// <summary>
         /// 添加反射信息到字典中
         /// </summary>

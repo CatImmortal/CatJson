@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.Profiling;
 
@@ -37,7 +38,7 @@ namespace CatJson
         
         private static readonly NullFormatter nullFormatter = new NullFormatter();
         private static readonly ArrayFormatter arrayFormatter = new ArrayFormatter();
-        private static readonly DefaultFormatter defaultFormatter = new DefaultFormatter();
+        private static readonly ReflectionFormatter reflectionFormatter = new ReflectionFormatter();
         private static readonly PolymorphicFormatter polymorphicFormatter = new PolymorphicFormatter();
         
         /// <summary>
@@ -77,12 +78,21 @@ namespace CatJson
         }
         
         /// <summary>
+        /// 设置用于获取字段/属性的BindingFlags
+        /// </summary>
+        public static void SetBindingFlags(BindingFlags bindingFlags)
+        {
+            reflectionFormatter.SetBindingFlags(bindingFlags);
+        }
+        
+        /// <summary>
         /// 添加需要忽略的成员
         /// </summary>
         public static void AddIgnoreMember(Type type, string memberName)
         {
-            defaultFormatter.AddIgnoreMember(type,memberName);
+            reflectionFormatter.AddIgnoreMember(type,memberName);
         }
+        
 
         /// <summary>
         /// 将指定类型的对象序列化为Json文本
@@ -132,6 +142,12 @@ namespace CatJson
                 return;
             }
 
+            if (obj is IJsonParserCallbackReceiver receiver)
+            {
+                //触发序列化开始回调
+                receiver.OnToJsonStart();
+            }
+
             if (realType == null)
             {
                 realType = TypeUtil.GetType(obj,type);
@@ -172,7 +188,7 @@ namespace CatJson
             }
             
             //使用处理自定义数据类的formatter
-            defaultFormatter.ToJson(obj,type,realType,depth);
+            reflectionFormatter.ToJson(obj,type,realType,depth);
         }
         
         /// <summary>
@@ -211,8 +227,6 @@ namespace CatJson
                 return nullFormatter.ParseJson(type,null);
             }
 
-            object result;
-
             if (realType == null && !ParserHelper.TryParseRealType(type,out realType))
             {
                 //未传入realType并且读取不到realType，就把type作为realType使用
@@ -221,38 +235,43 @@ namespace CatJson
                 //realType = type;  
                 realType = TypeUtil.CheckType(type);
             }
-
+            
+            
+            object result;
+            
             if (checkPolymorphic && !TypeUtil.TypeEquals(type,realType))
             {
                 //开启了多态检查并且type和realType不一致
                 //进行多态处理
                 result = polymorphicFormatter.ParseJson(type, realType);
-                return result;
             }
-
-            if (formatterDict.TryGetValue(realType, out IJsonFormatter formatter))
+            else if (formatterDict.TryGetValue(realType, out IJsonFormatter formatter))
             {
+                //使用通常的formatter处理
                 result = formatter.ParseJson(type, realType);
-                return result;
+            }
+            else if (realType.IsGenericType &&  formatterDict.TryGetValue(realType.GetGenericTypeDefinition(), out formatter))
+            {
+                //使用泛型类型formatter处理
+                result = formatter.ParseJson(type,realType);
+            }
+            else if (realType.IsArray)
+            {
+                //使用数组formatter处理
+                result = arrayFormatter.ParseJson(type,realType);
+            }
+            else
+            {
+                //使用处理自定义类的formatter
+                result = reflectionFormatter.ParseJson(type,realType);
             }
 
-            if (realType.IsGenericType &&  formatterDict.TryGetValue(realType.GetGenericTypeDefinition(), out formatter))
+            if (result is IJsonParserCallbackReceiver receiver)
             {
-                //特殊处理泛型类型
-                result = formatter.ParseJson(type,realType);
-                return result;
+                //触发序列化结束回调
+                receiver.OnParseJsonEnd();
             }
-            
-            if (realType.IsArray)
-            {
-                //特殊处理数组
-                result = arrayFormatter.ParseJson(type,realType);
-                return result;
- 
-            }
-            
-            //使用处理自定义类的formatter
-            result = defaultFormatter.ParseJson(type,realType);
+
             return result;
         }
 

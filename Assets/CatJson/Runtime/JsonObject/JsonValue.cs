@@ -31,6 +31,11 @@ namespace CatJson
 
         #region 构造方法
 
+        public JsonValue()
+        {
+            Type = ValueType.Null;
+        }
+        
         public JsonValue(bool b)
         {
             Type = ValueType.Boolean;
