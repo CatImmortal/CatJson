@@ -18,8 +18,6 @@ namespace CatJson
                 throw new Exception("请先调用CatJson.ILRuntimeHelper.RegisterILRuntimeCLRRedirection(appDomain)进行CatJson重定向");
             }
 #endif
-            //Type类型的变量其对象一般为RuntimeType类型，但是不能直接typeof(RuntimeType)，只能这样了
-            formatterDict.Add(Type.GetType("System.RuntimeType,mscorlib"),new RuntimeTypeFormatter());
         }
 
         /// <summary>
@@ -65,9 +63,26 @@ namespace CatJson
             
             //Unity特有类型
             {typeof(Hash128), new Hash128Formatter()},
+            
+            //其他
+            {Type.GetType("System.RuntimeType,mscorlib"),new RuntimeTypeFormatter()}   //Type类型的变量其对象一般为RuntimeType类型，但是不能直接typeof(RuntimeType)，只能这样了
         };
 
-
+        /// <summary>
+        /// 添加自定义的Json格式化器
+        /// </summary>
+        public static void AddCustomJsonFormatter(Type type, IJsonFormatter formatter)
+        {
+            formatterDict[type] = formatter;
+        }
+        
+        /// <summary>
+        /// 添加需要忽略的成员
+        /// </summary>
+        public static void AddIgnoreMember(Type type, string memberName)
+        {
+            defaultFormatter.AddIgnoreMember(type,memberName);
+        }
 
         /// <summary>
         /// 将指定类型的对象序列化为Json文本
@@ -111,7 +126,7 @@ namespace CatJson
         /// </summary>
         internal static void InternalToJson(object obj, Type type, Type realType = null, int depth = 1,bool checkPolymorphic = true)
         {
-            if (obj is null)
+            if (obj == null)
             {
                 nullFormatter.ToJson(null,type,null, depth);
                 return;
@@ -130,19 +145,28 @@ namespace CatJson
                 polymorphicFormatter.ToJson(obj,type,realType,depth);
                 return;;
             }
-            
-            if (formatterDict.TryGetValue(realType, out IJsonFormatter formatter))
-            {
-                formatter.ToJson(obj,type,realType, depth);
-                return;
-            }
 
-            if (realType.IsGenericType && formatterDict.TryGetValue(realType.GetGenericTypeDefinition(), out formatter))
+            if (!realType.IsGenericType)
             {
-                //特殊处理泛型类型
-                formatter.ToJson(obj,type,realType,depth);
-                return;
+                if (formatterDict.TryGetValue(realType, out IJsonFormatter formatter))
+                {
+                    formatter.ToJson(obj,type,realType, depth);
+                    return;
+                }
             }
+            else
+            {
+                if (formatterDict.TryGetValue(realType.GetGenericTypeDefinition(), out IJsonFormatter formatter))
+                {
+                    //特殊处理泛型类型
+                    formatter.ToJson(obj,type,realType,depth);
+                    return;
+                }
+            }
+            
+          
+
+            
             
             if (obj is Array array)
             {
@@ -236,13 +260,7 @@ namespace CatJson
             return result;
         }
 
-        /// <summary>
-        /// 添加需要忽略的成员
-        /// </summary>
-        public static void AddIgnoreMember(Type type, string memberName)
-        {
-            defaultFormatter.AddIgnoreMember(type,memberName);
-        }
+       
     }
 
 }
