@@ -69,11 +69,11 @@ namespace CatJson
             {
                 if (resultType == TokenType.Number || resultType == TokenType.String)
                 {
-                    ThrowLexerException($"NextTokenOfType调用失败，需求{type}但获取到的是类型为{resultType}的{token}");
+                    ThrowLexerException($"NextTokenOfType调用失败，需求Token为{type}但获取到的是类型为{resultType}的{token}");
                 }
                 else
                 {
-                    ThrowLexerException($"NextTokenOfType调用失败，需求{type}但获取到的是{resultType}");
+                    ThrowLexerException($"NextTokenOfType调用失败，需求Token为{type}但获取到的是{resultType}");
                 }
                 
                 
