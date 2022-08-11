@@ -12,22 +12,22 @@ namespace CatJson
     public class JsonValue
     {
         [FieldOffset(0)]
-        public readonly ValueType Type;
+        public ValueType Type;
         
         [FieldOffset(1)]
-        private readonly bool boolean;
+        private bool boolean;
         
         [FieldOffset(1)]
-        private readonly double number;
+        private double number;
         
         [FieldOffset(8)]
-        private readonly string str;
+        private string str;
         
         [FieldOffset(8)]
-        private readonly List<JsonValue> array;
+        private List<JsonValue> array;
         
         [FieldOffset(8)]
-        private readonly JsonObject obj;
+        private JsonObject obj;
 
         #region 构造方法
 
@@ -64,7 +64,6 @@ namespace CatJson
 
         #endregion
         
-       
         
         public JsonValue this[int index]
         {
@@ -167,7 +166,7 @@ namespace CatJson
         {
             if (value.Type != ValueType.Array)
             {
-                throw new Exception("JsonValue转换JsonValue[]失败");
+                throw new Exception("JsonValue转换List<JsonValue>失败");
             }
 
             return value.array;

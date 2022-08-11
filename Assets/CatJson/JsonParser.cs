@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.Profiling;
 
 namespace CatJson
 {
@@ -143,8 +142,7 @@ namespace CatJson
             InternalToJson(obj, typeof(T),null, depth);
         }
         
-
-
+        
         /// <summary>
         /// 将指定类型的对象序列化为Json文本
         /// </summary>
@@ -220,7 +218,7 @@ namespace CatJson
             }
             
             
-            //使用处理自定义类的formatter
+            //使用反射formatter处理
             reflectionFormatter.ToJson(obj,type,realType,depth);
         }
         
@@ -274,11 +272,10 @@ namespace CatJson
             {
                 //未传入realType并且读取不到realType，就把type作为realType使用
                 //这里不能直接赋值type，因为type有可能是一个包装了主工程类型的ILRuntimeWrapperType
-                //直接赋值type会导致无法从formatterDict拿到正确的formatter从而进入到defaultFormatter的处理中
+                //直接赋值type会导致无法从formatterDict拿到正确的formatter从而进入到reflectionFormatter的处理中
                 //realType = type;  
                 realType = TypeUtil.CheckType(type);
             }
-            
             
             object result;
             
@@ -293,7 +290,7 @@ namespace CatJson
                 //使用通常的formatter处理
                 result = formatter.ParseJson(type, realType);
             }
-            else if (realType.IsGenericType &&  formatterDict.TryGetValue(realType.GetGenericTypeDefinition(), out formatter))
+            else if (realType.IsGenericType && formatterDict.TryGetValue(realType.GetGenericTypeDefinition(), out formatter))
             {
                 //使用泛型类型formatter处理
                 result = formatter.ParseJson(type,realType);
@@ -317,7 +314,7 @@ namespace CatJson
             }
             else
             {
-                //使用处理自定义类的formatter
+                //使用反射formatter处理
                 result = reflectionFormatter.ParseJson(type,realType);
             }
 

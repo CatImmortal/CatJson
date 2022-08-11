@@ -5,7 +5,7 @@ using System.Reflection;
 namespace CatJson
 {
     /// <summary>
-    /// 基于反射的json格式化器，会通过反射来 序列化/反序列化 字段/属性
+    /// 基于反射的json格式化器，会通过反射来处理字段/属性
     /// </summary>
     public class ReflectionFormatter : IJsonFormatter
     {

@@ -7,11 +7,13 @@ namespace CatJson
     /// </summary>
     public class RuntimeTypeFormatter : BaseJsonFormatter<Type>
     {
+        /// <inheritdoc />
         public override void ToJson(Type value, Type type, Type realType, int depth)
         {
             TextUtil.Append(TypeUtil.GetTypeString(value));
         }
 
+        /// <inheritdoc />
         public override Type ParseJson(Type type, Type realType)
         {
             RangeString rs = JsonParser.Lexer.GetNextTokenByType(TokenType.String);
