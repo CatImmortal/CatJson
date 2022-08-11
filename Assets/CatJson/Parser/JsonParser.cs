@@ -36,10 +36,11 @@ namespace CatJson
         /// </summary>
         public static bool IgnoreDefaultValue { get; set; } = true;
         
-        private static readonly NullFormatter nullFormatter = new NullFormatter();
-        private static readonly ArrayFormatter arrayFormatter = new ArrayFormatter();
-        private static readonly ReflectionFormatter reflectionFormatter = new ReflectionFormatter();
-        private static readonly PolymorphicFormatter polymorphicFormatter = new PolymorphicFormatter();
+        private static NullFormatter nullFormatter = new NullFormatter();
+        private static EnumFormatter enumFormatter = new EnumFormatter();
+        private static ArrayFormatter arrayFormatter = new ArrayFormatter();
+        private static ReflectionFormatter reflectionFormatter = new ReflectionFormatter();
+        private static PolymorphicFormatter polymorphicFormatter = new PolymorphicFormatter();
         
         /// <summary>
         /// Json格式化器字典
@@ -179,6 +180,7 @@ namespace CatJson
             {
                 if (formatterDict.TryGetValue(realType, out IJsonFormatter formatter))
                 {
+                    //使用通常的formatter处理
                     formatter.ToJson(obj,type,realType, depth);
                     return;
                 }
@@ -187,20 +189,38 @@ namespace CatJson
             {
                 if (formatterDict.TryGetValue(realType.GetGenericTypeDefinition(), out IJsonFormatter formatter))
                 {
-                    //特殊处理泛型类型
+                    //使用泛型类型formatter处理
                     formatter.ToJson(obj,type,realType,depth);
                     return;
                 }
             }
 
+            
+#if FUCK_LUA
+            if (type is ILRuntime.Reflection.ILRuntimeType ilrtType && ilrtType.ILType.IsEnum)
+            {
+                //热更层枚举 使用int formatter处理
+                formatterDict[typeof(int)].ToJson(obj, type, realType,depth);
+                return;
+            }
+#endif
+            
+            if (obj is Enum e)
+            {
+                //使用枚举formatter处理
+                enumFormatter.ToJson(e, type, realType, depth);
+                return;
+            }
+            
             if (obj is Array array)
             {
-                //特殊处理数组
+                //使用数组formatter处理
                 arrayFormatter.ToJson(array,type,realType, depth);
                 return;
             }
             
-            //使用处理自定义数据类的formatter
+            
+            //使用处理自定义类的formatter
             reflectionFormatter.ToJson(obj,type,realType,depth);
         }
         
@@ -277,6 +297,18 @@ namespace CatJson
             {
                 //使用泛型类型formatter处理
                 result = formatter.ParseJson(type,realType);
+            }
+#if FUCK_LUA
+            else if (type is ILRuntime.Reflection.ILRuntimeType ilrtType && ilrtType.ILType.IsEnum)
+            {
+                //热更层枚举 使用int formatter处理
+                result = formatterDict[typeof(int)].ParseJson(type, realType);
+            }
+#endif
+            else if (realType.IsEnum)
+            {
+                //使用枚举formatter处理
+                result = enumFormatter.ParseJson(type, realType);
             }
             else if (realType.IsArray)
             {
