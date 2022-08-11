@@ -16,18 +16,19 @@ namespace CatJson
         public static  int NewLineLength => Environment.NewLine.Length;
 
 
-        public static void AppendTab(int tabNum)
+
+        
+        public static void Append(char c, int tabNum = 0)
         {
-            if (!JsonParser.IsFormat)
+            if (tabNum > 0 && JsonParser.IsFormat)
             {
-                return;
+                AppendTab(tabNum);
             }
-            for (int i = 0; i < tabNum; i++)
-            {
-                CachedSB.Append("\t");
-            }
+           
+            CachedSB.Append(c);
         }
 
+        
         public static void Append(string str,int tabNum = 0)
         {
             if (tabNum > 0 && JsonParser.IsFormat)
@@ -36,6 +37,18 @@ namespace CatJson
             }
            
             CachedSB.Append(str);
+        }
+        
+        public static void AppendTab(int tabNum)
+        {
+            if (!JsonParser.IsFormat)
+            {
+                return;
+            }
+            for (int i = 0; i < tabNum; i++)
+            {
+                CachedSB.Append('\t');
+            }
         }
 
         public static void AppendLine(string str, int tabNum = 0)
@@ -55,7 +68,6 @@ namespace CatJson
             }
         }
 
-        
 
         /// <summary>
         /// 获取4个字符代表的unicode码点

@@ -48,17 +48,31 @@ namespace CatJson
         {
             //基元类型
             {typeof(bool), new BooleanFormatter()},
+            
+            {typeof(byte), new ByteFormatter()},
+            {typeof(sbyte), new SByteFormatter()},
+            
+            {typeof(short), new Int16Formatter()},
+            {typeof(ushort), new UInt16Formatter()},
+            
             {typeof(int), new Int32Formatter()},
+            {typeof(uint), new UInt32Formatter()},
+            
             {typeof(long), new Int64Formatter()},
+            {typeof(ulong), new UInt64Formatter()},
+            
             {typeof(float), new SingleFormatter()},
             {typeof(double), new DoubleFormatter()},
+            {typeof(decimal), new DecimalFormatter()},
+            
+            {typeof(char), new CharFormatter()},
             {typeof(string), new StringFormatter()},
             
             //容器类型
             {typeof(List<>), new ListFormatter()},
             {typeof(Dictionary<,>), new DictionaryFormatter()},
             
-            //特殊类型
+            //Json通用对象类型
             {typeof(JsonObject), new JsonObjectFormatter()},
             {typeof(JsonValue), new JsonValueFormatter()},
             

@@ -30,6 +30,8 @@ namespace CatJson
         /// </summary>
         private int hashCode;
 
+        public char this[int index] => source[startIndex + index];
+
         public RangeString(string source) : this(source,0,source.Length - 1)
         {
         }
