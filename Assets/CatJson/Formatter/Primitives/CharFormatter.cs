@@ -10,7 +10,9 @@ namespace CatJson
         /// <inheritdoc />
         public override void ToJson(char value, Type type, Type realType, int depth)
         {
+            TextUtil.Append('\"');
             TextUtil.Append(value);
+            TextUtil.Append('\"');
         }
 
         /// <inheritdoc />

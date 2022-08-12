@@ -11,7 +11,9 @@ namespace CatJson
         /// <inheritdoc />
         public override void ToJson(Hash128 value, Type type, Type realType, int depth)
         {
-            TextUtil.Append($"\"{value.ToString()}\"");
+            TextUtil.Append('\"');
+            TextUtil.Append(value.ToString());
+            TextUtil.Append('\"');
         }
 
         /// <inheritdoc />

@@ -183,5 +183,17 @@ namespace CatJson
             ReadOnlySpan<char> span = source.AsSpan(startIndex, length);
             return span;
         }
+
+        public float AsFloat()
+        {
+            return float.Parse(AsSpan());
+        }
+
+        public int AsInt()
+        {
+            return int.Parse(AsSpan());
+        }
+        
+        
     }
 }

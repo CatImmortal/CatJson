@@ -78,9 +78,18 @@ namespace CatJson
             
             //Unity特有类型
             {typeof(Hash128), new Hash128Formatter()},
+            {typeof(Vector2),new Vector2Formatter()},
+            {typeof(Vector3),new Vector3Formatter()},
+            {typeof(Vector4),new Vector4Formatter()},
+            {typeof(Quaternion),new QuaternionFormatter()},
+            {typeof(Color),new ColorFormatter()},
+            {typeof(Bounds),new BoundsFormatter()},
+            {typeof(Rect),new RectFormatter()},
+            {typeof(Keyframe),new KeyFrameFormatter()},
             
             //其他
-            {Type.GetType("System.RuntimeType,mscorlib"),new RuntimeTypeFormatter()}   //Type类型的变量其对象一般为RuntimeType类型，但是不能直接typeof(RuntimeType)，只能这样了
+            {Type.GetType("System.RuntimeType,mscorlib"),new RuntimeTypeFormatter()},  //Type类型的变量其对象一般为RuntimeType类型，但是不能直接typeof(RuntimeType)，只能这样了
+            {typeof(DateTime),new DateTimeFormatter()},
         };
 
         /// <summary>

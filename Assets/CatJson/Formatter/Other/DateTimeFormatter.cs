@@ -10,13 +10,15 @@ namespace CatJson
         /// <inheritdoc />
         public override void ToJson(DateTime value, Type type, Type realType, int depth)
         {
+            TextUtil.Append('\"');
             TextUtil.Append(value.ToString());
+            TextUtil.Append('\"');
         }
 
         /// <inheritdoc />
         public override DateTime ParseJson(Type type, Type realType)
         {
-            RangeString rs = JsonParser.Lexer.GetNextTokenByType(TokenType.Number);
+            RangeString rs = JsonParser.Lexer.GetNextTokenByType(TokenType.String);
             return DateTime.Parse(rs.AsSpan());
         }
     }
