@@ -1,5 +1,5 @@
 # 简介
-为Unity开发者量身打造的功能强大的高性能Json库，内置ILRuntime支持
+为Unity开发者量身打造的Json库，内置ILRuntime支持
 
 在内存分配，CPU耗时上都达到了一个较好的水准
 
