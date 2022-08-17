@@ -85,4 +85,5 @@
 # 相关文章
 
 [CatJson开发总结](http://cathole.top/2021/12/05/catjson-dev-summary/)
+[CatJsonV2开发总结](http://cathole.top/2022/08/17/catjson-v2-dev-summary/)
 
