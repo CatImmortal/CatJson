@@ -15,7 +15,7 @@ namespace CatJson
         public override byte ParseJson(Type type, Type realType)
         {
             RangeString rs = JsonParser.Lexer.GetNextTokenByType(TokenType.Number);
-            return byte.Parse(rs.AsSpan());
+            return rs.AsByte();
         }
     }
 }

@@ -74,7 +74,7 @@ namespace CatJson
                 else
                 {
                     //处理字典key为int的情况
-                    localDict.Add(int.Parse(key.AsSpan()), value);
+                    localDict.Add(key.AsInt(), value);
                 }
             });
 

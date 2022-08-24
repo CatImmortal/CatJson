@@ -17,7 +17,7 @@ namespace CatJson
         public override decimal ParseJson(Type type, Type realType)
         {
             RangeString rs = JsonParser.Lexer.GetNextTokenByType(TokenType.Number);
-            return decimal.Parse(rs.AsSpan());
+            return rs.AsDecimal();
         }
     }
 }

@@ -19,7 +19,7 @@ namespace CatJson
         public override DateTime ParseJson(Type type, Type realType)
         {
             RangeString rs = JsonParser.Lexer.GetNextTokenByType(TokenType.String);
-            return DateTime.Parse(rs.AsSpan());
+            return rs.AsDateTime();
         }
     }
 }

@@ -17,7 +17,7 @@ namespace CatJson
         public override uint ParseJson(Type type, Type realType)
         {
             RangeString rs = JsonParser.Lexer.GetNextTokenByType(TokenType.Number);
-            return uint.Parse(rs.AsSpan());
+            return rs.AsUInt();
         }
     }
 }

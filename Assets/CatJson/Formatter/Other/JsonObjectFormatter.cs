@@ -44,7 +44,7 @@ namespace CatJson
         {
             JsonObject obj = new JsonObject();
 
-            ParserHelper.ParseJsonObjectProcedure(obj, default, default, (userdata1, _, _, key) =>
+            ParserHelper.ParseJsonObjectProcedure(obj, default, default, (userdata1, userdata2, _, key) =>
             {
                 JsonObject localObj = (JsonObject) userdata1;
                 JsonValue value = JsonParser.ParseJson<JsonValue>();

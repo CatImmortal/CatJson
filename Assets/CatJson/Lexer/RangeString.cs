@@ -176,7 +176,7 @@ namespace CatJson
 
             return str;
         }
-
+#if UNITY_2021_2_OR_NEWER
         public ReadOnlySpan<char> AsSpan()
         {
             int length = endIndex - startIndex + 1;
@@ -184,15 +184,126 @@ namespace CatJson
             return span;
         }
 
+        public byte AsByte()
+        {
+            return byte.Parse(AsSpan());
+        }
+        
+        public sbyte AsSByte()
+        {
+            return sbyte.Parse(AsSpan());
+        }
+
+        public short AsShort()
+        {
+            return short.Parse(AsSpan());
+        }
+        
+        public ushort AsUShort()
+        {
+            return ushort.Parse(AsSpan());
+        }
+        
+        public int AsInt()
+        {
+            return int.Parse(AsSpan());
+        }
+        
+        public uint AsUInt()
+        {
+            return uint.Parse(AsSpan());
+        }
+
+        public long AsLong()
+        {
+            return long.Parse(AsSpan());
+        }
+        
+        public ulong AsULong()
+        {
+            return ulong.Parse(AsSpan());
+        }
+        
         public float AsFloat()
         {
             return float.Parse(AsSpan());
         }
 
+        public double AsDouble()
+        {
+            return double.Parse(AsSpan());
+        }
+
+        public decimal AsDecimal()
+        {
+            return decimal.Parse(AsSpan());
+        }
+
+        public DateTime AsDateTime()
+        {
+            return DateTime.Parse(AsSpan());
+        }
+#else
+        public byte AsByte()
+        {
+            return byte.Parse(ToString());
+        }
+        
+        public sbyte AsSByte()
+        {
+            return sbyte.Parse(ToString());
+        }
+
+        public short AsShort()
+        {
+            return short.Parse(ToString());
+        }
+        
+        public ushort AsUShort()
+        {
+            return ushort.Parse(ToString());
+        }
+        
         public int AsInt()
         {
-            return int.Parse(AsSpan());
+            return int.Parse(ToString());
         }
+        
+        public uint AsUInt()
+        {
+            return uint.Parse(ToString());
+        }
+
+        public long AsLong()
+        {
+            return long.Parse(ToString());
+        }
+        
+        public ulong AsULong()
+        {
+            return ulong.Parse(ToString());
+        }
+        
+        public float AsFloat()
+        {
+            return float.Parse(ToString());
+        }
+
+        public double AsDouble()
+        {
+            return double.Parse(ToString());
+        }
+
+        public decimal AsDecimal()
+        {
+            return decimal.Parse(ToString());
+        }
+
+        public DateTime AsDateTime()
+        {
+            return DateTime.Parse(ToString());
+        }
+#endif
         
         
     }

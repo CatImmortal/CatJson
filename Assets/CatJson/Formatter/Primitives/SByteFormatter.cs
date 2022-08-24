@@ -17,7 +17,7 @@ namespace CatJson
         public override sbyte ParseJson(Type type, Type realType)
         {
             RangeString rs = JsonParser.Lexer.GetNextTokenByType(TokenType.Number);
-            return sbyte.Parse(rs.AsSpan());
+            return rs.AsSByte();
         }
     }
 }
