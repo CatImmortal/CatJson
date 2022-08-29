@@ -98,7 +98,7 @@ namespace CatJson
                 else
                 {
                     //这个json key既不是数据类的字段也不是属性，跳过
-                    JsonParser.ParseJson<JsonValue>();
+                    JsonParser.JumpJsonValue();
                 }
 
 

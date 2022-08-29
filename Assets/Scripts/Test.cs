@@ -191,19 +191,12 @@ public class Test : MonoBehaviour
     /// </summary>
     private void TestParseJsonObject()
     {
-        Profiler.BeginSample("Cat Json Reflection");
+        Profiler.BeginSample("Cat Json");
         for (int i = 0; i < TestCount; i++)
         {
             TestJson1_Root result = JsonParser.ParseJson<TestJson1_Root>(testJson1Text);
         }
         Profiler.EndSample();
-
-        // Profiler.BeginSample("Cat Json GenCode");
-        // for (int i = 0; i < TestCount; i++)
-        // {
-        //     TestJson1_Root result = JsonParser.ParseJson<TestJson1_Root>(testJson1Text, false);
-        // }
-        // Profiler.EndSample();
 
         Profiler.BeginSample("Lit Json");
         for (int i = 0; i < TestCount; i++)
@@ -237,19 +230,12 @@ public class Test : MonoBehaviour
     /// </summary>
     public void TestToJsonObject()
     {
-        Profiler.BeginSample("Cat Json Reflection");
+        Profiler.BeginSample("Cat Json");
         for (int i = 0; i < TestCount; i++)
         {
             string json = JsonParser.ToJson(testJson1Object);
         }
         Profiler.EndSample();
-
-        // Profiler.BeginSample("Cat Json GenCode");
-        // for (int i = 0; i < TestCount; i++)
-        // {
-        //     string json = JsonParser.ToJson(testJson1Object, false);
-        // }
-        // Profiler.EndSample();
 
         Profiler.BeginSample("Lit Json");
         for (int i = 0; i < TestCount; i++)
@@ -273,31 +259,5 @@ public class Test : MonoBehaviour
         }
         Profiler.EndSample();
     }
-
-    /// <summary>
-    /// Json格式化测试
-    /// </summary>
-    private void TestJsonFormat()
-    {
-        
-
-        string json1 = JsonParser.ToJson(testJson1Object);
-        StreamWriter sw = File.CreateText(Application.dataPath + "/ToJsonResultByReflection.txt");
-        sw.Write(json1);
-        sw.Close();
-
-        JsonObject jo = JsonParser.ParseJson<JsonObject>(json1);
-        string json2 = JsonParser.ToJson(jo);
-        StreamWriter sw2 = File.CreateText(Application.dataPath + "/ToJsonResultByJsonTree.txt");
-        sw2.Write(json2);
-        sw2.Close();
-
-        // string json3 = JsonParser.ToJson(testJson1Object, false);
-        // StreamWriter sw3 = File.CreateText(Application.dataPath + "/ToJsonResultByCode.txt");
-        // sw3.Write(json3);
-        // sw3.Close();
-
-
-        //Debug.Log(json1 == json2 && json2 == json3);
-    }
+    
 }

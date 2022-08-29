@@ -14,7 +14,17 @@ namespace CatJson
         /// 类型信息
         /// </summary>
         private Type type;
-
+        
+        /// <summary>
+        /// 带参构造方法
+        /// </summary>
+        private ConstructorInfo paramCtor;
+        
+        /// <summary>
+        /// 带参构造方法的参数列表缓存
+        /// </summary>
+        private object[] paramObjects;
+        
         /// <summary>
         /// 是否序列化此类型下的默认值字段/属性
         /// </summary>
@@ -67,8 +77,7 @@ namespace CatJson
                     PropertyInfos.Add(new RangeString(pi.Name),pi);
                 }
             }
-            
-          
+
         }
 
         /// <summary>
@@ -92,11 +101,32 @@ namespace CatJson
         /// <summary>
         /// 添加需要忽略的成员
         /// </summary>
-        public void AddIgnoreMember(string memberName)
+        internal void AddIgnoreMember(string memberName)
         {
             ignoreMembers.Add(memberName);
         }
-        
+
+        /// <summary>
+        /// 创建此类型的实例（使用任意有参构造）
+        /// </summary>
+        internal object CreateInstanceWithParamCtor()
+        {
+            if (paramCtor == null)
+            {
+                ConstructorInfo[] ctorInfos = type.GetConstructors();
+                foreach (ConstructorInfo ctor in ctorInfos)
+                {
+                    paramCtor = ctor;
+                    
+                    ParameterInfo[] paramInfos = ctor.GetParameters();
+                    paramObjects = new object[paramInfos.Length];
+                    break;
+                }
+            }
+            
+            return paramCtor?.Invoke(paramObjects);
+        }
+
         public override string ToString()
         {
             return type.ToString();

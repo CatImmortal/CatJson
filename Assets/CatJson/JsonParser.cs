@@ -336,6 +336,13 @@ namespace CatJson
             return result;
         }
 
+        /// <summary>
+        /// 跳过一个Json值
+        /// </summary>
+        internal static void JumpJsonValue()
+        {
+            formatterDict[typeof(JsonValue)].ParseJson(null, null);
+        }
        
     }
 

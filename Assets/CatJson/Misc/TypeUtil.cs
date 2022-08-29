@@ -109,7 +109,27 @@ namespace CatJson
                 return ilrtType.ILType.Instantiate();
             }
 #endif
-            return Activator.CreateInstance(type);
+            object obj;
+
+            try
+            {
+                obj = Activator.CreateInstance(type);
+            }
+            catch (Exception e)
+            {
+                if (e is MissingMethodException)
+                {
+                    //没有无参构造 使用任意有参构造
+                    obj = TypeMetaDataManager.CreateInstanceWithParamCtor(type);
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return obj;
+
         }
 
         /// <summary>
