@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 
 namespace CatJson
@@ -119,6 +120,25 @@ namespace CatJson
             ignoreMembers.Add(memberName);
         }
 
+        /// <summary>
+        /// 设置字段的自定义JsonKey
+        /// </summary>
+        internal void SetJsonKey(string key, FieldInfo fi)
+        {
+            FieldInfos[new RangeString(key)] = fi;
+        }
+        
+        /// <summary>
+        /// 设置属性的自定义JsonKey
+        /// </summary>
+        internal void SetJsonKey(string key, PropertyInfo pi)
+        {
+            if (pi.SetMethod != null && pi.GetMethod != null && pi.Name != "Item")
+            {
+                PropertyInfos[new RangeString(key)] = pi;
+            }
+        }
+        
         /// <summary>
         /// 创建此类型的实例（使用任意有参构造）
         /// </summary>

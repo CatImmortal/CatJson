@@ -107,6 +107,22 @@ namespace CatJson
         {
             TypeMetaDataManager.AddIgnoreMember(type,memberName);
         }
+        
+        /// <summary>
+        /// 设置字段的自定义JsonKey
+        /// </summary>
+        public static void SetJsonKey(Type type, string key, FieldInfo fi)
+        {
+            TypeMetaDataManager.SetJsonKey(type,key,fi);
+        }
+        
+        /// <summary>
+        /// 设置属性的自定义JsonKey
+        /// </summary>
+        public static void SetJsonKey(Type type,string key, PropertyInfo pi)
+        {
+            TypeMetaDataManager.SetJsonKey(type,key,pi);
+        }
 
         /// <summary>
         /// Json词法分析器

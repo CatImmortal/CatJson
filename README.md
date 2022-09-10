@@ -75,6 +75,10 @@ QQ交流群：762036315
 
   对于无法通过修改源码进行标记的字段/属性，可通过调用`JsonParser.AddIgnoreMember(Type type, string memberName)`进行忽略
 
+- **支持使用JsonKey特性自定义序列化/反序列化时的Key名称**
+
+  对于无法通过修改源码进行自定义JsonKey的字段/属性，可通过调用`JsonParser.SetJsonKey(Type type, string key, FieldInfo fi)`和`JsonParser.SetJsonKey(Type type, string key, PropertyInfo fi)`进行自定义
+
 - **定义了IJsonParserCallbackReceiver接口，为使用者提供序列化前的回调OnToJsonStart和反序列化后的回调OnParseJsonEnd，以处理其他特殊情况**
 
 - **支持使用ILRuntime时对于热更层类型的序列化/反序列化，使用FUCK_LUA宏即可一键开启对ILRuntime的适配**

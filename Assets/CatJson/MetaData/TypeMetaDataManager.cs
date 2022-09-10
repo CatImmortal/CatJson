@@ -41,6 +41,24 @@ namespace CatJson
             TypeMetaData metaData = GetOrAddMetaData(type);
             metaData.AddIgnoreMember(memberName);
         }
+        
+        /// <summary>
+        /// 设置字段的自定义JsonKey
+        /// </summary>
+        internal static void SetJsonKey(Type type, string key, FieldInfo fi)
+        {
+            TypeMetaData metaData = GetOrAddMetaData(type);
+            metaData.SetJsonKey(key,fi);
+        }
+        
+        /// <summary>
+        /// 设置属性的自定义JsonKey
+        /// </summary>
+        internal static void SetJsonKey(Type type,string key, PropertyInfo pi)
+        {
+            TypeMetaData metaData = GetOrAddMetaData(type);
+            metaData.SetJsonKey(key,pi);
+        }
 
         /// <summary>
         /// 是否序列化此类型下的默认值字段/属性
