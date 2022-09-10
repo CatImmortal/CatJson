@@ -12,7 +12,7 @@ namespace CatJson
     {
 
         /// <inheritdoc />
-        public override void ToJson(IDictionary value, Type type, Type realType, int depth)
+        public override void ToJson(JsonParser parser, IDictionary value, Type type, Type realType, int depth)
         {
             Type dictType = type;
             if (!type.IsGenericType)
@@ -22,34 +22,33 @@ namespace CatJson
             }
             Type valueType = TypeUtil.GetDictValueType(dictType);
 
-            TextUtil.AppendLine("{");
+            parser.AppendLine("{");
 
             if (value != null)
             {
                 int index = 0;
                 foreach (DictionaryEntry item in value)
                 {
-                    
-                    TextUtil.Append("\"", depth);
-                    TextUtil.Append(item.Key.ToString());
-                    TextUtil.Append("\"");
-                    TextUtil.Append(":");
-                    JsonParser.InternalToJson(item.Value,valueType,null,depth + 1);
+                    parser.Append("\"", depth);
+                    parser.Append(item.Key.ToString());
+                    parser.Append("\"");
+                    parser.Append(":");
+                    parser.InternalToJson(item.Value,valueType,null,depth + 1);
 
                     if (index < value.Count-1)
                     {
-                        TextUtil.AppendLine(",");
+                        parser.AppendLine(",");
                     }
                     index++;
                 }
             }
 
-            TextUtil.AppendLine(string.Empty);
-            TextUtil.Append("}", depth - 1);
+            parser.AppendLine(string.Empty);
+            parser.Append("}", depth - 1);
         }
 
         /// <inheritdoc />
-        public override IDictionary ParseJson(Type type, Type realType)
+        public override IDictionary ParseJson(JsonParser parser, Type type, Type realType)
         {
             IDictionary dict = (IDictionary)TypeUtil.CreateInstance(realType);
             Type dictType = type;
@@ -59,13 +58,13 @@ namespace CatJson
             }
             Type keyType =  TypeUtil.GetDictKeyType(dictType);
             Type valueType = TypeUtil.GetDictValueType(dictType);
-            ParserHelper.ParseJsonObjectProcedure(dict,keyType,valueType, (userdata1,userdata2,userdata3, key) =>
+            ParserHelper.ParseJsonObjectProcedure(parser,dict,keyType,valueType, (userdata1,userdata2,userdata3, key) =>
             {
                 IDictionary localDict = (IDictionary) userdata1;
                 Type localKeyType = (Type) userdata2;
                 Type localValueType = (Type) userdata3;
                 
-                object value = JsonParser.InternalParseJson(localValueType);
+                object value = parser.InternalParseJson(localValueType);
                 if (localKeyType == typeof(string))
                 {
                     //处理字典key为string的情况

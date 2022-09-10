@@ -24,8 +24,8 @@ QQ交流群：762036315
 - **支持Json文本与通用Json对象间的转换**
 
   ```csharp
-  JsonObject jo = JsonParser.ParseJson<JsonObject>(jsonText);
-  string jsonText = JsonParser.ToJson(jo);
+  JsonObject jo = JsonParser.Default.ParseJson<JsonObject>(jsonText);
+  string jsonText = JsonParser.Default.ToJson(jo);
   
   //或者使用扩展方法的形式
   JsonObject jo = jsonText.ParseJson<JsonObject>();
@@ -35,8 +35,8 @@ QQ交流群：762036315
 - **支持Json文本与自定义数据对象间的转换**
 
   ```csharp
-  CustomData data = JsonParser.ParseJson<CustomData>(jsonText);
-  string jsonText = JsonParser.ToJson<CustomData>(data);
+  CustomData data = JsonParser.Default.ParseJson<CustomData>(jsonText);
+  string jsonText = JsonParser.Default.ToJson<CustomData>(data);
   
   //或者使用扩展方法的形式
   CustomData data = jsonText.ParseJson<CustomData>();
@@ -54,18 +54,18 @@ QQ交流群：762036315
 - **支持Json文本与数据容器类型间的转换**
 
   ```csharp
-  int[] nums =  JsonParser.ParseJson<int[]>("[1,2,3]");
+  int[] nums =  JsonParser.Default.ParseJson<int[]>("[1,2,3]");
   ```
 
 - **支持各种Unity特有数据类型，如Vector2/3/4，Quaternion,Color,Bounds,Rect,Keyframe,AnimationCurve等**
 
 - **序列化为Json文本时支持格式化**
 
-  可通过设置`JsonParser.IsFormat = false`关闭格式化序列化
+  可通过设置`JsonParser.Default.IsFormat = false`关闭格式化序列化
 
 - **支持多态序列化/反序列化**
 
-  可通过设置`JsonParser.IsPolymorphic = false`关闭多态序列化/反序列化
+  可通过设置`JsonParser.Default.IsPolymorphic = false`关闭多态序列化/反序列化
 
 - **支持使用者通过自定义JsonFormatter指定某个类型的转换方式**
 
@@ -83,8 +83,9 @@ QQ交流群：762036315
 
 # 注意事项
 
+- `JsonParser.Default`表示默认Json解析器对象，若需要创建不同Parser实例，可通过`JsonParser jsonParserObject = new JsonParser()`创建，不同实例不共享配置设置
 - 默认只会对公有的实例字段/属性(且属性必须同时具有get/set)进行序列化/反序列化，可通过调用`JsonParser.SetBindingFlags(BindingFlags bindingFlags)`来修改BindingFlags
-- 对于字段/属性而言，如果其值为null,false或0，那么为了性能考虑将不会对该字段/属性进行序列化（可以通过`JsonParser.IgnoreDefaultValue = false`全局关闭此项设置，或针对指定类型标记`JsonCareDefaultValue`特性进行局部关闭）
+- 对于字段/属性而言，如果其值为null,false或0，那么为了性能考虑将不会对该字段/属性进行序列化（可以通过`JsonParser.Default.IgnoreDefaultValue = false`全局关闭此项设置，或针对指定类型标记`JsonCareDefaultValue`特性进行局部关闭）
 
 # 相关文章
 

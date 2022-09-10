@@ -8,15 +8,15 @@ namespace CatJson
     public class SByteFormatter : BaseJsonFormatter<sbyte>
     {
         /// <inheritdoc />
-        public override void ToJson(sbyte value, Type type, Type realType, int depth)
+        public override void ToJson(JsonParser parser, sbyte value, Type type, Type realType, int depth)
         {
-            TextUtil.Append(value.ToString());
+            parser.Append(value.ToString());
         }
 
         /// <inheritdoc />
-        public override sbyte ParseJson(Type type, Type realType)
+        public override sbyte ParseJson(JsonParser parser, Type type, Type realType)
         {
-            RangeString rs = JsonParser.Lexer.GetNextTokenByType(TokenType.Number);
+            RangeString rs = parser.Lexer.GetNextTokenByType(TokenType.Number);
             return rs.AsSByte();
         }
     }

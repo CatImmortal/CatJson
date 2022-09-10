@@ -98,6 +98,12 @@ namespace CatJson
 
         public override string ToString()
         {
+            string str = ToString(JsonParser.Default);
+            return str;
+        }
+
+        public string ToString(JsonParser parser)
+        {
             if (endIndex - startIndex + 1 == 0)
             {
                 //长度为0 处理空字符串的情况
@@ -117,7 +123,7 @@ namespace CatJson
                 if (c != '\\')
                 {
                     //普通字符
-                    TextUtil.CachedSB.Append(source[i]);
+                    parser.CachedSB.Append(source[i]);
                     continue;
                 }
 
@@ -134,33 +140,33 @@ namespace CatJson
                 switch (c)
                 {
                     case '"':
-                        TextUtil.CachedSB.Append('\"');
+                        parser.CachedSB.Append('\"');
                         break;
                     case '\\':
-                        TextUtil.CachedSB.Append('\\');
+                        parser.CachedSB.Append('\\');
                         break;
                     case '/':
-                        TextUtil.CachedSB.Append('/');
+                        parser.CachedSB.Append('/');
                         break;
                     case 'b':
-                        TextUtil.CachedSB.Append('\b');
+                        parser.CachedSB.Append('\b');
                         break;
                     case 'f':
-                        TextUtil.CachedSB.Append('\f');
+                        parser.CachedSB.Append('\f');
                         break;
                     case 'n':
-                        TextUtil.CachedSB.Append('\n');
+                        parser.CachedSB.Append('\n');
                         break;
                     case 'r':
-                        TextUtil.CachedSB.Append('\r');
+                        parser.CachedSB.Append('\r');
                         break;
                     case 't':
-                        TextUtil.CachedSB.Append('\t');
+                        parser.CachedSB.Append('\t');
                         break;
                     case 'u':
                         //unicode字符
                         char codePoint = TextUtil.GetUnicodeCodePoint(source[i + 1], source[i + 2], source[i + 3], source[i + 4]);
-                        TextUtil.CachedSB.Append(codePoint);
+                        parser.CachedSB.Append(codePoint);
                         i += 4;
                         break;
                     default:
@@ -171,11 +177,12 @@ namespace CatJson
 
             }
 
-            string str = TextUtil.CachedSB.ToString();
-            TextUtil.CachedSB.Clear();
+            string str = parser.CachedSB.ToString();
+            parser.CachedSB.Clear();
 
             return str;
         }
+        
 #if UNITY_2021_2_OR_NEWER
         public ReadOnlySpan<char> AsSpan()
         {
