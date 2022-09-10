@@ -65,6 +65,8 @@ QQ交流群：762036315
 
 - **支持多态序列化/反序列化**
 
+  可通过设置`JsonParser.IsPolymorphic = false`关闭多态序列化/反序列化
+
 - **支持使用者通过自定义JsonFormatter指定某个类型的转换方式**
 
   调用`JsonParser.AddCustomJsonFormatter(Type type, IJsonFormatter formatter)`即可注册指定类型的自定义Formatter

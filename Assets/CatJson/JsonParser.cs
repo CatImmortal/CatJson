@@ -34,6 +34,11 @@ namespace CatJson
         /// 序列化时是否忽略默认值
         /// </summary>
         public static bool IgnoreDefaultValue { get; set; } = true;
+
+        /// <summary>
+        /// 是否进行多态序列化/反序列化
+        /// </summary>
+        public static bool IsPolymorphic { get; set; } = true;
         
         private static NullFormatter nullFormatter = new NullFormatter();
         private static EnumFormatter enumFormatter = new EnumFormatter();
@@ -173,7 +178,8 @@ namespace CatJson
             {
                 realType = TypeUtil.GetType(obj,type);
             }
-            
+
+            checkPolymorphic = checkPolymorphic && IsPolymorphic;
             if (checkPolymorphic && !TypeUtil.TypeEquals(type,realType))
             {
                 //开启了多态序列化检测
