@@ -10,7 +10,7 @@ namespace CatJson
         /// <summary>
         /// 解析Json对象的通用流程
         /// </summary>
-        public static void ParseJsonObjectProcedure(object userdata1,object userdata2,bool isIntKey,Action<object,object,bool,RangeString> action)
+        public static void ParseJsonObjectProcedure(object userdata1,object userdata2,object userdata3,Action<object,object,object,RangeString> action)
         {
             //跳过 {
             JsonParser.Lexer.GetNextTokenByType(TokenType.LeftBrace);
@@ -24,7 +24,7 @@ namespace CatJson
                 JsonParser.Lexer.GetNextTokenByType(TokenType.Colon);
 
                 //提取value
-                action(userdata1,userdata2,isIntKey,key);
+                action(userdata1,userdata2,userdata3,key);
 
                 //此时value已经被提取了
                 

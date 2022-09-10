@@ -45,9 +45,9 @@ QQ交流群：762036315
 
 - **基础数据类型支持byte,sbyte,short,ushort,int,uint,long,ulong,float,double,decimal,char**
 
-- **支持自定义枚举类型，会根据其实现类型进行转换**
+- **支持自定义枚举类型，会作为string进行转换**
 
-- **数据容器类型支持字典、数组、List，其中字典key的类型除了string外还支持int类型**
+- **数据容器类型支持字典、数组、List，其中字典key的类型除了string外还支持int与枚举类型**
 
   *注意：支持三者的互相嵌套，但对于数组套数组的情况只支持锯齿数组不支持多维数组*
 

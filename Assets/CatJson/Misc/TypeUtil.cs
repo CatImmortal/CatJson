@@ -225,6 +225,25 @@ namespace CatJson
         }
 
         /// <summary>
+        /// 获取字典key的类型
+        /// </summary>
+        public static Type GetDictKeyType(Type dictType)
+        {                       
+            Type keyType;
+#if FUCK_LUA
+            if (dictType is ILRuntimeWrapperType wt)
+            {
+                keyType = wt.CLRType.GenericArguments[0].Value.ReflectionType;
+            }
+            else         
+#endif
+            {
+                keyType = dictType.GetGenericArguments()[0];
+            }
+            return keyType;
+        }
+        
+        /// <summary>
         /// 获取字典value的类型
         /// </summary>
         public static Type GetDictValueType(Type dictType)

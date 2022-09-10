@@ -76,7 +76,7 @@ namespace CatJson
            
             object obj = TypeUtil.CreateInstance(realType);
             
-            ParserHelper.ParseJsonObjectProcedure(obj, realType, default, (userdata1, userdata2, _, key) =>
+            ParserHelper.ParseJsonObjectProcedure(obj, realType, default, (userdata1, userdata2, userdata3, key) =>
             {
                 object localObj = userdata1;
                 Type localRealType = (Type) userdata2;

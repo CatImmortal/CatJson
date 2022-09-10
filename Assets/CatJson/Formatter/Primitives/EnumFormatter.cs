@@ -10,17 +10,17 @@ namespace CatJson
         /// <inheritdoc />
         public void ToJson(object value, Type type, Type realType, int depth)
         {
-            Type underlyingType = realType.GetEnumUnderlyingType();
-            JsonParser.InternalToJson(value,underlyingType,underlyingType,depth,false);
+            TextUtil.Append('\"');
+            TextUtil.Append(value.ToString());
+            TextUtil.Append('\"');
         }
 
         /// <inheritdoc />
         public object ParseJson(Type type, Type realType)
         {
-            Type underlyingType = realType.GetEnumUnderlyingType();
-            object result = JsonParser.InternalParseJson(underlyingType, underlyingType, false);
-            object obj = Enum.ToObject(realType, result);
-            return obj;
+            RangeString rs = JsonParser.Lexer.GetNextTokenByType(TokenType.String);
+            object enumOBj = Enum.Parse(realType,rs.ToString());
+            return enumOBj;
         }
     }
 }
