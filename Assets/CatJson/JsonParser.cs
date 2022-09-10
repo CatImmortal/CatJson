@@ -382,6 +382,21 @@ namespace CatJson
             CachedSB.Append(str);
         }
         
+        public void Append(RangeString rs,int tabNum = 0)
+        {
+            if (tabNum > 0 && IsFormat)
+            {
+                AppendTab(tabNum);
+            }
+
+            for (int i = 0; i < rs.Length; i++)
+            {
+                CachedSB.Append(rs[i]);
+            }
+            
+           
+        }
+        
         public void AppendTab(int tabNum)
         {
             if (!IsFormat)

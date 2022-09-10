@@ -29,7 +29,7 @@ namespace CatJson
                     continue;
                 }
                 
-                AppendMember(parser, item.Value.FieldType,item.Value.Name,fieldValue,depth);
+                AppendMember(parser, item.Value.FieldType,item.Key,fieldValue,depth);
                 needRemoveLastComma = true;
             }
             //序列化属性
@@ -44,7 +44,7 @@ namespace CatJson
                     continue;
                 }
 
-                AppendMember(parser, item.Value.PropertyType,item.Value.Name,propValue,depth);
+                AppendMember(parser, item.Value.PropertyType,item.Key,propValue,depth);
                 needRemoveLastComma = true;
             }
 
@@ -127,7 +127,7 @@ namespace CatJson
         /// <summary>
         /// 追加字段/属性的json文本
         /// </summary>
-        private static void AppendMember(JsonParser parser, Type memberType,string memberName,object value,int depth)
+        private static void AppendMember(JsonParser parser, Type memberType,RangeString memberName,object value,int depth)
         {
             //key
             parser.Append("\"", depth);

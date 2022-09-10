@@ -16,12 +16,12 @@ namespace CatJson
         private Type type;
         
         /// <summary>
-        /// 带参构造方法
+        /// 有参构造方法
         /// </summary>
         private ConstructorInfo paramCtor;
         
         /// <summary>
-        /// 带参构造方法的参数列表缓存
+        /// 有参构造方法的参数列表缓存
         /// </summary>
         private object[] paramObjects;
         
@@ -58,8 +58,15 @@ namespace CatJson
                 {
                     continue;
                 }
-                
-                FieldInfos.Add(new RangeString(fi.Name), fi);
+
+
+                string name = fi.Name;
+                JsonKeyAttribute jsonKey = fi.GetCustomAttribute<JsonKeyAttribute>();
+                if (jsonKey != null)
+                {
+                    name = jsonKey.Key;
+                }
+                FieldInfos.Add(new RangeString(name), fi);
             }
             
             //收集属性信息
@@ -71,10 +78,16 @@ namespace CatJson
                     continue;
                 }
                 
+                //属性必须同时具有get set 并且不能是索引器item
                 if (pi.SetMethod != null && pi.GetMethod != null && pi.Name != "Item")
                 {
-                    //属性必须同时具有get set 并且不能是索引器item
-                    PropertyInfos.Add(new RangeString(pi.Name),pi);
+                    string name = pi.Name;
+                    JsonKeyAttribute jsonKey = pi.GetCustomAttribute<JsonKeyAttribute>();
+                    if (jsonKey != null)
+                    {
+                        name = jsonKey.Key;
+                    }
+                    PropertyInfos.Add(new RangeString(name),pi);
                 }
             }
 

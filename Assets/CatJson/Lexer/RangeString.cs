@@ -26,6 +26,11 @@ namespace CatJson
         private int endIndex;
 
         /// <summary>
+        /// 长度
+        /// </summary>
+        public int Length { get; }
+        
+        /// <summary>
         /// 哈希码
         /// </summary>
         private int hashCode;
@@ -41,6 +46,7 @@ namespace CatJson
             this.source = source;
             this.startIndex = startIndex;
             this.endIndex = endIndex;
+            Length = (endIndex - startIndex) + 1;
             hashCode = 0;
         }
 
@@ -58,9 +64,8 @@ namespace CatJson
             {
                 return false;
             }
-            int length = endIndex - startIndex + 1;
-            int otherLength = other.endIndex - other.startIndex + 1;
-            if (length != otherLength)
+
+            if (Length != other.Length)
             {
                 return false;
             }
