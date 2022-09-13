@@ -33,9 +33,9 @@ namespace CatJson
                     parser.Append(item.Key.ToString());
                     parser.Append("\"");
                     parser.Append(":");
-                    parser.InternalToJson(item.Value,valueType,null,depth + 1);
+                    parser.InternalToJson(item.Value, valueType, null, depth + 1);
 
-                    if (index < value.Count-1)
+                    if (index < value.Count - 1)
                     {
                         parser.AppendLine(",");
                     }
@@ -47,6 +47,21 @@ namespace CatJson
             parser.Append("}", depth - 1);
         }
 
+        Dictionary<Type, Action<IDictionary, RangeString, object>> keyType2Fn = new Dictionary<Type, Action<IDictionary, RangeString, object>>()
+        {
+            {typeof(byte),      (dict,key,value) => dict.Add(key.AsByte(), value)  },
+            {typeof(sbyte),     (dict,key,value) => dict.Add(key.AsSByte(), value) },
+            {typeof(short),     (dict,key,value) => dict.Add(key.AsShort(), value) },
+            {typeof(ushort),    (dict,key,value) => dict.Add(key.AsUShort(), value) },
+            {typeof(int),       (dict,key,value) => dict.Add(key.AsInt(), value) },
+            {typeof(uint),      (dict,key,value) => dict.Add(key.AsUInt(), value) },
+            {typeof(long),      (dict,key,value) => dict.Add(key.AsLong(), value) },
+            {typeof(ulong),     (dict,key,value) => dict.Add(key.AsULong(), value) },
+            {typeof(float),     (dict,key,value) => dict.Add(key.AsFloat(), value) },
+            {typeof(double),    (dict,key,value) => dict.Add(key.AsDouble(), value) },
+            {typeof(string),    (dict,key,value) => dict.Add(key.ToString(), value) },
+        };
+
         /// <inheritdoc />
         public override IDictionary ParseJson(JsonParser parser, Type type, Type realType)
         {
@@ -56,34 +71,29 @@ namespace CatJson
             {
                 dictType = realType;
             }
-            Type keyType =  TypeUtil.GetDictKeyType(dictType);
+            Type keyType = TypeUtil.GetDictKeyType(dictType);
             Type valueType = TypeUtil.GetDictValueType(dictType);
-            ParserHelper.ParseJsonObjectProcedure(parser,dict,keyType,valueType, (userdata1,userdata2,userdata3, key) =>
+            ParserHelper.ParseJsonObjectProcedure(parser, dict, keyType, valueType, (userdata1, userdata2, userdata3, key) =>
             {
-                IDictionary localDict = (IDictionary) userdata1;
-                Type localKeyType = (Type) userdata2;
-                Type localValueType = (Type) userdata3;
-                
+                IDictionary localDict = (IDictionary)userdata1;
+                Type localKeyType = (Type)userdata2;
+                Type localValueType = (Type)userdata3;
+
                 object value = parser.InternalParseJson(localValueType);
-                if (localKeyType == typeof(string))
+                if (localKeyType.IsEnum)
                 {
-                    //处理字典key为string的情况
-                    localDict.Add(key.ToString(), value);
-                }
-                else if (localKeyType == typeof(int))
-                {
-                    //处理字典key为int的情况
-                    localDict.Add(key.AsInt(), value);
-                }
-                else if (localKeyType.IsEnum)
-                {
-                    //处理字典key为枚举的情况
-                    object enumObj = Enum.Parse(localKeyType, key.ToString());
-                    localDict.Add(enumObj,value);
+                    localDict.Add(Enum.Parse(keyType, key.ToString()), value);
                 }
                 else
                 {
-                    throw new Exception($"不支持的字典key类型:{localKeyType}");
+                    if (keyType2Fn.TryGetValue(localKeyType, out var fn))
+                    {
+                        fn.Invoke(localDict, key, value);
+                    }
+                    else
+                    {
+                        throw new Exception($"不支持的字典key类型:{localKeyType}");
+                    }
                 }
             });
 

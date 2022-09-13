@@ -29,7 +29,7 @@ public class Test : MonoBehaviour
 
         testJson1Text = Resources.Load<TextAsset>("TestJson1").text;
 
-        testJson1Object = JsonParser.ParseJson<TestJson1_Root>(testJson1Text);
+        testJson1Object = JsonParser.Default.ParseJson<TestJson1_Root>(testJson1Text);
     }
 
 
@@ -73,7 +73,7 @@ public class Test : MonoBehaviour
         Profiler.BeginSample("Cat Json");
         for (int i = 0; i < TestCount; i++)
         {
-            JsonObject result2 = JsonParser.ParseJson<JsonObject>(testJson1Text);
+            JsonObject result2 = JsonParser.Default.ParseJson<JsonObject>(testJson1Text);
         }
         Profiler.EndSample();
 
@@ -126,12 +126,12 @@ public class Test : MonoBehaviour
     /// </summary>
     private void TestToJsonNodeTree()
     {
-        JsonObject result2_1 = JsonParser.ParseJson<JsonObject>(testJson1Text);
+        JsonObject result2_1 = JsonParser.Default.ParseJson<JsonObject>(testJson1Text);
 
         Profiler.BeginSample("Cat Json");
         for (int i = 0; i < TestCount; i++)
         {
-            string json = JsonParser.ToJson(result2_1);
+            string json = JsonParser.Default.ToJson(result2_1);
         }
         Profiler.EndSample();
 
@@ -194,7 +194,7 @@ public class Test : MonoBehaviour
         Profiler.BeginSample("Cat Json");
         for (int i = 0; i < TestCount; i++)
         {
-            TestJson1_Root result = JsonParser.ParseJson<TestJson1_Root>(testJson1Text);
+            TestJson1_Root result = JsonParser.Default.ParseJson<TestJson1_Root>(testJson1Text);
         }
         Profiler.EndSample();
 
@@ -233,7 +233,7 @@ public class Test : MonoBehaviour
         Profiler.BeginSample("Cat Json");
         for (int i = 0; i < TestCount; i++)
         {
-            string json = JsonParser.ToJson(testJson1Object);
+            string json = JsonParser.Default.ToJson(testJson1Object);
         }
         Profiler.EndSample();
 
