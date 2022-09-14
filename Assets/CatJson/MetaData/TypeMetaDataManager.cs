@@ -17,7 +17,7 @@ namespace CatJson
         /// <summary>
         /// 类型元数据字典
         /// </summary>
-        private static Dictionary<Type, TypeMetaData> metaDataDict = new Dictionary<Type, TypeMetaData>();
+        private static readonly Dictionary<Type, TypeMetaData> metaDataDict = new Dictionary<Type, TypeMetaData>();
 
         /// <summary>
         /// 获取指定类型的元数据，若不存在则创建

@@ -44,7 +44,7 @@ namespace CatJson
         /// <summary>
         /// 需要忽略处理的字段/属性名
         /// </summary>
-        private HashSet<string> ignoreMembers = new HashSet<string>();
+        private readonly HashSet<string> ignoreMembers = new HashSet<string>();
         
         public TypeMetaData(Type type)
         {

@@ -76,7 +76,7 @@ namespace CatJson
            
             object obj = TypeUtil.CreateInstance(realType);
             
-            ParserHelper.ParseJsonObjectProcedure(parser,obj, realType, default, (userdata1, userdata2, userdata3, key) =>
+            ParserHelper.ParseJsonObjectProcedure(parser,obj, realType, default, (localParser, userdata1, userdata2, userdata3, key) =>
             {
                 object localObj = userdata1;
                 Type localRealType = (Type) userdata2;
@@ -86,19 +86,19 @@ namespace CatJson
                 if (fieldInfos.TryGetValue(key, out FieldInfo fi))
                 {
                     //是字段
-                    object value = parser.InternalParseJson(fi.FieldType);
+                    object value = localParser.InternalParseJson(fi.FieldType);
                     fi.SetValue(localObj, value);
                 }
                 else if (propertyInfos.TryGetValue(key, out PropertyInfo pi))
                 {
                     //是属性
-                    object value = parser.InternalParseJson(pi.PropertyType);
+                    object value = localParser.InternalParseJson(pi.PropertyType);
                     pi.SetValue(localObj, value);
                 }
                 else
                 {
                     //这个json key既不是数据类的字段也不是属性，跳过
-                    parser.JumpJsonValue();
+                    localParser.JumpJsonValue();
                 }
 
 
