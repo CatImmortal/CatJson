@@ -191,8 +191,7 @@ namespace CatJson
 #if UNITY_2021_2_OR_NEWER
         public ReadOnlySpan<char> AsSpan()
         {
-            int length = endIndex - startIndex + 1;
-            ReadOnlySpan<char> span = source.AsSpan(startIndex, length);
+            ReadOnlySpan<char> span = source.AsSpan(startIndex, Length);
             return span;
         }
 
