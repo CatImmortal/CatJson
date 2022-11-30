@@ -117,7 +117,7 @@ namespace CatJson
             }
             catch (Exception)
             {
-				throw new Exception($"找不到{type.Name}的无参构造函数");
+		throw new Exception($"找不到{type.Name}的无参构造函数");
             }
 
             return obj;
