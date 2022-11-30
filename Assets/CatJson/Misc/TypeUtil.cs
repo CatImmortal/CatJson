@@ -115,17 +115,9 @@ namespace CatJson
             {
                 obj = Activator.CreateInstance(type);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                if (e is MissingMethodException)
-                {
-                    //没有无参构造 使用任意有参构造
-                    obj = TypeMetaDataManager.CreateInstanceWithParamCtor(type);
-                }
-                else
-                {
-                    throw;
-                }
+				throw new Exception($"找不到{type.Name}的无参构造函数");
             }
 
             return obj;
