@@ -80,7 +80,7 @@ namespace CatJson
                  return $"\"{ilrtType.FullName}\"";
             }
 #endif
-            return $"\"{value.FullName}\"";
+            return $"\"{value.FullName},{value.Assembly.GetName().Name}\"";
         }
         
         /// <summary>
