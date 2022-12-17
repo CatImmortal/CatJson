@@ -103,6 +103,11 @@ namespace CatJson
             {
                 return true;
             }
+            
+            if (Attribute.IsDefined(mi, typeof(NonSerializedAttribute)))
+            {
+                return true;
+            }
 
             if (ignoreMembers.Contains(name))
             {

@@ -45,7 +45,7 @@ namespace CatJson
         /// <inheritdoc />
         public override IList ParseJson(JsonParser parser, Type type, Type realType)
         {
-            IList list = (IList)TypeUtil.CreateInstance(realType);
+            IList list = (IList)TypeUtil.CreateInstance(realType,parser.IsUseParamCtor);
             
             Type listType = type;
             if (!listType.IsGenericType)

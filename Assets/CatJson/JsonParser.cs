@@ -145,8 +145,11 @@ namespace CatJson
         /// 是否进行多态序列化/反序列化
         /// </summary>
         public bool IsPolymorphic { get; set; } = true;
-        
-      
+
+        /// <summary>
+        /// 是否在没有无参构造时使用任意有参构造
+        /// </summary>
+        public bool IsUseParamCtor { get; set; } = false;
 
         /// <summary>
         /// 将指定类型的对象序列化为Json文本

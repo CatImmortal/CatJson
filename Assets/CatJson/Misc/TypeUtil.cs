@@ -80,7 +80,7 @@ namespace CatJson
                  return $"\"{ilrtType.FullName}\"";
             }
 #endif
-            return $"\"{value.AssemblyQualifiedName}\"";
+            return $"\"{value.FullName}\"";
         }
         
         /// <summary>
@@ -101,7 +101,7 @@ namespace CatJson
         /// <summary>
         /// 创建type的实例
         /// </summary>
-        public static object CreateInstance(Type type)
+        public static object CreateInstance(Type type,bool isUseParamCtor)
         {
 #if FUCK_LUA
             if (type is ILRuntimeType ilrtType)
@@ -117,9 +117,9 @@ namespace CatJson
             }
             catch (Exception e)
             {
-                if (e is MissingMethodException)
+                if (e is MissingMethodException && isUseParamCtor)
                 {
-                    //没有无参构造 使用任意有参构造
+                    //没有无参构造 并且允许使用任意有参构造
                     obj = TypeMetaDataManager.CreateInstanceWithParamCtor(type);
                 }
                 else

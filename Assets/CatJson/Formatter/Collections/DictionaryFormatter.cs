@@ -71,7 +71,7 @@ namespace CatJson
         /// <inheritdoc />
         public override IDictionary ParseJson(JsonParser parser, Type type, Type realType)
         {
-            IDictionary dict = (IDictionary) TypeUtil.CreateInstance(realType);
+            IDictionary dict = (IDictionary) TypeUtil.CreateInstance(realType,parser.IsUseParamCtor);
             Type dictType = type;
             if (!type.IsGenericType)
             {
