@@ -127,7 +127,7 @@ namespace CatJson
         /// <summary>
         /// Json词法分析器
         /// </summary>
-        internal JsonLexer Lexer { get; } = new JsonLexer();
+        public JsonLexer Lexer { get; } = new JsonLexer();
         
         internal StringBuilder CachedSB { get; } = new StringBuilder();
         
