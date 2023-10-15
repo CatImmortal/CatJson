@@ -34,15 +34,6 @@ namespace CatJson
         }
 
         /// <summary>
-        /// 是否需要忽略此字段/属性
-        /// </summary>
-        internal static bool IsIgnoreMember(Type type, MemberInfo mi, string name)
-        {
-            TypeMetaData metaData = GetOrAddMetaData(type);
-            return metaData.IsIgnoreMember(mi, name);
-        }
-        
-        /// <summary>
         /// 添加指定类型需要忽略的成员
         /// </summary>
         internal static void AddIgnoreMember(Type type, string memberName)
@@ -88,15 +79,6 @@ namespace CatJson
             fieldInfos = metaData.FieldInfos;
             propertyInfos = metaData.PropertyInfos;
         }
-
-        // /// <summary>
-        // /// 获取指定类型的属性信息
-        // /// </summary>
-        // internal static Dictionary<RangeString, PropertyInfo> GetPropertyInfos(Type type)
-        // {
-        //     TypeMetaData metaData = GetOrAddMetaData(type);
-        //     return metaData.PropertyInfos;
-        // }
 
         /// <summary>
         /// 创建指定类型的实例（使用任意有参构造）

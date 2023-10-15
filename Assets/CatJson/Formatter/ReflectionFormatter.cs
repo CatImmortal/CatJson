@@ -79,8 +79,7 @@ namespace CatJson
             {
                 object localObj = userdata1;
                 Type localType = (Type) userdata2;
-                TypeMetaDataManager.GetFieldAndPropertyInfos(type,out var fieldInfos,out var propertyInfos);
-                
+                TypeMetaDataManager.GetFieldAndPropertyInfos(localType,out var fieldInfos,out var propertyInfos);
                 
                 if (fieldInfos.TryGetValue(key, out FieldInfo fi))
                 {
