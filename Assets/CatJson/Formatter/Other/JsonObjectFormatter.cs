@@ -9,7 +9,7 @@ namespace CatJson
     public class JsonObjectFormatter : BaseJsonFormatter<JsonObject>
     {
         /// <inheritdoc />
-        public override void ToJson(JsonParser parser, JsonObject value, Type type, Type realType, int depth)
+        public override void ToJson(JsonParser parser, JsonObject value, Type type, int depth)
         {
             parser.AppendLine("{");
 
@@ -25,7 +25,7 @@ namespace CatJson
 
                     parser.Append(":");
 
-                    parser.ToJson(item.Value,depth + 1);
+                    parser.InternalToJson(item.Value,typeof(JsonValue),depth + 1);
 
                     if (index < value.ValueDict.Count-1)
                     {
@@ -40,7 +40,7 @@ namespace CatJson
         }
 
         /// <inheritdoc />
-        public override JsonObject ParseJson(JsonParser parser, Type type, Type realType)
+        public override JsonObject ParseJson(JsonParser parser, Type type)
         {
             JsonObject obj = new JsonObject();
 

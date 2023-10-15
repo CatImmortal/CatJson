@@ -9,7 +9,7 @@ namespace CatJson
     public class QuaternionFormatter : BaseJsonFormatter<Quaternion>
     {
         /// <inheritdoc />
-        public override void ToJson(JsonParser parser, Quaternion value, Type type, Type realType, int depth)
+        public override void ToJson(JsonParser parser, Quaternion value, Type type, int depth)
         {
             parser.Append('{');
             parser.Append(value.x.ToString());
@@ -23,7 +23,7 @@ namespace CatJson
         }
 
         /// <inheritdoc />
-        public override Quaternion ParseJson(JsonParser parser, Type type, Type realType)
+        public override Quaternion ParseJson(JsonParser parser, Type type)
         {
             parser.Lexer.GetNextTokenByType(TokenType.LeftBrace);
             float x = parser.Lexer.GetNextTokenByType(TokenType.Number).AsFloat();

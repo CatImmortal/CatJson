@@ -9,25 +9,25 @@ namespace CatJson
     {
     
         /// <inheritdoc />
-        void IJsonFormatter.ToJson(JsonParser parser, object value, Type type, Type realType, int depth)
+        void IJsonFormatter.ToJson(JsonParser parser, object value, Type type, int depth)
         {
-            ToJson(parser, (TValue)value,type,realType, depth);
+            ToJson(parser, (TValue)value,type, depth);
         }
     
         /// <inheritdoc />
-        object IJsonFormatter.ParseJson(JsonParser parser, Type type, Type realType)
+        object IJsonFormatter.ParseJson(JsonParser parser, Type type)
         {
-            return ParseJson(parser, type,realType);
+            return ParseJson(parser,type);
         }
         
         /// <summary>
         /// 将对象序列化为Json文本
         /// </summary>
-        public abstract void ToJson(JsonParser parser, TValue value, Type type, Type realType, int depth);
+        public abstract void ToJson(JsonParser parser, TValue value, Type type, int depth);
         
         /// <summary>
         /// 将Json文本反序列化为对象
         /// </summary>
-        public abstract TValue ParseJson(JsonParser parser, Type type, Type realType);
+        public abstract TValue ParseJson(JsonParser parser, Type type);
     }
 }

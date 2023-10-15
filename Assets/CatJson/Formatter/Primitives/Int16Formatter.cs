@@ -8,13 +8,13 @@ namespace CatJson
     public class Int16Formatter : BaseJsonFormatter<short>
     {
         /// <inheritdoc />
-        public override void ToJson(JsonParser parser, short value, Type type, Type realType, int depth)
+        public override void ToJson(JsonParser parser, short value, Type type, int depth)
         {
             parser.Append(value.ToString());
         }
 
         /// <inheritdoc />
-        public override short ParseJson(JsonParser parser, Type type, Type realType)
+        public override short ParseJson(JsonParser parser, Type type)
         {
             RangeString rs = parser.Lexer.GetNextTokenByType(TokenType.Number);
             return rs.AsShort();

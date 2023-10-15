@@ -8,13 +8,13 @@ namespace CatJson
     public class Int64Formatter : BaseJsonFormatter<long>
     {
         /// <inheritdoc />
-        public override void ToJson(JsonParser parser, long value, Type type, Type realType, int depth)
+        public override void ToJson(JsonParser parser, long value, Type type, int depth)
         {
             parser.Append(value.ToString());
         }
 
         /// <inheritdoc />
-        public override long ParseJson(JsonParser parser, Type type, Type realType)
+        public override long ParseJson(JsonParser parser, Type type)
         {
             RangeString rs = parser.Lexer.GetNextTokenByType(TokenType.Number);
             return rs.AsLong();

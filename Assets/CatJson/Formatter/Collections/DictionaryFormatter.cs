@@ -30,16 +30,9 @@ namespace CatJson
             };
 
         /// <inheritdoc />
-        public override void ToJson(JsonParser parser, IDictionary value, Type type, Type realType, int depth)
+        public override void ToJson(JsonParser parser, IDictionary value, Type type, int depth)
         {
-            Type dictType = type;
-            if (!type.IsGenericType)
-            {
-                //此处的处理原因类似ArrayFormatter
-                dictType = realType;
-            }
-
-            Type valueType = TypeUtil.GetDictValueType(dictType);
+            Type valueType = TypeUtil.GetDictValueType(type);
 
             parser.AppendLine("{");
 
@@ -52,7 +45,7 @@ namespace CatJson
                     parser.Append(item.Key.ToString());
                     parser.Append("\"");
                     parser.Append(":");
-                    parser.InternalToJson(item.Value, valueType, null, depth + 1);
+                    parser.InternalToJson(item.Value, valueType, depth + 1);
 
                     if (index < value.Count - 1)
                     {
@@ -69,17 +62,11 @@ namespace CatJson
 
 
         /// <inheritdoc />
-        public override IDictionary ParseJson(JsonParser parser, Type type, Type realType)
+        public override IDictionary ParseJson(JsonParser parser, Type type)
         {
-            IDictionary dict = (IDictionary) TypeUtil.CreateInstance(realType,parser.IsUseParamCtor);
-            Type dictType = type;
-            if (!type.IsGenericType)
-            {
-                dictType = realType;
-            }
-
-            Type keyType = TypeUtil.GetDictKeyType(dictType);
-            Type valueType = TypeUtil.GetDictValueType(dictType);
+            IDictionary dict = (IDictionary) TypeUtil.CreateInstance(type,parser.IsUseParamCtor);
+            Type keyType = TypeUtil.GetDictKeyType(type);
+            Type valueType = TypeUtil.GetDictValueType(type);
             ParserHelper.ParseJsonObjectProcedure(parser, dict, keyType, valueType,
                 (localParser, userdata1, userdata2, userdata3, key) =>
                 {

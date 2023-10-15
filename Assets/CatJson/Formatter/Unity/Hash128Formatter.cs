@@ -9,7 +9,7 @@ namespace CatJson
     public class Hash128Formatter : BaseJsonFormatter<Hash128>
     {
         /// <inheritdoc />
-        public override void ToJson(JsonParser parser, Hash128 value, Type type, Type realType, int depth)
+        public override void ToJson(JsonParser parser, Hash128 value, Type type, int depth)
         {
             parser.Append('\"');
             parser.Append(value.ToString());
@@ -17,7 +17,7 @@ namespace CatJson
         }
 
         /// <inheritdoc />
-        public override Hash128 ParseJson(JsonParser parser, Type type, Type realType)
+        public override Hash128 ParseJson(JsonParser parser, Type type)
         {
             RangeString rs = parser.Lexer.GetNextTokenByType(TokenType.String);
             return Hash128.Parse(rs.ToString());

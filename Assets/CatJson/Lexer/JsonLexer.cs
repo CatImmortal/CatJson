@@ -294,7 +294,7 @@ namespace CatJson
                 c = json[CurIndex];
             }
             
-            // 字符串中有转义\" 的需要继续
+            //到这里碰到了第二个双引号" 但如果是被转义\" 的需要继续
             bool isNeedBack = false;
             if (json[CurIndex-1] == '\\')
             {

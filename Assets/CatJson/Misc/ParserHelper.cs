@@ -15,7 +15,7 @@ namespace CatJson
             //跳过 {
             parser.Lexer.GetNextTokenByType(TokenType.LeftBrace);
 
-            while ( parser.Lexer.LookNextTokenType() != TokenType.RightBrace)
+            while (parser.Lexer.LookNextTokenType() != TokenType.RightBrace)
             {
                 //提取key
                 RangeString key =  parser.Lexer.GetNextTokenByType(TokenType.String);
@@ -53,14 +53,14 @@ namespace CatJson
         /// <summary>
         /// 解析Json数组的通用流程
         /// </summary>
-        public static void ParseJsonArrayProcedure(JsonParser parser,object userdata1,object userdata2, Action<object,object> action)
+        public static void ParseJsonArrayProcedure(JsonParser parser,object userdata1,object userdata2, Action<JsonParser,object,object> action)
         {
             //跳过[
              parser.Lexer.GetNextTokenByType(TokenType.LeftBracket);
 
-            while ( parser.Lexer.LookNextTokenType() != TokenType.RightBracket)
+            while (parser.Lexer.LookNextTokenType() != TokenType.RightBracket)
             {
-                action(userdata1,userdata2);
+                action(parser, userdata1,userdata2);
 
                 //此时value已经被提取了
                 
@@ -88,7 +88,7 @@ namespace CatJson
         /// <summary>
         /// 尝试从多态序列化的Json文本中读取真实类型
         /// </summary>
-        public static bool TryParseRealType(JsonParser parser,Type type, out Type realType)
+        public static bool TryParseRealType(JsonParser parser, out Type realType)
         {
             realType = null;
             
@@ -106,7 +106,7 @@ namespace CatJson
                     parser.Lexer.GetNextTokenByType(TokenType.Colon); // :
                     
                     rs = parser.Lexer.GetNextTokenByType(TokenType.String); //RealType Value
-                    realType = TypeUtil.GetRealType(type, rs.ToString());  //获取真实类型
+                    realType = TypeUtil.GetRealType(rs.ToString());  //获取真实类型
 
                     return true;
                 }
@@ -115,8 +115,6 @@ namespace CatJson
                 //回滚到前一个{的位置上，并将缓存置空，因为被look过所以需要-1
                 parser.Lexer.Rollback(curIndex - 1,curLine);
                 return false;
-
-
             }
 
             return false;

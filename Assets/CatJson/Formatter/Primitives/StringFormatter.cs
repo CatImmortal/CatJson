@@ -9,7 +9,7 @@ namespace CatJson
     public class StringFormatter : BaseJsonFormatter<string>
     {
         /// <inheritdoc />
-        public override void ToJson(JsonParser parser, string value, Type type, Type realType, int depth)
+        public override void ToJson(JsonParser parser, string value, Type type, int depth)
         {
             parser.Append('\"');
             for (int i = 0; i < value.Length; i++)
@@ -30,7 +30,7 @@ namespace CatJson
         }
 
         /// <inheritdoc />
-        public override string ParseJson(JsonParser parser, Type type, Type realType)
+        public override string ParseJson(JsonParser parser, Type type)
         {
             RangeString rs = parser.Lexer.GetNextTokenByType(TokenType.String);
             return rs.ToString();

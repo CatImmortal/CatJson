@@ -9,7 +9,7 @@ namespace CatJson
     public class Vector2Formatter : BaseJsonFormatter<Vector2>
     {
         /// <inheritdoc />
-        public override void ToJson(JsonParser parser, Vector2 value, Type type, Type realType, int depth)
+        public override void ToJson(JsonParser parser, Vector2 value, Type type, int depth)
         {
             parser.Append('{');
             parser.Append(value.x.ToString());
@@ -19,7 +19,7 @@ namespace CatJson
         }
 
         /// <inheritdoc />
-        public override Vector2 ParseJson(JsonParser parser, Type type, Type realType)
+        public override Vector2 ParseJson(JsonParser parser, Type type)
         {
             parser.Lexer.GetNextTokenByType(TokenType.LeftBrace);
             float x = parser.Lexer.GetNextTokenByType(TokenType.Number).AsFloat();

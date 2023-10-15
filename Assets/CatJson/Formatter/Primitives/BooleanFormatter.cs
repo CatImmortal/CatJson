@@ -8,7 +8,7 @@ namespace CatJson
     public class BooleanFormatter : BaseJsonFormatter<bool>
     {
         /// <inheritdoc />
-        public override void ToJson(JsonParser parser, bool value, Type type, Type realType, int depth)
+        public override void ToJson(JsonParser parser, bool value, Type type, int depth)
         {
             string json = "true";
             if (!value)
@@ -20,7 +20,7 @@ namespace CatJson
         }
 
         /// <inheritdoc />
-        public override bool ParseJson(JsonParser parser, Type type, Type realType)
+        public override bool ParseJson(JsonParser parser, Type type)
         {
             parser.Lexer.GetNextToken(out TokenType nextTokenType);
             return nextTokenType == TokenType.True;

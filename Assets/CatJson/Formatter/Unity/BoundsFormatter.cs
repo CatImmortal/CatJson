@@ -9,7 +9,7 @@ namespace CatJson
     public class BoundsFormatter : BaseJsonFormatter<Bounds>
     {
         /// <inheritdoc />
-        public override void ToJson(JsonParser parser, Bounds value, Type type, Type realType, int depth)
+        public override void ToJson(JsonParser parser, Bounds value, Type type, int depth)
         {
             parser.Append('{');
             
@@ -30,7 +30,7 @@ namespace CatJson
         }
 
         /// <inheritdoc />
-        public override Bounds ParseJson(JsonParser parser, Type type, Type realType)
+        public override Bounds ParseJson(JsonParser parser, Type type)
         {
             parser.Lexer.GetNextTokenByType(TokenType.LeftBrace);
             

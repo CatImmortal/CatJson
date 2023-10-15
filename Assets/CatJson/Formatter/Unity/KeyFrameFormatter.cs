@@ -9,7 +9,7 @@ namespace CatJson
     public class KeyFrameFormatter : BaseJsonFormatter<Keyframe>
     {
         /// <inheritdoc />
-        public override void ToJson(JsonParser parser, Keyframe value, Type type, Type realType, int depth)
+        public override void ToJson(JsonParser parser, Keyframe value, Type type, int depth)
         {
             parser.Append('{');
             parser.Append(value.time.ToString());
@@ -27,7 +27,7 @@ namespace CatJson
         }
 
         /// <inheritdoc />
-        public override Keyframe ParseJson(JsonParser parser, Type type, Type realType)
+        public override Keyframe ParseJson(JsonParser parser, Type type)
         {
             parser.Lexer.GetNextTokenByType(TokenType.LeftBrace);
             float time = parser.Lexer.GetNextTokenByType(TokenType.Number).AsFloat();

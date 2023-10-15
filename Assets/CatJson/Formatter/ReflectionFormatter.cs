@@ -10,20 +10,20 @@ namespace CatJson
     public class ReflectionFormatter : IJsonFormatter
     {
         /// <inheritdoc />
-        public void ToJson(JsonParser parser, object value, Type type, Type realType, int depth)
+        public void ToJson(JsonParser parser, object value, Type type, int depth)
         {
             //是否需要删除最后一个逗号
             bool needRemoveLastComma = false;
             
             parser.AppendLine("{");
             
+            TypeMetaDataManager.GetFieldAndPropertyInfos(type,out var fieldInfos,out var propertyInfos);
             //序列化字段
-            Dictionary<RangeString, FieldInfo> fieldInfos = TypeMetaDataManager.GetFieldInfos(realType);
             foreach (KeyValuePair<RangeString, FieldInfo> item in fieldInfos)
             {
                 object fieldValue = item.Value.GetValue(value);
 
-                if (IsJump(parser, realType,fieldValue))
+                if (IsJump(parser, type,fieldValue))
                 {
                     //跳过默认值序列化
                     continue;
@@ -33,12 +33,11 @@ namespace CatJson
                 needRemoveLastComma = true;
             }
             //序列化属性
-            Dictionary<RangeString, PropertyInfo> propertyInfos = TypeMetaDataManager.GetPropertyInfos(realType);
             foreach (KeyValuePair<RangeString, PropertyInfo> item in propertyInfos)
             {
                 object propValue = item.Value.GetValue(value);
                 
-                if (IsJump(parser, realType,propValue))
+                if (IsJump(parser, type,propValue))
                 {
                     //跳过默认值序列化
                     continue;
@@ -71,18 +70,18 @@ namespace CatJson
         }
 
         /// <inheritdoc />
-        public object ParseJson(JsonParser parser, Type type, Type realType)
+        public object ParseJson(JsonParser parser, Type type)
         {
            
-            object obj = TypeUtil.CreateInstance(realType,parser.IsUseParamCtor);
+            object obj = TypeUtil.CreateInstance(type,parser.IsUseParamCtor);
             
-            ParserHelper.ParseJsonObjectProcedure(parser,obj, realType, default, (localParser, userdata1, userdata2, userdata3, key) =>
+            ParserHelper.ParseJsonObjectProcedure(parser,obj, type, default, (localParser, userdata1, userdata2, userdata3, key) =>
             {
                 object localObj = userdata1;
-                Type localRealType = (Type) userdata2;
-                Dictionary<RangeString, FieldInfo> fieldInfos = TypeMetaDataManager.GetFieldInfos(localRealType);
-                Dictionary<RangeString, PropertyInfo> propertyInfos = TypeMetaDataManager.GetPropertyInfos(localRealType);
-
+                Type localType = (Type) userdata2;
+                TypeMetaDataManager.GetFieldAndPropertyInfos(type,out var fieldInfos,out var propertyInfos);
+                
+                
                 if (fieldInfos.TryGetValue(key, out FieldInfo fi))
                 {
                     //是字段
@@ -137,7 +136,7 @@ namespace CatJson
             parser.Append(":");
         
             //value
-            parser.InternalToJson(value,memberType,null,depth + 1);
+            parser.InternalToJson(value,memberType,depth + 1);
 
             parser.AppendLine(",");
         }

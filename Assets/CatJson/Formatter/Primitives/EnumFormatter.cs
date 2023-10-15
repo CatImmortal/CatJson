@@ -8,7 +8,7 @@ namespace CatJson
     public class EnumFormatter : IJsonFormatter
     {
         /// <inheritdoc />
-        public void ToJson(JsonParser parser, object value, Type type, Type realType, int depth)
+        public void ToJson(JsonParser parser, object value, Type type, int depth)
         {
             parser.Append('\"');
             parser.Append(value.ToString());
@@ -16,19 +16,19 @@ namespace CatJson
         }
 
         /// <inheritdoc />
-        public object ParseJson(JsonParser parser, Type type, Type realType)
+        public object ParseJson(JsonParser parser, Type type)
         {
             object enumOBj = null;
             var nextTokenType = parser.Lexer.LookNextTokenType();
             if (nextTokenType == TokenType.String)
             {
                 RangeString rs = parser.Lexer.GetNextTokenByType(TokenType.String);
-                enumOBj = Enum.Parse(realType, rs.ToString());
+                enumOBj = Enum.Parse(type, rs.ToString());
             }
             else if (nextTokenType == TokenType.Number)
             {
                 RangeString rs = parser.Lexer.GetNextTokenByType(TokenType.Number);
-                enumOBj = Enum.ToObject(realType, rs.AsInt());
+                enumOBj = Enum.ToObject(type, rs.AsInt());
             }
             return enumOBj;
         }

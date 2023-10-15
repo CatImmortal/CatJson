@@ -9,7 +9,7 @@ namespace CatJson
     public class JsonValueFormatter : BaseJsonFormatter<JsonValue>
     {
         /// <inheritdoc />
-        public override void ToJson(JsonParser parser, JsonValue value, Type type, Type realType, int depth)
+        public override void ToJson(JsonParser parser, JsonValue value, Type type, int depth)
         {
             switch (value.Type)
             {
@@ -17,25 +17,25 @@ namespace CatJson
                     parser.Append("null");
                     break;
                 case ValueType.Boolean:
-                    parser.ToJson((bool)value,0);
+                    parser.InternalToJson((bool)value,typeof(bool),0);
                     break;
                 case ValueType.Number:
-                    parser.ToJson((double)value,0);
+                    parser.InternalToJson((double)value,typeof(double),0);
                     break;
                 case ValueType.String:
-                    parser.ToJson((string)value,0);
+                    parser.InternalToJson((string)value,typeof(string),0);
                     break;
                 case ValueType.Array:
-                    parser.ToJson((List<JsonValue>)value, depth);
+                    parser.InternalToJson((List<JsonValue>)value,typeof(List<JsonValue>), depth);
                     break;
                 case ValueType.Object:
-                    parser.ToJson((JsonObject)value, depth);
+                    parser.InternalToJson((JsonObject)value,typeof(JsonObject), depth);
                     break;
             }
         }
 
         /// <inheritdoc />
-        public override JsonValue ParseJson(JsonParser parser, Type type, Type realType)
+        public override JsonValue ParseJson(JsonParser parser, Type type)
         {
             //这里只能look不能get，get交给各类型的formatter去进行
             TokenType nextTokenType = parser.Lexer.LookNextTokenType();

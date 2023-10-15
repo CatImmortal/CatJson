@@ -8,13 +8,13 @@ namespace CatJson
     public class DecimalFormatter : BaseJsonFormatter<decimal>
     {
         /// <inheritdoc />
-        public override void ToJson(JsonParser parser, decimal value, Type type, Type realType, int depth)
+        public override void ToJson(JsonParser parser, decimal value, Type type, int depth)
         {
             parser.Append(value.ToString());
         }
 
         /// <inheritdoc />
-        public override decimal ParseJson(JsonParser parser, Type type, Type realType)
+        public override decimal ParseJson(JsonParser parser, Type type)
         {
             RangeString rs = parser.Lexer.GetNextTokenByType(TokenType.Number);
             return rs.AsDecimal();

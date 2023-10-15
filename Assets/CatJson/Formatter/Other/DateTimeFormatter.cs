@@ -8,7 +8,7 @@ namespace CatJson
     public class DateTimeFormatter : BaseJsonFormatter<DateTime>
     {
         /// <inheritdoc />
-        public override void ToJson(JsonParser parser, DateTime value, Type type, Type realType, int depth)
+        public override void ToJson(JsonParser parser, DateTime value, Type type, int depth)
         {
             parser.Append('\"');
             parser.Append(value.ToString());
@@ -16,7 +16,7 @@ namespace CatJson
         }
 
         /// <inheritdoc />
-        public override DateTime ParseJson(JsonParser parser, Type type, Type realType)
+        public override DateTime ParseJson(JsonParser parser, Type type)
         {
             RangeString rs = parser.Lexer.GetNextTokenByType(TokenType.String);
             return rs.AsDateTime();

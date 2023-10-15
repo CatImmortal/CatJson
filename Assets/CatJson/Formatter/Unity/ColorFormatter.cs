@@ -9,7 +9,7 @@ namespace CatJson
     public class ColorFormatter : BaseJsonFormatter<Color>
     {
         /// <inheritdoc />
-        public override void ToJson(JsonParser parser, Color value, Type type, Type realType, int depth)
+        public override void ToJson(JsonParser parser, Color value, Type type, int depth)
         {
 
             parser.Append('{');
@@ -24,7 +24,7 @@ namespace CatJson
         }
 
         /// <inheritdoc />
-        public override Color ParseJson(JsonParser parser, Type type, Type realType)
+        public override Color ParseJson(JsonParser parser, Type type)
         {
             parser.Lexer.GetNextTokenByType(TokenType.LeftBrace);
             float r = parser.Lexer.GetNextTokenByType(TokenType.Number).AsFloat();

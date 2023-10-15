@@ -18,7 +18,7 @@ namespace CatJson
         private const string objectKey = "<>Object";
         
         /// <inheritdoc />
-        public void ToJson(JsonParser parser, object value, Type type, Type realType, int depth)
+        public void ToJson(JsonParser parser, object value, Type type, int depth)
         {
             parser.AppendLine("{");
                 
@@ -27,7 +27,7 @@ namespace CatJson
             parser.Append(RealTypeKey);
             parser.Append("\"");
             parser.Append(":");
-            parser.Append(TypeUtil.GetTypeString(realType));
+            parser.Append(TypeUtil.GetTypeString(type));
                 
             parser.AppendLine(",");
                 
@@ -36,14 +36,14 @@ namespace CatJson
             parser.Append(objectKey);
             parser.Append("\"");
             parser.Append(":");
-            parser.InternalToJson(value,type,realType,depth + 1,false);
+            parser.InternalToJson(value,type,depth + 1);
                 
             parser.AppendLine(string.Empty);
             parser.Append("}", depth);
         }
 
         /// <inheritdoc />
-        public object ParseJson(JsonParser parser, Type type, Type realType)
+        public object ParseJson(JsonParser parser, Type type)
         {
            
             //{
@@ -65,7 +65,7 @@ namespace CatJson
             parser.Lexer.GetNextTokenByType(TokenType.Colon);
             
             //读取被多态序列化的对象的Json文本并反序列化
-            object obj = parser.InternalParseJson(type,realType,false);
+            object obj = parser.InternalParseJson(type);
             
             //跳过}
             parser.Lexer.GetNextTokenByType(TokenType.RightBrace);

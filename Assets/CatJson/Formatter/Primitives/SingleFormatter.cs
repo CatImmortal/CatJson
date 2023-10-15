@@ -8,13 +8,13 @@ namespace CatJson
     public class SingleFormatter : BaseJsonFormatter<float>
     {
         /// <inheritdoc />
-        public override void ToJson(JsonParser parser, float value, Type type, Type realType, int depth)
+        public override void ToJson(JsonParser parser, float value, Type type, int depth)
         {
             parser.Append(value.ToString());
         }
 
         /// <inheritdoc />
-        public override float ParseJson(JsonParser parser, Type type, Type realType)
+        public override float ParseJson(JsonParser parser, Type type)
         {
             RangeString rs = parser.Lexer.GetNextTokenByType(TokenType.Number);
             return rs.AsFloat();

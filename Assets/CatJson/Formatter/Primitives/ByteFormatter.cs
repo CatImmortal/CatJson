@@ -7,12 +7,12 @@ namespace CatJson
     /// </summary>
     public class ByteFormatter : BaseJsonFormatter<byte>
     {
-        public override void ToJson(JsonParser parser, byte value, Type type, Type realType, int depth)
+        public override void ToJson(JsonParser parser, byte value, Type type, int depth)
         {
             parser.Append(value.ToString());
         }
 
-        public override byte ParseJson(JsonParser parser, Type type, Type realType)
+        public override byte ParseJson(JsonParser parser, Type type)
         {
             RangeString rs = parser.Lexer.GetNextTokenByType(TokenType.Number);
             return rs.AsByte();

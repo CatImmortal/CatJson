@@ -10,7 +10,6 @@ namespace CatJson
     /// </summary>
     public class TypeMetaData
     {
-
         /// <summary>
         /// 类型信息
         /// </summary>
@@ -45,11 +44,26 @@ namespace CatJson
         /// 需要忽略处理的字段/属性名
         /// </summary>
         private readonly HashSet<string> ignoreMembers = new HashSet<string>();
-        
+
+        private bool isInit;
+
         public TypeMetaData(Type type)
         {
             this.type = type;
             IsCareDefaultValue = Attribute.IsDefined(type, typeof(JsonCareDefaultValueAttribute));
+        }
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        internal void TryInit()
+        {
+            if (isInit)
+            {
+                return;
+            }
+
+            isInit = true;
             
             //收集字段信息
             FieldInfo[] fis = type.GetFields(TypeMetaDataManager.Flags);
@@ -59,8 +73,6 @@ namespace CatJson
                 {
                     continue;
                 }
-
-
                 string name = fi.Name;
                 JsonKeyAttribute jsonKey = fi.GetCustomAttribute<JsonKeyAttribute>();
                 if (jsonKey != null)
@@ -91,13 +103,12 @@ namespace CatJson
                     PropertyInfos.Add(new RangeString(name),pi);
                 }
             }
-
         }
-
+        
         /// <summary>
         /// 是否需要忽略此字段/属性
         /// </summary>
-        private bool IsIgnoreMember(MemberInfo mi,string name)
+        public bool IsIgnoreMember(MemberInfo mi,string name)
         {
             if (Attribute.IsDefined(mi, typeof(JsonIgnoreAttribute)))
             {
