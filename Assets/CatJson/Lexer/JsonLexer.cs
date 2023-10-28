@@ -261,7 +261,7 @@ namespace CatJson
 
             int endIndex = CurIndex - 1;
 
-            RangeString rs = new RangeString(json, startIndex, endIndex);
+            RangeString rs = new RangeString(json, startIndex, endIndex, CurIndex);
 
             return rs;
             
@@ -279,9 +279,22 @@ namespace CatJson
             int startIndex = CurIndex;
 
             char c = json[CurIndex];
-            while (!(CurIndex >= json.Length) & c != '"')
+
+            while (true)
             {
-                if ((c == '\r' || c =='\n') && IsPrefix(Environment.NewLine))
+                if (CurIndex >= json.Length)
+                {
+                    //到达末尾了
+                    break;
+                }
+
+                if (c == '"' && json[CurIndex - 1] != '\\')
+                {
+                    //遇到第二个双引号（非转义的）
+                    break;
+                }
+                
+                if ((c == '\r' || c == '\n') && IsPrefix(Environment.NewLine))
                 {
                     CurLine++;
                     Next(Environment.NewLine.Length);
@@ -294,26 +307,6 @@ namespace CatJson
                 c = json[CurIndex];
             }
             
-            //到这里碰到了第二个双引号" 但如果是被转义\" 的需要继续
-            bool isNeedBack = false;
-            if (json[CurIndex-1] == '\\')
-            {
-                int index = 2;
-                while (CurIndex-index!=0 && json[CurIndex-index]=='\\' )
-                {
-                    index++;
-                }
-                if (index%2==0)
-                {
-                    ScanString();
-                    isNeedBack = true;
-                }
-            }
-
-            if (isNeedBack)
-            {
-                Next(-1);
-            }
             int endIndex = CurIndex - 1;
 
             if (CurIndex >= json.Length)
@@ -326,7 +319,7 @@ namespace CatJson
                 Next();
             }
 
-            RangeString rs = new RangeString(json, startIndex, endIndex);
+            RangeString rs = new RangeString(json, startIndex, endIndex,CurLine);
 
             return rs;
         }

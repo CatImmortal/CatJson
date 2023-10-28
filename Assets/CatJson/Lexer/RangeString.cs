@@ -35,17 +35,23 @@ namespace CatJson
         /// </summary>
         private int hashCode;
 
+        /// <summary>
+        /// 行号
+        /// </summary>
+        private int curLine;
+
         public char this[int index] => source[startIndex + index];
 
-        public RangeString(string source) : this(source,0,source.Length - 1)
+        public RangeString(string source) : this(source,0,source.Length - 1, 0)
         {
         }
 
-        public RangeString(string source, int startIndex, int endIndex)
+        public RangeString(string source, int startIndex, int endIndex, int curLine)
         {
             this.source = source;
             this.startIndex = startIndex;
             this.endIndex = endIndex;
+            this.curLine = curLine;
             Length = (endIndex - startIndex) + 1;
             hashCode = 0;
         }
@@ -136,7 +142,7 @@ namespace CatJson
 
                 if (i == endIndex)
                 {
-                    throw new Exception("处理转义字符失败，\\后没有剩余字符");
+                    throw new Exception($"处理转义字符失败，\\后没有剩余字符,行号:{curLine}");
                 }
 
                 //检测\后的下一个字符
@@ -175,7 +181,7 @@ namespace CatJson
                         i += 4;
                         break;
                     default:
-                        throw new Exception("处理转义字符失败，\\后的字符不在可转义范围内");
+                        throw new Exception($"处理转义字符失败，\\后的字符不在可转义范围内,行号:{curLine}");
                 }
 
 
